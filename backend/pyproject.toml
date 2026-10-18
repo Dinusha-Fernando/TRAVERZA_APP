@@ -1,0 +1,43 @@
+[project]
+name = "traverza-backend"
+version = "0.1.0"
+description = "TRAVERZA: Connected Travel Operating Platform for Sri Lanka - Modular Monolith API"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "pydantic>=2.9.0",
+    "pydantic-settings>=2.5.0",
+    "SQLAlchemy>=2.0.35",
+    "alembic>=1.13.3",
+    "asyncpg>=0.29.0",
+    "psycopg2-binary>=2.9.9",
+    "geoalchemy2>=0.15.2",
+    "shapely>=2.0.6",
+    "argon2-cffi>=23.1.0",
+    "PyJWT>=2.9.0",
+    "python-multipart>=0.0.12",
+    "redis>=5.1.0",
+    "celery>=5.4.0",
+    "httpx>=0.27.2",
+    "boto3>=1.35.0",
+]
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP", "B", "C4"]
+ignore = ["B008"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-ra -q --asyncio-mode=auto"
+testpaths = ["tests"]
+pythonpath = ["."]
