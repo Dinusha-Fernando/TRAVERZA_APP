@@ -1,6 +1,7 @@
 import json
 import uuid
-from typing import Any, Dict
+from typing import Any
+
 from fastapi import APIRouter, Depends, Header, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -28,7 +29,7 @@ router = APIRouter(prefix="/payments", tags=["Payments & Ledger"])
 @router.post("/intents", response_model=PaymentIntentResponse, status_code=status.HTTP_201_CREATED)
 async def create_payment_intent(
     req: PaymentIntentCreateRequest,
-    token_payload: Dict[str, Any] = Depends(get_current_user_token),
+    token_payload: dict[str, Any] = Depends(get_current_user_token),
     db: AsyncSession = Depends(get_db),
 ):
     # Check idempotency
@@ -134,7 +135,7 @@ async def receive_payment_webhook(
         # Debit: Cash in transit / Gateway (Asset)
         # Credit: Platform Escrow / Customer Funds (Liability)
         tx_id = uuid.uuid4()
-        
+
         # Ensure default accounts exist
         cash_acc = (await db.execute(select(LedgerAccount).where(LedgerAccount.code == "GATEWAY_CASH"))).scalar_one_or_none()
         if not cash_acc:

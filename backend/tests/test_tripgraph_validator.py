@@ -1,6 +1,6 @@
 import uuid
 from datetime import time
-import pytest
+
 from app.modules.tripgraph.schemas import (
     DependencyEdgeValidationInput,
     ItineraryItemValidationInput,

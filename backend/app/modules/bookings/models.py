@@ -1,8 +1,8 @@
 import uuid
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
+
 from sqlalchemy import BigInteger, ForeignKey, String, Text
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base, TimestampMixin, UUIDMixin
@@ -24,10 +24,10 @@ class QuoteSnapshot(Base, UUIDMixin, TimestampMixin):
     )
     amount_minor: Mapped[int] = mapped_column(BigInteger, nullable=False)
     currency: Mapped[str] = mapped_column(String(3), default="LKR", nullable=False)
-    inclusions_json: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    inclusions_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     cancellation_terms: Mapped[str] = mapped_column(String(100), nullable=False)
     expires_at: Mapped[datetime] = mapped_column(nullable=False)
-    captured_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc), nullable=False)
+    captured_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(UTC), nullable=False)
 
 
 class ServiceBooking(Base, UUIDMixin, TimestampMixin):
@@ -47,14 +47,14 @@ class ServiceBooking(Base, UUIDMixin, TimestampMixin):
     quote_snapshot_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("quote_snapshots.id", ondelete="RESTRICT"), nullable=False
     )
-    
+
     # Status: 'REQUEST_SUBMITTED', 'PROVIDER_ACCEPTED', 'CONFIRMED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'EXCEPTION'
     status: Mapped[str] = mapped_column(String(50), default="REQUEST_SUBMITTED", nullable=False, index=True)
     amount_minor: Mapped[int] = mapped_column(BigInteger, nullable=False)
     currency: Mapped[str] = mapped_column(String(3), default="LKR", nullable=False)
     response_deadline_at: Mapped[datetime] = mapped_column(nullable=False)
-    confirmed_at: Mapped[Optional[datetime]] = mapped_column(nullable=True)
-    cancellation_reason: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    confirmed_at: Mapped[datetime | None] = mapped_column(nullable=True)
+    cancellation_reason: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
 
 class BookingEvent(Base, UUIDMixin, TimestampMixin):
@@ -69,4 +69,4 @@ class BookingEvent(Base, UUIDMixin, TimestampMixin):
     to_status: Mapped[str] = mapped_column(String(50), nullable=False)
     actor_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False)
     actor_role: Mapped[str] = mapped_column(String(50), nullable=False)
-    reason: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    reason: Mapped[str | None] = mapped_column(String(255), nullable=True)

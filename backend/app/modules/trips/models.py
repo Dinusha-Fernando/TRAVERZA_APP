@@ -1,6 +1,6 @@
 import uuid
 from datetime import date, time
-from typing import List, Optional
+
 from sqlalchemy import Boolean, Date, Float, ForeignKey, Integer, String, Time
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -21,12 +21,12 @@ class Trip(Base, UUIDMixin, TimestampMixin):
     end_date: Mapped[date] = mapped_column(Date, nullable=False)
     party_size: Mapped[int] = mapped_column(Integer, default=2, nullable=False)
     corridor_name: Mapped[str] = mapped_column(String(100), default="Colombo - Sigiriya - Kandy - Nuwara Eliya")
-    
+
     # Status: 'DRAFT', 'QUOTED', 'REQUEST_SUBMITTED', 'PARTIALLY_CONFIRMED', 'CONFIRMED', 'ACTIVE', 'COMPLETED'
     status: Mapped[str] = mapped_column(String(50), default="DRAFT", nullable=False)
     version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
 
-    days: Mapped[List["ItineraryDay"]] = relationship(
+    days: Mapped[list["ItineraryDay"]] = relationship(
         "ItineraryDay", back_populates="trip", cascade="all, delete-orphan", order_by="ItineraryDay.day_number"
     )
 
@@ -39,10 +39,10 @@ class ItineraryDay(Base, UUIDMixin, TimestampMixin):
     )
     day_number: Mapped[int] = mapped_column(Integer, nullable=False)
     date: Mapped[date] = mapped_column(Date, nullable=False)
-    title: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    title: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
     trip: Mapped["Trip"] = relationship("Trip", back_populates="days")
-    items: Mapped[List["ItineraryItem"]] = relationship(
+    items: Mapped[list["ItineraryItem"]] = relationship(
         "ItineraryItem", back_populates="day", cascade="all, delete-orphan", order_by="ItineraryItem.start_time"
     )
 
@@ -53,10 +53,10 @@ class ItineraryItem(Base, UUIDMixin, TimestampMixin):
     day_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("itinerary_days.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    listing_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+    listing_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("listings.id", ondelete="SET NULL"), nullable=True
     )
-    place_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+    place_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("places.id", ondelete="SET NULL"), nullable=True
     )
     title: Mapped[str] = mapped_column(String(255), nullable=False)

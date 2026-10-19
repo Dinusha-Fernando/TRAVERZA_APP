@@ -1,10 +1,9 @@
 import math
-from typing import Tuple
 
 
 def haversine_distance_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     """Calculate the great-circle distance between two points in km."""
-    R = 6371.0  # Earth radius in km
+    radius_km = 6371.0  # Earth radius in km
 
     dlat = math.radians(lat2 - lat1)
     dlon = math.radians(lon2 - lon1)
@@ -15,7 +14,7 @@ def haversine_distance_km(lat1: float, lon1: float, lat2: float, lon2: float) ->
         * math.sin(dlon / 2) ** 2
     )
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-    return R * c
+    return radius_km * c
 
 
 class SriLankaTransitCalculator:
@@ -39,8 +38,8 @@ class SriLankaTransitCalculator:
     @classmethod
     def estimate_travel_time_minutes(
         cls,
-        origin: Tuple[float, float],
-        destination: Tuple[float, float],
+        origin: tuple[float, float],
+        destination: tuple[float, float],
         is_expressway: bool = False,
     ) -> int:
         """

@@ -1,11 +1,10 @@
-import json
 import uuid
+
 import pytest
 from httpx import ASGITransport, AsyncClient
 
-from app.core.database import get_db
 from app.main import app
-from app.modules.payments.models import LedgerEntry, PaymentIntent, WebhookEvent
+from app.modules.payments.models import LedgerEntry, PaymentIntent
 
 
 @pytest.mark.asyncio

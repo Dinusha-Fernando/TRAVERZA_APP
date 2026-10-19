@@ -1,5 +1,5 @@
-from datetime import datetime, timedelta
-from typing import List
+from datetime import datetime
+
 from app.modules.tripgraph.schemas import (
     DependencyEdgeValidationInput,
     HardError,
@@ -16,11 +16,11 @@ class TripGraphValidator:
     @classmethod
     def validate_itinerary(
         cls,
-        items: List[ItineraryItemValidationInput],
-        edges: List[DependencyEdgeValidationInput],
+        items: list[ItineraryItemValidationInput],
+        edges: list[DependencyEdgeValidationInput],
     ) -> ValidationResult:
-        hard_errors: List[HardError] = []
-        warnings: List[WarningItem] = []
+        hard_errors: list[HardError] = []
+        warnings: list[WarningItem] = []
 
         item_map = {item.id: item for item in items}
 

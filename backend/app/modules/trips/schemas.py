@@ -1,12 +1,12 @@
 import uuid
 from datetime import date, time
-from typing import List, Optional
+
 from pydantic import BaseModel
 
 
 class ItineraryItemCreateRequest(BaseModel):
-    listing_id: Optional[uuid.UUID] = None
-    place_id: Optional[uuid.UUID] = None
+    listing_id: uuid.UUID | None = None
+    place_id: uuid.UUID | None = None
     title: str
     category: str
     start_time: time
@@ -20,8 +20,8 @@ class ItineraryItemCreateRequest(BaseModel):
 class ItineraryItemResponse(BaseModel):
     id: uuid.UUID
     day_id: uuid.UUID
-    listing_id: Optional[uuid.UUID]
-    place_id: Optional[uuid.UUID]
+    listing_id: uuid.UUID | None
+    place_id: uuid.UUID | None
     title: str
     category: str
     start_time: time
@@ -39,8 +39,8 @@ class ItineraryDayResponse(BaseModel):
     id: uuid.UUID
     day_number: int
     date: date
-    title: Optional[str]
-    items: List[ItineraryItemResponse] = []
+    title: str | None
+    items: list[ItineraryItemResponse] = []
 
     model_config = {"from_attributes": True}
 
@@ -63,6 +63,6 @@ class TripResponse(BaseModel):
     corridor_name: str
     status: str
     version: int
-    days: List[ItineraryDayResponse] = []
+    days: list[ItineraryDayResponse] = []
 
     model_config = {"from_attributes": True}

@@ -1,5 +1,5 @@
 import uuid
-from typing import Optional
+
 from sqlalchemy import String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
@@ -18,6 +18,6 @@ class AuditEvent(Base, UUIDMixin, TimestampMixin):
     action: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
     resource_type: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
     resource_id: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
-    previous_state: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    new_state: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    previous_state: Mapped[str | None] = mapped_column(Text, nullable=True)
+    new_state: Mapped[str | None] = mapped_column(Text, nullable=True)
     reason: Mapped[str] = mapped_column(String(500), nullable=False)

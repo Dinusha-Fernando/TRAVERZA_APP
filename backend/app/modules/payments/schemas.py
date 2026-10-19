@@ -1,5 +1,6 @@
 import uuid
-from typing import Any, Dict
+from typing import Any
+
 from pydantic import BaseModel
 
 
@@ -27,4 +28,4 @@ class WebhookPayload(BaseModel):
     gateway_reference: str
     amount_minor: int
     currency: str = "LKR"
-    data: Dict[str, Any] = {}
+    data: dict[str, Any] = {}

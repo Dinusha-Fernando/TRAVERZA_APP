@@ -1,7 +1,9 @@
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
+
 import pytest
-from app.core.errors import ForbiddenException, QuoteExpiredException
+
+from app.core.errors import ForbiddenException
 from app.core.security import TenantContext
 from app.modules.trips.models import ItineraryItem
 from app.modules.trips.router import derive_trip_status

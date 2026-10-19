@@ -1,12 +1,12 @@
 import uuid
-from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, Optional
+from datetime import UTC, datetime, timedelta
+from typing import Any
+
+import jwt
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
-import jwt
 from fastapi import Depends, Header
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
@@ -41,17 +41,17 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 def create_access_token(
     subject: str,
-    extra_claims: Optional[Dict[str, Any]] = None,
-    expires_delta: Optional[timedelta] = None,
+    extra_claims: dict[str, Any] | None = None,
+    expires_delta: timedelta | None = None,
 ) -> str:
     """Generate signed JWT access token."""
-    expire = datetime.now(timezone.utc) + (
+    expire = datetime.now(UTC) + (
         expires_delta or timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     )
-    payload: Dict[str, Any] = {
+    payload: dict[str, Any] = {
         "sub": subject,
         "exp": expire,
-        "iat": datetime.now(timezone.utc),
+        "iat": datetime.now(UTC),
         "type": "access",
     }
     if extra_claims:
@@ -60,7 +60,7 @@ def create_access_token(
     return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
 
 
-def decode_token(token: str) -> Dict[str, Any]:
+def decode_token(token: str) -> dict[str, Any]:
     """Decode and validate JWT token."""
     try:
         return jwt.decode(
@@ -69,9 +69,9 @@ def decode_token(token: str) -> Dict[str, Any]:
             algorithms=[settings.JWT_ALGORITHM],
         )
     except jwt.ExpiredSignatureError:
-        raise UnauthorizedException("Token has expired")
+        raise UnauthorizedException("Token has expired") from None
     except jwt.InvalidTokenError:
-        raise UnauthorizedException("Invalid authentication token")
+        raise UnauthorizedException("Invalid authentication token") from None
 
 
 class AuthenticatedUserContext:
@@ -83,8 +83,8 @@ class AuthenticatedUserContext:
 
 
 async def get_current_user_token(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security_scheme),
-) -> Dict[str, Any]:
+    credentials: HTTPAuthorizationCredentials | None = Depends(security_scheme),
+) -> dict[str, Any]:
     if not credentials or not credentials.credentials:
         raise UnauthorizedException("Authorization header missing or invalid")
     return decode_token(credentials.credentials)
@@ -93,13 +93,13 @@ async def get_current_user_token(
 class TenantContext:
     """Enforces organization-scoped tenancy isolation for provider routes."""
 
-    def __init__(self, required_permission: Optional[str] = None):
+    def __init__(self, required_permission: str | None = None):
         self.required_permission = required_permission
 
     async def __call__(
         self,
-        token_payload: Dict[str, Any] = Depends(get_current_user_token),
-        x_organization_id: Optional[str] = Header(None, alias="X-Organization-ID"),
+        token_payload: dict[str, Any] = Depends(get_current_user_token),
+        x_organization_id: str | None = Header(None, alias="X-Organization-ID"),
         db: AsyncSession = Depends(get_db),
     ) -> uuid.UUID:
         if not x_organization_id:
@@ -108,7 +108,7 @@ class TenantContext:
         try:
             target_org_id = uuid.UUID(x_organization_id)
         except ValueError:
-            raise ForbiddenException("Invalid X-Organization-ID format")
+            raise ForbiddenException("Invalid X-Organization-ID format") from None
 
         # In production, check membership in DB; token contains list of allowed orgs
         user_orgs = token_payload.get("org_ids", [])

@@ -1,6 +1,7 @@
 import uuid
-from datetime import datetime, timedelta, timezone
-from typing import Any, Dict
+from datetime import UTC, datetime, timedelta
+from typing import Any
+
 from fastapi import APIRouter, Depends, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -31,14 +32,14 @@ router = APIRouter(tags=["Quotes & Bookings"])
 async def create_quote_snapshot(
     trip_id: uuid.UUID,
     req: QuoteCreateRequest,
-    token_payload: Dict[str, Any] = Depends(get_current_user_token),
+    token_payload: dict[str, Any] = Depends(get_current_user_token),
     db: AsyncSession = Depends(get_db),
 ):
     listing = await db.get(Listing, req.listing_id)
     if not listing:
         raise NotFoundException("Listing", req.listing_id)
 
-    expires_at = datetime.now(timezone.utc) + timedelta(hours=req.validity_hours)
+    expires_at = datetime.now(UTC) + timedelta(hours=req.validity_hours)
 
     quote = QuoteSnapshot(
         trip_id=trip_id,
@@ -58,7 +59,7 @@ async def create_quote_snapshot(
 @router.post("/bookings", response_model=BookingResponse, status_code=status.HTTP_201_CREATED)
 async def create_booking_request(
     req: BookingCreateRequest,
-    token_payload: Dict[str, Any] = Depends(get_current_user_token),
+    token_payload: dict[str, Any] = Depends(get_current_user_token),
     db: AsyncSession = Depends(get_db),
 ):
     traveler_id = uuid.UUID(token_payload["sub"])
@@ -71,9 +72,9 @@ async def create_booking_request(
     if not quote:
         raise NotFoundException("QuoteSnapshot", req.quote_snapshot_id)
 
-    now_utc = datetime.now(timezone.utc)
+    now_utc = datetime.now(UTC)
     # Ensure timezone awareness for comparison
-    quote_exp = quote.expires_at if quote.expires_at.tzinfo else quote.expires_at.replace(tzinfo=timezone.utc)
+    quote_exp = quote.expires_at if quote.expires_at.tzinfo else quote.expires_at.replace(tzinfo=UTC)
     if now_utc > quote_exp:
         raise QuoteExpiredException(str(quote.id))
 
@@ -127,7 +128,7 @@ async def provider_respond_to_booking(
     booking_id: uuid.UUID,
     req: ProviderRespondRequest,
     org_id: uuid.UUID = Depends(TenantContext()),
-    token_payload: Dict[str, Any] = Depends(get_current_user_token),
+    token_payload: dict[str, Any] = Depends(get_current_user_token),
     db: AsyncSession = Depends(get_db),
 ):
     booking = await db.get(ServiceBooking, booking_id)
@@ -143,7 +144,7 @@ async def provider_respond_to_booking(
 
     if req.action == "ACCEPT":
         booking.status = "PROVIDER_ACCEPTED"
-        booking.confirmed_at = datetime.now(timezone.utc)
+        booking.confirmed_at = datetime.now(UTC)
     elif req.action == "DECLINE":
         booking.status = "CANCELLED"
         booking.cancellation_reason = req.reason or "Provider declined"

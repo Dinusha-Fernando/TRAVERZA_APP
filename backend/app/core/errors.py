@@ -1,7 +1,8 @@
-from typing import Any, Dict, Optional
+import uuid
+from typing import Any
+
 from fastapi import Request, status
 from fastapi.responses import JSONResponse
-import uuid
 
 
 class TraverzaException(Exception):
@@ -12,7 +13,7 @@ class TraverzaException(Exception):
         code: str,
         message: str,
         status_code: int = status.HTTP_400_BAD_REQUEST,
-        details: Optional[Dict[str, Any]] = None,
+        details: dict[str, Any] | None = None,
     ):
         self.code = code
         self.message = message
@@ -60,7 +61,7 @@ class QuoteExpiredException(TraverzaException):
 
 
 class DependencyConflictException(TraverzaException):
-    def __init__(self, message: str, conflicts: Dict[str, Any]):
+    def __init__(self, message: str, conflicts: dict[str, Any]):
         super().__init__(
             code="DEPENDENCY_CONFLICT",
             message=message,

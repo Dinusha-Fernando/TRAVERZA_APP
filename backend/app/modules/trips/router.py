@@ -1,6 +1,7 @@
 import uuid
 from datetime import timedelta
-from typing import Any, Dict, List
+from typing import Any
+
 from fastapi import APIRouter, Depends, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -27,7 +28,7 @@ from app.modules.trips.schemas import (
 router = APIRouter(prefix="/trips", tags=["Trips & Itinerary"])
 
 
-def derive_trip_status(items: List[ItineraryItem]) -> str:
+def derive_trip_status(items: list[ItineraryItem]) -> str:
     """
     Enforces Gate 6: A trip is NEVER 'CONFIRMED' if any required booking is pending.
     """
@@ -52,7 +53,7 @@ def derive_trip_status(items: List[ItineraryItem]) -> str:
 @router.post("", response_model=TripResponse, status_code=status.HTTP_201_CREATED)
 async def create_trip(
     req: TripCreateRequest,
-    token_payload: Dict[str, Any] = Depends(get_current_user_token),
+    token_payload: dict[str, Any] = Depends(get_current_user_token),
     db: AsyncSession = Depends(get_db),
 ):
     traveler_id = uuid.UUID(token_payload["sub"])
@@ -95,7 +96,7 @@ async def create_trip(
 @router.get("/{trip_id}", response_model=TripResponse)
 async def get_trip(
     trip_id: uuid.UUID,
-    token_payload: Dict[str, Any] = Depends(get_current_user_token),
+    token_payload: dict[str, Any] = Depends(get_current_user_token),
     db: AsyncSession = Depends(get_db),
 ):
     stmt = (
@@ -127,7 +128,7 @@ async def add_itinerary_item(
     trip_id: uuid.UUID,
     day_number: int,
     req: ItineraryItemCreateRequest,
-    token_payload: Dict[str, Any] = Depends(get_current_user_token),
+    token_payload: dict[str, Any] = Depends(get_current_user_token),
     db: AsyncSession = Depends(get_db),
 ):
     stmt = (
@@ -172,7 +173,7 @@ async def add_itinerary_item(
 @router.post("/{trip_id}/validate", response_model=ValidationResult)
 async def validate_trip_itinerary(
     trip_id: uuid.UUID,
-    token_payload: Dict[str, Any] = Depends(get_current_user_token),
+    token_payload: dict[str, Any] = Depends(get_current_user_token),
     db: AsyncSession = Depends(get_db),
 ):
     stmt = (
@@ -189,7 +190,7 @@ async def validate_trip_itinerary(
     edge_res = await db.execute(select(DependencyEdge).where(DependencyEdge.trip_id == trip_id))
     edges = edge_res.scalars().all()
 
-    validation_items: List[ItineraryItemValidationInput] = []
+    validation_items: list[ItineraryItemValidationInput] = []
     for day in trip.days:
         for it in day.items:
             validation_items.append(

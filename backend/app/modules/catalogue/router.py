@@ -1,11 +1,10 @@
 import uuid
-from typing import List, Optional
+
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.core.errors import NotFoundException
 from app.core.security import TenantContext
 from app.modules.catalogue.models import Destination, Listing, Place
 from app.modules.catalogue.schemas import (
@@ -18,9 +17,9 @@ from app.modules.catalogue.schemas import (
 router = APIRouter(prefix="/catalogue", tags=["Catalogue & Discovery"])
 
 
-@router.get("/destinations", response_model=List[DestinationResponse])
+@router.get("/destinations", response_model=list[DestinationResponse])
 async def list_destinations(
-    corridor: Optional[str] = Query(None),
+    corridor: str | None = Query(None),
     db: AsyncSession = Depends(get_db),
 ):
     query = select(Destination)
@@ -30,7 +29,7 @@ async def list_destinations(
     return result.scalars().all()
 
 
-@router.get("/destinations/{destination_id}/places", response_model=List[PlaceResponse])
+@router.get("/destinations/{destination_id}/places", response_model=list[PlaceResponse])
 async def list_places_by_destination(
     destination_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
@@ -40,10 +39,10 @@ async def list_places_by_destination(
     return result.scalars().all()
 
 
-@router.get("/listings", response_model=List[ListingResponse])
+@router.get("/listings", response_model=list[ListingResponse])
 async def list_published_listings(
-    category: Optional[str] = Query(None),
-    destination_id: Optional[uuid.UUID] = Query(None),
+    category: str | None = Query(None),
+    destination_id: uuid.UUID | None = Query(None),
     db: AsyncSession = Depends(get_db),
 ):
     query = select(Listing).where(Listing.is_published.is_(True))

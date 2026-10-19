@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from typing import Optional
+
 from pydantic import BaseModel
 
 
@@ -39,11 +39,11 @@ class BookingResponse(BaseModel):
     amount_minor: int
     currency: str
     response_deadline_at: datetime
-    confirmed_at: Optional[datetime]
+    confirmed_at: datetime | None
 
     model_config = {"from_attributes": True}
 
 
 class ProviderRespondRequest(BaseModel):
     action: str  # 'ACCEPT' or 'DECLINE'
-    reason: Optional[str] = None
+    reason: str | None = None

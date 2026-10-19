@@ -1,5 +1,5 @@
 import uuid
-from typing import Optional
+
 from sqlalchemy import BigInteger, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
@@ -19,7 +19,7 @@ class PaymentIntent(Base, UUIDMixin, TimestampMixin):
     gateway_reference: Mapped[str] = mapped_column(String(100), unique=True, index=True, nullable=False)
     amount_minor: Mapped[int] = mapped_column(BigInteger, nullable=False)
     currency: Mapped[str] = mapped_column(String(3), default="LKR", nullable=False)
-    
+
     # Status: 'CREATED', 'AUTHORIZED', 'CAPTURED', 'FAILED', 'REFUNDED'
     status: Mapped[str] = mapped_column(String(50), default="CREATED", nullable=False)
     idempotency_key: Mapped[str] = mapped_column(String(100), unique=True, index=True, nullable=False)
@@ -55,10 +55,10 @@ class LedgerEntry(Base, UUIDMixin, TimestampMixin):
     account_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("ledger_accounts.id", ondelete="RESTRICT"), nullable=False
     )
-    booking_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+    booking_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("service_bookings.id", ondelete="RESTRICT"), nullable=True
     )
     debit_minor: Mapped[int] = mapped_column(BigInteger, default=0, nullable=False)
     credit_minor: Mapped[int] = mapped_column(BigInteger, default=0, nullable=False)
     currency: Mapped[str] = mapped_column(String(3), default="LKR", nullable=False)
-    memo: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    memo: Mapped[str | None] = mapped_column(String(255), nullable=True)

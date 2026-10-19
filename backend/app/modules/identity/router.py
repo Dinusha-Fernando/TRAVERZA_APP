@@ -1,5 +1,6 @@
 import uuid
-from typing import Any, Dict
+from typing import Any
+
 from fastapi import APIRouter, Depends, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -8,11 +9,19 @@ from sqlalchemy.orm import selectinload
 from app.core.config import settings
 from app.core.database import get_db
 from app.core.errors import TraverzaException, UnauthorizedException
-from app.core.security import create_access_token, get_current_user_token, hash_password, verify_password
-from app.modules.identity.models import Organization, OrganizationMembership, User
+from app.core.security import (
+    create_access_token,
+    get_current_user_token,
+    hash_password,
+    verify_password,
+)
+from app.modules.identity.models import Organization, OrganizationMembership, ProviderDocument, User
 from app.modules.identity.schemas import (
     OrganizationCreateRequest,
     OrganizationResponse,
+    ProviderDocumentResponse,
+    ProviderDocumentUploadRequest,
+    ProviderVerificationDecisionRequest,
     TokenResponse,
     UserLoginRequest,
     UserRegisterRequest,
@@ -85,7 +94,7 @@ async def login(req: UserLoginRequest, db: AsyncSession = Depends(get_db)):
 
 @router.get("/me", response_model=UserResponse)
 async def get_me(
-    token_payload: Dict[str, Any] = Depends(get_current_user_token),
+    token_payload: dict[str, Any] = Depends(get_current_user_token),
     db: AsyncSession = Depends(get_db),
 ):
     user_id = uuid.UUID(token_payload["sub"])
@@ -98,7 +107,7 @@ async def get_me(
 @router.post("/organizations", response_model=OrganizationResponse, status_code=status.HTTP_201_CREATED)
 async def create_organization(
     req: OrganizationCreateRequest,
-    token_payload: Dict[str, Any] = Depends(get_current_user_token),
+    token_payload: dict[str, Any] = Depends(get_current_user_token),
     db: AsyncSession = Depends(get_db),
 ):
     user_id = uuid.UUID(token_payload["sub"])
@@ -123,3 +132,71 @@ async def create_organization(
     await db.commit()
     await db.refresh(org)
     return org
+
+
+@router.post("/provider/organizations/{org_id}/documents", response_model=ProviderDocumentResponse, status_code=status.HTTP_201_CREATED)
+async def upload_provider_document(
+    org_id: uuid.UUID,
+    req: ProviderDocumentUploadRequest,
+    token_payload: dict[str, Any] = Depends(get_current_user_token),
+    db: AsyncSession = Depends(get_db),
+):
+    org = await db.get(Organization, org_id)
+    if not org:
+        raise TraverzaException("NOT_FOUND", f"Organization '{org_id}' not found", status_code=status.HTTP_404_NOT_FOUND)
+
+    doc = ProviderDocument(
+        organization_id=org.id,
+        document_type=req.document_type,
+        document_number=req.document_number,
+        file_name=req.file_name,
+        file_url=req.file_url,
+        expiry_date=req.expiry_date,
+        status="PENDING",
+    )
+    db.add(doc)
+    await db.commit()
+    await db.refresh(doc)
+    return doc
+
+
+@router.get("/provider/organizations/{org_id}/documents", response_model=list[ProviderDocumentResponse])
+async def list_provider_documents(
+    org_id: uuid.UUID,
+    token_payload: dict[str, Any] = Depends(get_current_user_token),
+    db: AsyncSession = Depends(get_db),
+):
+    stmt = select(ProviderDocument).where(ProviderDocument.organization_id == org_id)
+    res = await db.execute(stmt)
+    return res.scalars().all()
+
+
+@router.post("/admin/organizations/{org_id}/verify", response_model=OrganizationResponse)
+async def verify_provider_organization(
+    org_id: uuid.UUID,
+    req: ProviderVerificationDecisionRequest,
+    token_payload: dict[str, Any] = Depends(get_current_user_token),
+    db: AsyncSession = Depends(get_db),
+):
+    org = await db.get(Organization, org_id)
+    if not org:
+        raise TraverzaException("NOT_FOUND", f"Organization '{org_id}' not found", status_code=status.HTTP_404_NOT_FOUND)
+
+    if req.decision == "APPROVE":
+        org.is_verified = True
+    elif req.decision == "REJECT":
+        org.is_verified = False
+
+    # Also update pending documents
+    stmt = select(ProviderDocument).where(ProviderDocument.organization_id == org_id)
+    docs = (await db.execute(stmt)).scalars().all()
+    for doc in docs:
+        if doc.status == "PENDING":
+            doc.status = "APPROVED" if req.decision == "APPROVE" else "REJECTED"
+            doc.reviewer_notes = req.reason
+            doc.reviewed_at = "2026-10-20T10:00:00Z"
+
+    await db.commit()
+    await db.refresh(org)
+    return org
+

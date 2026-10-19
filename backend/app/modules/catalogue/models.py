@@ -1,8 +1,8 @@
 import uuid
-from typing import Optional
+
 from sqlalchemy import Boolean, Float, ForeignKey, Integer, String, Text
-from sqlalchemy.dialects.postgresql import JSONB, UUID
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base, TimestampMixin, UUIDMixin
 
@@ -35,10 +35,10 @@ class Place(Base, UUIDMixin, TimestampMixin):
     description: Mapped[str] = mapped_column(Text, nullable=False)
     latitude: Mapped[float] = mapped_column(Float, nullable=False)
     longitude: Mapped[float] = mapped_column(Float, nullable=False)
-    altitude_meters: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    altitude_meters: Mapped[int | None] = mapped_column(Integer, nullable=True)
     recommended_duration_minutes: Mapped[int] = mapped_column(Integer, default=120)
-    opening_time_str: Mapped[Optional[str]] = mapped_column(String(5), default="08:00")
-    closing_time_str: Mapped[Optional[str]] = mapped_column(String(5), default="18:00")
+    opening_time_str: Mapped[str | None] = mapped_column(String(5), default="08:00")
+    closing_time_str: Mapped[str | None] = mapped_column(String(5), default="18:00")
 
 
 class Listing(Base, UUIDMixin, TimestampMixin):
@@ -49,7 +49,7 @@ class Listing(Base, UUIDMixin, TimestampMixin):
     organization_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    destination_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+    destination_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("destinations.id", ondelete="SET NULL"), nullable=True
     )
     title: Mapped[str] = mapped_column(String(255), nullable=False)

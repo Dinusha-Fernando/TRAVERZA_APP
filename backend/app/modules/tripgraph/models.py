@@ -1,5 +1,5 @@
 import uuid
-from typing import Optional
+
 from sqlalchemy import ForeignKey, Integer, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
@@ -25,4 +25,4 @@ class DependencyEdge(Base, UUIDMixin, TimestampMixin):
         String(50), nullable=False
     )  # 'FLIGHT_ARRIVAL_TO_TRANSFER', 'TRANSFER_TO_CHECKIN', 'CHECKIN_TO_ACTIVITY'
     min_buffer_minutes: Mapped[int] = mapped_column(Integer, default=30, nullable=False)
-    description: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    description: Mapped[str | None] = mapped_column(String(255), nullable=True)
