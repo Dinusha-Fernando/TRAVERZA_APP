@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'screens/home_screen.dart';
+import 'theme/app_theme.dart';
 
 void main() {
   runApp(const TraverzaApp());
@@ -12,27 +14,7 @@ class TraverzaApp extends StatelessWidget {
     return MaterialApp(
       title: 'TRAVERZA',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF070B12),
-        primaryColor: const Color(0xFF10B981),
-        colorScheme: const ColorScheme.dark(
-          primary: Color(0xFF10B981),
-          secondary: Color(0xFF3B82F6),
-          surface: Color(0xFF0E1624),
-          error: Color(0xFFF43F5E),
-        ),
-        cardTheme: const CardThemeData(
-          color: Color(0xFF0E1624),
-          elevation: 2,
-          margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-        ),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF0B1320),
-          elevation: 0,
-          centerTitle: false,
-        ),
-      ),
+      theme: AppTheme.darkTheme,
       home: const MainTripScreen(),
     );
   }
@@ -48,109 +30,171 @@ class MainTripScreen extends StatefulWidget {
 class _MainTripScreenState extends State<MainTripScreen> {
   int _currentIndex = 0;
 
-  // State for interactive confirmation
+  // State for interactive confirmation & filter
   bool _hotelConfirmed = false;
+  String? _selectedCategory;
+
+  void _navigateToPlan() {
+    setState(() => _currentIndex = 1);
+  }
+
+  void _navigateToBookings({String? category}) {
+    setState(() {
+      _selectedCategory = category;
+      _currentIndex = 2;
+    });
+  }
+
+  void _navigateToSafety() {
+    setState(() => _currentIndex = 4);
+  }
 
   @override
   Widget build(BuildContext context) {
     final screens = [
+      HomeScreen(
+        hasActiveTrip: true,
+        isHotelConfirmed: _hotelConfirmed,
+        onNavigateToPlan: _navigateToPlan,
+        onCategorySelected: (cat) => _navigateToBookings(category: cat.categoryTag),
+        onNavigateToSafety: _navigateToSafety,
+        onNavigateToCatalogue: () => _navigateToBookings(),
+      ),
       _buildTimelineView(),
       _buildFitToTripCatalogue(),
       _buildReadinessView(),
-      _buildEmergencyVault(),
+      _buildProfileAndEmergencyVault(),
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF10B981), Color(0xFF3B82F6)],
-                ),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Text(
-                'T',
-                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text(
-                  'TRAVERZA',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.2,
-                    fontSize: 16,
-                  ),
-                ),
-                Text(
-                  'SRI LANKA OPERATING PLATFORM',
-                  style: TextStyle(
-                    fontSize: 9,
-                    color: Color(0xFF10B981),
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 1.0,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none, color: Colors.white70),
-            onPressed: () {},
-          ),
-        ],
-      ),
+      appBar: _buildAppBar(),
       body: screens[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
         type: BottomNavigationBarType.fixed,
-        backgroundColor: const Color(0xFF0B1320),
-        selectedItemColor: const Color(0xFF10B981),
+        backgroundColor: TraverzaColors.darkScaffold,
+        selectedItemColor: TraverzaColors.lagoonTeal,
         unselectedItemColor: Colors.white54,
         selectedFontSize: 11,
         unselectedFontSize: 11,
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.route_outlined),
-            activeIcon: Icon(Icons.route),
-            label: 'Timeline',
+            icon: Icon(Icons.explore_outlined),
+            activeIcon: Icon(Icons.explore),
+            label: 'Explore',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.search_outlined),
-            activeIcon: Icon(Icons.search),
-            label: 'Fit-to-Trip',
+            icon: Icon(Icons.alt_route_outlined),
+            activeIcon: Icon(Icons.alt_route),
+            label: 'Plan',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.fact_check_outlined),
-            activeIcon: Icon(Icons.fact_check),
-            label: 'Readiness',
+            icon: Icon(Icons.confirmation_number_outlined),
+            activeIcon: Icon(Icons.confirmation_number),
+            label: 'Bookings',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bookmark_outline_rounded),
+            activeIcon: Icon(Icons.bookmark_rounded),
+            label: 'Saved',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.shield_outlined),
             activeIcon: Icon(Icons.shield),
-            label: 'SOS Vault',
+            label: 'Profile',
           ),
         ],
       ),
     );
   }
 
+  PreferredSizeWidget _buildAppBar() {
+    return AppBar(
+      title: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [TraverzaColors.oceanBlue, TraverzaColors.lagoonTeal],
+              ),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Text(
+              'T',
+              style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: Colors.white),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'TRAVERZA',
+                style: TextStyle(
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.4,
+                  fontSize: 15,
+                  color: Colors.white,
+                ),
+              ),
+              Row(
+                children: const [
+                  Icon(Icons.location_on, size: 10, color: TraverzaColors.lagoonTeal),
+                  SizedBox(width: 2),
+                  Text(
+                    'SRI LANKA · CULTURAL TRIANGLE',
+                    style: TextStyle(
+                      fontSize: 8.5,
+                      color: TraverzaColors.warmSand,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+      actions: [
+        IconButton(
+          icon: Stack(
+            children: [
+              const Icon(Icons.notifications_none_rounded, color: Colors.white70),
+              Positioned(
+                right: 2,
+                top: 2,
+                child: Container(
+                  width: 8,
+                  height: 8,
+                  decoration: const BoxDecoration(
+                    color: TraverzaColors.amberWarning,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          onPressed: () {},
+        ),
+        IconButton(
+          icon: const Icon(Icons.account_circle_outlined, color: Colors.white70),
+          onPressed: () => setState(() => _currentIndex = 4),
+        ),
+      ],
+    );
+  }
+
+  // --- TAB 1: Plan / Trip Canvas Timeline ---
   Widget _buildTimelineView() {
     final statusText = _hotelConfirmed
         ? 'Fully Confirmed (3/3)'
         : 'Partially Confirmed (2/3)';
 
     return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -161,12 +205,12 @@ class _MainTripScreenState extends State<MainTripScreen> {
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [Color(0xFF122238), Color(0xFF0E1624)],
+                colors: [Color(0xFF10283E), Color(0xFF0C1929)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white.withOpacity(0.08)),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: TraverzaColors.lagoonTeal.withOpacity(0.3)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -194,8 +238,8 @@ class _MainTripScreenState extends State<MainTripScreen> {
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
                           color: _hotelConfirmed
-                              ? const Color(0xFF10B981)
-                              : const Color(0xFFF59E0B),
+                              ? TraverzaColors.emeraldSuccess
+                              : TraverzaColors.amberWarning,
                           width: 1,
                         ),
                       ),
@@ -217,7 +261,7 @@ class _MainTripScreenState extends State<MainTripScreen> {
                   'ID: TRIP-LK-2026-9041',
                   style: TextStyle(
                     fontFamily: 'monospace',
-                    color: Color(0xFF10B981),
+                    color: TraverzaColors.lagoonTeal,
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
                   ),
@@ -229,14 +273,14 @@ class _MainTripScreenState extends State<MainTripScreen> {
                 ),
                 const SizedBox(height: 14),
                 Row(
-                  children: [
-                    const Icon(Icons.people_alt_outlined, size: 16, color: Colors.white54),
-                    const SizedBox(width: 6),
-                    const Text('2 Travellers', style: TextStyle(color: Colors.white70, fontSize: 12)),
-                    const SizedBox(width: 16),
-                    const Icon(Icons.payments_outlined, size: 16, color: Colors.white54),
-                    const SizedBox(width: 6),
-                    const Text('LKR 68,500 Total', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                  children: const [
+                    Icon(Icons.people_alt_outlined, size: 16, color: Colors.white54),
+                    SizedBox(width: 6),
+                    Text('2 Travellers', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    SizedBox(width: 16),
+                    Icon(Icons.payments_outlined, size: 16, color: Colors.white54),
+                    SizedBox(width: 6),
+                    Text('LKR 68,500 Total', style: TextStyle(color: Colors.white70, fontSize: 12)),
                   ],
                 ),
               ],
@@ -264,7 +308,7 @@ class _MainTripScreenState extends State<MainTripScreen> {
                   },
                   child: Text(
                     _hotelConfirmed ? 'Simulate Unconfirmed' : 'Simulate Provider Accept',
-                    style: const TextStyle(color: Color(0xFF10B981), fontSize: 12),
+                    style: const TextStyle(color: TraverzaColors.lagoonTeal, fontSize: 12),
                   ),
                 ),
               ],
@@ -297,7 +341,7 @@ class _MainTripScreenState extends State<MainTripScreen> {
             category: 'TRANSFER',
             status: 'CONFIRMED',
             icon: Icons.directions_car,
-            iconColor: const Color(0xFF10B981),
+            iconColor: TraverzaColors.emeraldSuccess,
             price: 'LKR 18,500',
           ),
 
@@ -327,7 +371,7 @@ class _MainTripScreenState extends State<MainTripScreen> {
             category: 'STAY',
             status: _hotelConfirmed ? 'CONFIRMED' : 'REQUEST_SUBMITTED',
             icon: Icons.hotel,
-            iconColor: _hotelConfirmed ? const Color(0xFF10B981) : Colors.orangeAccent,
+            iconColor: _hotelConfirmed ? TraverzaColors.emeraldSuccess : Colors.orangeAccent,
             price: 'LKR 38,000',
           ),
 
@@ -350,10 +394,10 @@ class _MainTripScreenState extends State<MainTripScreen> {
     Color badgeColor = Colors.grey;
     String badgeText = status;
     if (status == 'CONFIRMED') {
-      badgeColor = const Color(0xFF10B981);
+      badgeColor = TraverzaColors.emeraldSuccess;
       badgeText = 'Confirmed';
     } else if (status == 'REQUEST_SUBMITTED') {
-      badgeColor = const Color(0xFFF59E0B);
+      badgeColor = TraverzaColors.amberWarning;
       badgeText = 'Request Pending';
     }
 
@@ -453,7 +497,7 @@ class _MainTripScreenState extends State<MainTripScreen> {
           Container(
             width: 2,
             height: 28,
-            color: const Color(0xFF10B981).withOpacity(0.3),
+            color: TraverzaColors.lagoonTeal.withOpacity(0.4),
           ),
           const SizedBox(width: 16),
           Icon(Icons.directions_car_outlined, size: 14, color: Colors.white.withOpacity(0.4)),
@@ -471,19 +515,59 @@ class _MainTripScreenState extends State<MainTripScreen> {
     );
   }
 
+  // --- TAB 2: Bookings / Fit-to-Trip Catalogue ---
   Widget _buildFitToTripCatalogue() {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        const Text(
-          'Fit-to-Trip Verified Services',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Text(
+                  'Fit-to-Trip Verified Services',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  'Services matched against corridor route, dates, and party size.',
+                  style: TextStyle(fontSize: 12, color: Colors.white60),
+                ),
+              ],
+            ),
+          ],
         ),
-        const SizedBox(height: 6),
-        const Text(
-          'Services matched against corridor route, dates, and vehicle capacity.',
-          style: TextStyle(fontSize: 12, color: Colors.white60),
-        ),
+        if (_selectedCategory != null) ...[
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: TraverzaColors.oceanBlue.withOpacity(0.4),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: TraverzaColors.lagoonTeal),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Filtered: $_selectedCategory',
+                      style: const TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(width: 6),
+                    InkWell(
+                      onTap: () => setState(() => _selectedCategory = null),
+                      child: const Icon(Icons.close, size: 14, color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
         const SizedBox(height: 16),
 
         _buildCatalogueItem(
@@ -548,13 +632,13 @@ class _MainTripScreenState extends State<MainTripScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF10B981).withOpacity(0.15),
+                    color: TraverzaColors.lagoonTeal.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     category,
                     style: const TextStyle(
-                      color: Color(0xFF10B981),
+                      color: TraverzaColors.lagoonTeal,
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
                     ),
@@ -600,6 +684,7 @@ class _MainTripScreenState extends State<MainTripScreen> {
     );
   }
 
+  // --- TAB 3: Saved / Trip Readiness Audit ---
   Widget _buildReadinessView() {
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -646,7 +731,7 @@ class _MainTripScreenState extends State<MainTripScreen> {
       child: ListTile(
         leading: Icon(
           isOk ? Icons.check_circle : Icons.warning_amber_rounded,
-          color: isOk ? const Color(0xFF10B981) : const Color(0xFFF59E0B),
+          color: isOk ? TraverzaColors.emeraldSuccess : TraverzaColors.amberWarning,
           size: 28,
         ),
         title: Text(
@@ -661,10 +746,47 @@ class _MainTripScreenState extends State<MainTripScreen> {
     );
   }
 
-  Widget _buildEmergencyVault() {
+  // --- TAB 4: Profile & Offline Emergency Vault ---
+  Widget _buildProfileAndEmergencyVault() {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
+        // Traveler Profile Summary Card
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: TraverzaColors.surfaceNavy,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white10),
+          ),
+          child: Row(
+            children: [
+              const CircleAvatar(
+                radius: 24,
+                backgroundColor: TraverzaColors.oceanBlue,
+                child: Text('D', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20)),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text(
+                      'Dinusha Wijesinghe',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+                    ),
+                    Text(
+                      'Independent International Traveller • Pilot Member',
+                      style: TextStyle(fontSize: 11, color: Colors.white60),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 20),
+
         const Text(
           'Offline SOS & Emergency Vault',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
@@ -713,8 +835,8 @@ class _MainTripScreenState extends State<MainTripScreen> {
     return Card(
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: const Color(0xFFF43F5E).withOpacity(0.15),
-          child: Icon(icon, color: const Color(0xFFF43F5E)),
+          backgroundColor: TraverzaColors.roseEmergency.withOpacity(0.15),
+          child: Icon(icon, color: TraverzaColors.roseEmergency),
         ),
         title: Text(
           title,
@@ -727,7 +849,7 @@ class _MainTripScreenState extends State<MainTripScreen> {
         trailing: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
-            color: const Color(0xFFF43F5E).withOpacity(0.2),
+            color: TraverzaColors.roseEmergency.withOpacity(0.2),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(
