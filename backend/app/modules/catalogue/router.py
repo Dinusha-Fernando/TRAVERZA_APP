@@ -29,6 +29,25 @@ async def list_destinations(
     return result.scalars().all()
 
 
+@router.get("/destinations/{slug_or_id}", response_model=DestinationResponse)
+async def get_destination(
+    slug_or_id: str,
+    db: AsyncSession = Depends(get_db),
+):
+    try:
+        dest_uuid = uuid.UUID(slug_or_id)
+        stmt = select(Destination).where(Destination.id == dest_uuid)
+    except ValueError:
+        stmt = select(Destination).where(Destination.slug == slug_or_id)
+
+    result = await db.execute(stmt)
+    dest = result.scalar_one_or_none()
+    if not dest:
+        from app.core.errors import NotFoundException
+        raise NotFoundException("Destination", slug_or_id)
+    return dest
+
+
 @router.get("/destinations/{destination_id}/places", response_model=list[PlaceResponse])
 async def list_places_by_destination(
     destination_id: uuid.UUID,
@@ -53,6 +72,18 @@ async def list_published_listings(
 
     result = await db.execute(query)
     return result.scalars().all()
+
+
+@router.get("/listings/{listing_id}", response_model=ListingResponse)
+async def get_listing(
+    listing_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+):
+    listing = await db.get(Listing, listing_id)
+    if not listing:
+        from app.core.errors import NotFoundException
+        raise NotFoundException("Listing", listing_id)
+    return listing
 
 
 # Provider-scoped listing management

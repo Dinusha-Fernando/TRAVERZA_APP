@@ -66,3 +66,21 @@ class TripResponse(BaseModel):
     days: list[ItineraryDayResponse] = []
 
     model_config = {"from_attributes": True}
+
+
+class ReadinessCheckItem(BaseModel):
+    category: str
+    severity: str  # "READY", "ACTION_NEEDED", "ATTENTION", "INFO"
+    title: str
+    description: str
+    is_blocking: bool = False
+
+
+class TripReadinessResponse(BaseModel):
+    trip_id: uuid.UUID
+    trip_title: str
+    overall_status: str  # "READY", "ACTION_NEEDED", "ATTENTION"
+    checks: list[ReadinessCheckItem]
+    confirmed_items_count: int
+    pending_items_count: int
+    total_items_count: int

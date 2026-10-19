@@ -168,3 +168,60 @@ async def provider_respond_to_booking(
     await db.commit()
     await db.refresh(booking)
     return booking
+
+
+@router.get("/bookings/{booking_id}", response_model=BookingResponse)
+async def get_booking(
+    booking_id: uuid.UUID,
+    token_payload: dict[str, Any] = Depends(get_current_user_token),
+    db: AsyncSession = Depends(get_db),
+):
+    booking = await db.get(ServiceBooking, booking_id)
+    if not booking:
+        raise NotFoundException("ServiceBooking", booking_id)
+
+    user_id = uuid.UUID(token_payload["sub"])
+    role = token_payload.get("role")
+    org_ids = [uuid.UUID(oid) for oid in token_payload.get("org_ids", [])]
+
+    # Verify authorization: Must be trip owner, provider org member, or admin
+    trip = await db.get(Trip, booking.trip_id)
+    is_traveler = trip and trip.traveler_id == user_id
+    is_provider = booking.organization_id in org_ids
+    is_admin = role == "SUPER_ADMIN"
+
+    if not (is_traveler or is_provider or is_admin):
+        raise ForbiddenException("You are not authorized to view this booking")
+
+    return booking
+
+
+@router.get("/bookings", response_model=list[BookingResponse])
+async def list_bookings(
+    trip_id: uuid.UUID | None = None,
+    token_payload: dict[str, Any] = Depends(get_current_user_token),
+    db: AsyncSession = Depends(get_db),
+):
+    traveler_id = uuid.UUID(token_payload["sub"])
+    role = token_payload.get("role")
+
+    stmt = select(ServiceBooking).join(Trip, ServiceBooking.trip_id == Trip.id)
+    if role != "SUPER_ADMIN":
+        stmt = stmt.where(Trip.traveler_id == traveler_id)
+    if trip_id:
+        stmt = stmt.where(ServiceBooking.trip_id == trip_id)
+
+    res = await db.execute(stmt)
+    return res.scalars().all()
+
+
+@router.get("/provider/bookings", response_model=list[BookingResponse])
+async def list_provider_bookings(
+    org_id: uuid.UUID = Depends(TenantContext()),
+    token_payload: dict[str, Any] = Depends(get_current_user_token),
+    db: AsyncSession = Depends(get_db),
+):
+    stmt = select(ServiceBooking).where(ServiceBooking.organization_id == org_id)
+    res = await db.execute(stmt)
+    return res.scalars().all()
+

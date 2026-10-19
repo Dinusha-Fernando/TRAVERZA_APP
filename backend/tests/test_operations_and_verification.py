@@ -116,3 +116,113 @@ async def test_support_exception_desk_lifecycle(test_db):
         resolved_data = resolve_res.json()
         assert resolved_data["status"] == "RESOLVED"
         assert "Backup driver dispatched" in resolved_data["resolution_notes"]
+
+
+@pytest.mark.asyncio
+async def test_catalogue_detail_and_trip_readiness(test_db):
+    """
+    Tests destination/listing detail contracts and Section 13.4 Trip Readiness Check.
+    """
+    from app.modules.catalogue.models import Destination, Listing
+    from app.modules.trips.models import ItineraryDay, ItineraryItem, Trip
+
+    dest = Destination(
+        name="Sigiriya",
+        slug="sigiriya",
+        province="Central",
+        corridor_name="Colombo - Sigiriya - Kandy - Nuwara Eliya",
+        description="The ancient Lion Rock fortress",
+        latitude=7.9570,
+        longitude=80.7603,
+    )
+    test_db.add(dest)
+    await test_db.flush()
+
+    listing = Listing(
+        organization_id=uuid.uuid4(),
+        destination_id=dest.id,
+        title="Sigiriya Village Heritage Cottage",
+        category="ACCOMMODATION",
+        description="Serene villa near the water gardens",
+        base_price_minor=3500000,
+        currency="LKR",
+        is_published=True,
+    )
+    test_db.add(listing)
+
+    from datetime import date, time
+
+    traveler_id = uuid.uuid4()
+    trip = Trip(
+        traveler_id=traveler_id,
+        title="Ceylon Cultural Corridor Pilot",
+        start_date=date(2026, 11, 1),
+        end_date=date(2026, 11, 4),
+        party_size=2,
+        corridor_name="Colombo - Sigiriya - Kandy - Nuwara Eliya",
+        status="DRAFT",
+    )
+    test_db.add(trip)
+    await test_db.flush()
+
+    day1 = ItineraryDay(
+        trip_id=trip.id,
+        day_number=1,
+        date=date(2026, 11, 1),
+        title="Day 1: Arrival & Transit",
+    )
+    test_db.add(day1)
+    await test_db.flush()
+
+    item = ItineraryItem(
+        day_id=day1.id,
+        listing_id=listing.id,
+        title="Sigiriya Eco Stay",
+        category="ACCOMMODATION",
+        start_time=time(14, 0),
+        end_time=time(11, 0),
+        latitude=7.9570,
+        longitude=80.7603,
+        requires_booking=True,
+        booking_status="CONFIRMED",
+    )
+    test_db.add(item)
+    await test_db.commit()
+
+    token = create_access_token(
+        subject=str(traveler_id),
+        extra_claims={"email": "traveler@traverza.lk", "role": "TRAVELER", "org_ids": []},
+    )
+
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        # 1. Test Destination slug lookup
+        dest_res = await client.get("/api/v1/catalogue/destinations/sigiriya")
+        assert dest_res.status_code == 200
+        assert dest_res.json()["slug"] == "sigiriya"
+
+        # 2. Test Listing detail lookup
+        list_res = await client.get(f"/api/v1/catalogue/listings/{listing.id}")
+        assert list_res.status_code == 200
+        assert list_res.json()["title"] == "Sigiriya Village Heritage Cottage"
+
+        # 3. Test Trips list
+        trips_res = await client.get(
+            "/api/v1/trips",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert trips_res.status_code == 200
+        assert len(trips_res.json()) >= 1
+
+        # 4. Test Trip Readiness Check (Section 13.4)
+        readiness_res = await client.get(
+            f"/api/v1/trips/{trip.id}/readiness",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert readiness_res.status_code == 200
+        r_data = readiness_res.json()
+        assert r_data["overall_status"] == "READY"
+        assert r_data["confirmed_items_count"] == 1
+        assert any(c["category"] == "DOCUMENT" for c in r_data["checks"])
+        assert any(c["title"] == "Confirmed: Sigiriya Eco Stay" for c in r_data["checks"])
+

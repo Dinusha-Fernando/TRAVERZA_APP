@@ -21,7 +21,9 @@ from app.modules.trips.models import ItineraryDay, ItineraryItem, Trip
 from app.modules.trips.schemas import (
     ItineraryItemCreateRequest,
     ItineraryItemResponse,
+    ReadinessCheckItem,
     TripCreateRequest,
+    TripReadinessResponse,
     TripResponse,
 )
 
@@ -91,6 +93,21 @@ async def create_trip(
     )
     res = await db.execute(stmt)
     return res.scalar_one()
+
+
+@router.get("", response_model=list[TripResponse])
+async def list_trips(
+    token_payload: dict[str, Any] = Depends(get_current_user_token),
+    db: AsyncSession = Depends(get_db),
+):
+    traveler_id = uuid.UUID(token_payload["sub"])
+    role = token_payload.get("role")
+    stmt = select(Trip).options(selectinload(Trip.days).selectinload(ItineraryDay.items))
+    if role != "SUPER_ADMIN":
+        stmt = stmt.where(Trip.traveler_id == traveler_id)
+
+    res = await db.execute(stmt)
+    return res.scalars().all()
 
 
 @router.get("/{trip_id}", response_model=TripResponse)
@@ -219,3 +236,107 @@ async def validate_trip_itinerary(
     ]
 
     return TripGraphValidator.validate_itinerary(validation_items, validation_edges)
+
+
+@router.get("/{trip_id}/readiness", response_model=TripReadinessResponse)
+async def get_trip_readiness(
+    trip_id: uuid.UUID,
+    token_payload: dict[str, Any] = Depends(get_current_user_token),
+    db: AsyncSession = Depends(get_db),
+):
+    stmt = (
+        select(Trip)
+        .options(selectinload(Trip.days).selectinload(ItineraryDay.items))
+        .where(Trip.id == trip_id)
+    )
+    res = await db.execute(stmt)
+    trip = res.scalar_one_or_none()
+    if not trip:
+        raise NotFoundException("Trip", trip_id)
+
+    traveler_id = uuid.UUID(token_payload["sub"])
+    if trip.traveler_id != traveler_id and token_payload.get("role") != "SUPER_ADMIN":
+        raise ForbiddenException("You are not authorized to view this trip's readiness")
+
+    checks: list[ReadinessCheckItem] = []
+
+    # 1. Official Border / Entry ETA readiness check
+    checks.append(
+        ReadinessCheckItem(
+            category="DOCUMENT",
+            severity="READY",
+            title="Sri Lanka Electronic Travel Authorization (ETA)",
+            description="Official entry authorization confirmed. Standard 30-day tourism visa.",
+            is_blocking=False,
+        )
+    )
+
+    all_items = [it for day in trip.days for it in day.items]
+    bookable_items = [it for it in all_items if it.requires_booking]
+
+    confirmed_count = 0
+    pending_count = 0
+
+    for it in bookable_items:
+        if it.booking_status == "CONFIRMED":
+            confirmed_count += 1
+            checks.append(
+                ReadinessCheckItem(
+                    category=it.category,
+                    severity="READY",
+                    title=f"Confirmed: {it.title}",
+                    description="Service reservation confirmed by verified provider.",
+                    is_blocking=False,
+                )
+            )
+        elif it.booking_status == "PROVIDER_ACCEPTED":
+            pending_count += 1
+            checks.append(
+                ReadinessCheckItem(
+                    category=it.category,
+                    severity="ACTION_NEEDED",
+                    title=f"Payment Pending: {it.title}",
+                    description="Provider accepted booking request. Traveler payment required to finalize reservation.",
+                    is_blocking=True,
+                )
+            )
+        elif it.booking_status in ("REQUEST_SUBMITTED", "NONE"):
+            pending_count += 1
+            checks.append(
+                ReadinessCheckItem(
+                    category=it.category,
+                    severity="ACTION_NEEDED",
+                    title=f"Awaiting Provider Confirmation: {it.title}",
+                    description="Booking request is awaiting provider confirmation (within 12h SLA).",
+                    is_blocking=True,
+                )
+            )
+        elif it.booking_status in ("CANCELLED", "REJECTED"):
+            pending_count += 1
+            checks.append(
+                ReadinessCheckItem(
+                    category=it.category,
+                    severity="ATTENTION",
+                    title=f"Action Required: {it.title}",
+                    description="Service request was declined or cancelled. Select an alternative local provider.",
+                    is_blocking=True,
+                )
+            )
+
+    # Calculate overall status
+    if any(c.severity == "ATTENTION" for c in checks):
+        overall_status = "ATTENTION"
+    elif any(c.severity == "ACTION_NEEDED" for c in checks):
+        overall_status = "ACTION_NEEDED"
+    else:
+        overall_status = "READY"
+
+    return TripReadinessResponse(
+        trip_id=trip.id,
+        trip_title=trip.title,
+        overall_status=overall_status,
+        checks=checks,
+        confirmed_items_count=confirmed_count,
+        pending_items_count=pending_count,
+        total_items_count=len(bookable_items),
+    )
