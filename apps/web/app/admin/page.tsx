@@ -136,17 +136,36 @@ export default function AdminOpsPage() {
           alignItems: 'center',
           marginBottom: '32px',
           flexWrap: 'wrap',
-          gap: '16px',
+          gap: '20px',
+          background: 'linear-gradient(135deg, rgba(16, 42, 67, 0.75) 0%, rgba(11, 110, 142, 0.2) 100%)',
+          padding: '24px 28px',
+          borderRadius: 'var(--radius-md)',
+          border: '1px solid rgba(27, 166, 166, 0.3)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.25)',
         }}
       >
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <h1 style={{ fontSize: '2.2rem' }}>Trip Operations & Exception Desk</h1>
-            <span className="badge badge-ruby">MFA Authenticated</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <img
+            src="/traverza-logo.jpg"
+            alt="TRAVERZA Logo"
+            style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '16px',
+              objectFit: 'cover',
+              boxShadow: '0 8px 24px rgba(11, 110, 142, 0.5)',
+              border: '2px solid rgba(27, 166, 166, 0.45)',
+            }}
+          />
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <h1 style={{ fontSize: '2.0rem', margin: 0 }}>TRAVERZA Operations & Exception Desk</h1>
+              <span className="badge badge-ruby">MFA Authenticated</span>
+            </div>
+            <p style={{ color: 'var(--text-secondary)', marginTop: '6px', marginBottom: 0, fontSize: '0.92rem' }}>
+              Priority Incident Resolution • Tenant Audited • SLTDA Grievance Compliance (Sections 15 & 16)
+            </p>
           </div>
-          <p style={{ color: 'var(--text-secondary)', marginTop: '4px' }}>
-            Priority Incident Resolution • Tenant Audited • SLTDA Grievance Compliance (Section 15 & 16)
-          </p>
         </div>
 
         <div style={{ display: 'flex', gap: '12px' }}>

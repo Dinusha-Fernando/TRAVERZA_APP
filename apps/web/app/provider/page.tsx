@@ -158,17 +158,36 @@ export default function ProviderPortalPage() {
           alignItems: 'center',
           marginBottom: '32px',
           flexWrap: 'wrap',
-          gap: '16px',
+          gap: '20px',
+          background: 'linear-gradient(135deg, rgba(16, 42, 67, 0.7) 0%, rgba(11, 110, 142, 0.15) 100%)',
+          padding: '24px 28px',
+          borderRadius: 'var(--radius-md)',
+          border: '1px solid rgba(27, 166, 166, 0.25)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.25)',
         }}
       >
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <h1 style={{ fontSize: '2.2rem' }}>Provider OS Dashboard</h1>
-            <span className="badge badge-emerald">SLTDA Scope Approved</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <img
+            src="/traverza-logo.jpg"
+            alt="TRAVERZA Provider OS"
+            style={{
+              width: '60px',
+              height: '60px',
+              borderRadius: '14px',
+              objectFit: 'cover',
+              boxShadow: '0 8px 24px rgba(11, 110, 142, 0.45)',
+              border: '2px solid rgba(27, 166, 166, 0.4)',
+            }}
+          />
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <h1 style={{ fontSize: '2.0rem', margin: 0 }}>TRAVERZA Provider OS</h1>
+              <span className="badge badge-emerald">SLTDA Scope Approved</span>
+            </div>
+            <p style={{ color: 'var(--text-secondary)', marginTop: '6px', marginBottom: 0 }}>
+              Organisation: <strong>Boutique Heritage Stays (Pvt) Ltd</strong> • Licence: <strong>SLTDA/SQ/2026/089</strong> • Corridor: <strong>Cultural Triangle</strong>
+            </p>
           </div>
-          <p style={{ color: 'var(--text-secondary)', marginTop: '4px' }}>
-            Organisation: <strong>Boutique Heritage Stays (Pvt) Ltd</strong> • Licence: <strong>SLTDA/SQ/2026/089</strong> • Corridor: <strong>Cultural Triangle</strong>
-          </p>
         </div>
 
         <div style={{ display: 'flex', gap: '12px' }}>

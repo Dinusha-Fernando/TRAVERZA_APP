@@ -38,24 +38,19 @@ export default function RootLayout({
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
-              <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div
+              <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <img
+                  src="/traverza-logo.jpg"
+                  alt="TRAVERZA Logo"
                   style={{
-                    width: '36px',
-                    height: '36px',
+                    width: '38px',
+                    height: '38px',
                     borderRadius: '10px',
-                    background: 'linear-gradient(135deg, #10b981 0%, #3b82f6 100%)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: 800,
-                    fontSize: '1.2rem',
-                    color: '#fff',
-                    boxShadow: '0 4px 12px rgba(16, 185, 129, 0.4)',
+                    objectFit: 'cover',
+                    boxShadow: '0 4px 14px rgba(11, 110, 142, 0.45)',
+                    border: '1.5px solid rgba(27, 166, 166, 0.4)',
                   }}
-                >
-                  T
-                </div>
+                />
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                   <span
                     style={{
@@ -71,7 +66,7 @@ export default function RootLayout({
                   <span
                     style={{
                       fontSize: '0.65rem',
-                      color: 'var(--accent-emerald)',
+                      color: '#1BA6A6',
                       letterSpacing: '0.12em',
                       fontWeight: 700,
                     }}
@@ -151,7 +146,14 @@ export default function RootLayout({
             }}
           >
             <div>
-              <h3 style={{ fontSize: '1.2rem', marginBottom: '8px' }}>TRAVERZA</h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                <img
+                  src="/traverza-logo.jpg"
+                  alt="TRAVERZA"
+                  style={{ width: '28px', height: '28px', borderRadius: '8px', objectFit: 'cover' }}
+                />
+                <h3 style={{ fontSize: '1.2rem', margin: 0 }}>TRAVERZA</h3>
+              </div>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', maxWidth: '340px' }}>
                 Connected travel operating platform for Sri Lanka. Curating verified stays, licensed chauffeur guides, and authentic excursions.
               </p>

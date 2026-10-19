@@ -113,17 +113,28 @@ class _MainTripScreenState extends State<MainTripScreen> {
     return AppBar(
       title: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [TraverzaColors.oceanBlue, TraverzaColors.lagoonTeal],
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Image.asset(
+              'assets/traverza_logo.jpg',
+              width: 36,
+              height: 36,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [TraverzaColors.oceanBlue, TraverzaColors.lagoonTeal],
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                alignment: Alignment.center,
+                child: const Text(
+                  'T',
+                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: Colors.white),
+                ),
               ),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Text(
-              'T',
-              style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: Colors.white),
             ),
           ),
           const SizedBox(width: 10),
