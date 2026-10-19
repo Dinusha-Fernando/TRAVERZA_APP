@@ -121,6 +121,7 @@ export default function HomePage() {
   const [activeTab, setActiveTab] = useState<'timeline' | 'corridor' | 'validation' | 'checkout'>('timeline');
   const [simulatedWebhookState, setSimulatedWebhookState] = useState<'idle' | 'processing' | 'captured' | 'duplicate'>('idle');
   const [showNotification, setShowNotification] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Compute truthful trip status (Gate 6 invariant)
   const bookableStops = stops.filter((s) => s.category !== 'FLIGHT');
@@ -136,6 +137,17 @@ export default function HomePage() {
   const totalPriceLKR = stops.reduce((acc, s) => acc + s.priceLKR, 0);
   const platformCommissionLKR = Math.round(totalPriceLKR * 0.10);
   const netProviderPayableLKR = totalPriceLKR - platformCommissionLKR;
+
+  // Filtered stops for search query
+  const filteredStops = searchQuery.trim()
+    ? stops.filter(
+        (s) =>
+          s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          s.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          s.provider.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          s.category.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : stops;
 
   const toggleEcoVillaConfirmation = () => {
     setStops((prev) =>
@@ -193,7 +205,7 @@ export default function HomePage() {
             lineHeight: 1.15,
             marginBottom: '20px',
             maxWidth: '920px',
-            background: 'linear-gradient(180deg, #FFFFFF 0%, #94A3B8 100%)',
+            background: 'linear-gradient(180deg, var(--color-primary) 0%, var(--color-secondary) 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
           }}
@@ -205,11 +217,91 @@ export default function HomePage() {
             fontSize: '1.2rem',
             color: 'var(--text-secondary)',
             maxWidth: '720px',
-            marginBottom: '32px',
+            marginBottom: '28px',
           }}
         >
           Discover Sri Lanka, plan realistic multi-day itineraries, book SLTDA-verified local services, and manage your entire journey with real-time transit validation.
         </p>
+
+        {/* Interactive Search Bar */}
+        <div
+          style={{
+            width: '100%',
+            maxWidth: '680px',
+            marginBottom: '16px',
+            display: 'flex',
+            alignItems: 'center',
+            background: 'var(--color-surface)',
+            border: '1.5px solid var(--color-border)',
+            borderRadius: 'var(--radius-pill)',
+            padding: '8px 16px',
+            boxShadow: 'var(--shadow-card)',
+            gap: '12px',
+          }}
+        >
+          <span style={{ fontSize: '1.2rem' }}>🔍</span>
+          <input
+            type="text"
+            placeholder="Search Sri Lanka destinations, stays and experiences (e.g., Sigiriya, Kandy)..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{
+              flex: 1,
+              border: 'none',
+              outline: 'none',
+              background: 'transparent',
+              fontSize: '0.95rem',
+              color: 'var(--color-text)',
+              fontFamily: 'inherit',
+            }}
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--color-text-muted)',
+                cursor: 'pointer',
+                fontSize: '1rem',
+              }}
+            >
+              ✕
+            </button>
+          )}
+          <button
+            onClick={() => setActiveTab('timeline')}
+            className="btn btn-primary"
+            style={{ padding: '8px 20px', fontSize: '0.9rem' }}
+          >
+            Search
+          </button>
+        </div>
+
+        {/* Quick Destination Pills */}
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '28px' }}>
+          {['Sigiriya', 'Kandy', 'Nuwara Eliya', 'Chauffeur', 'Eco Villa'].map((tag) => (
+            <button
+              key={tag}
+              onClick={() => {
+                setSearchQuery(tag);
+                setActiveTab('timeline');
+              }}
+              style={{
+                background: searchQuery === tag ? 'var(--color-sand)' : 'var(--color-surface)',
+                border: '1px solid var(--color-border)',
+                borderRadius: 'var(--radius-pill)',
+                padding: '4px 12px',
+                fontSize: '0.8rem',
+                color: 'var(--color-primary)',
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
 
         {/* Tab Controls */}
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
@@ -313,8 +405,52 @@ export default function HomePage() {
               </div>
 
               {/* Stop Cards List */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {stops.map((stop) => (
+              {searchQuery && (
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginBottom: '16px',
+                    padding: '10px 14px',
+                    background: 'rgba(8, 126, 139, 0.1)',
+                    border: '1px solid rgba(8, 126, 139, 0.3)',
+                    borderRadius: 'var(--radius-sm)',
+                  }}
+                >
+                  <span style={{ fontSize: '0.86rem', color: 'var(--color-primary)' }}>
+                    Filtering stops by <strong>"{searchQuery}"</strong> ({filteredStops.length} result{filteredStops.length === 1 ? '' : 's'})
+                  </span>
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--color-secondary)',
+                      fontSize: '0.8rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Clear Filter
+                  </button>
+                </div>
+              )}
+
+              {filteredStops.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '36px 16px', color: 'var(--color-text-muted)' }}>
+                  <p style={{ fontSize: '1.05rem', marginBottom: '8px' }}>No itinerary stops match "{searchQuery}"</p>
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="btn btn-secondary"
+                    style={{ fontSize: '0.85rem' }}
+                  >
+                    Show All Stops
+                  </button>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {filteredStops.map((stop) => (
                   <div key={stop.id}>
                     <div
                       style={{
@@ -419,6 +555,7 @@ export default function HomePage() {
                   </div>
                 ))}
               </div>
+            )}
 
               {/* Simulation Action Callout */}
               <div

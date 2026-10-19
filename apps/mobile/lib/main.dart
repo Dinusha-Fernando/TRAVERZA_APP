@@ -39,14 +39,16 @@ class _MainTripScreenState extends State<MainTripScreen> {
   // State for interactive confirmation & filter
   bool _hotelConfirmed = false;
   String? _selectedCategory;
+  String? _searchQuery;
 
   void _navigateToPlan() {
     setState(() => _currentIndex = 1);
   }
 
-  void _navigateToBookings({String? category}) {
+  void _navigateToBookings({String? category, String? searchQuery}) {
     setState(() {
       _selectedCategory = category;
+      _searchQuery = searchQuery;
       _currentIndex = 2;
     });
   }
@@ -65,6 +67,7 @@ class _MainTripScreenState extends State<MainTripScreen> {
         onCategorySelected: (cat) => _navigateToBookings(category: cat.categoryTag),
         onNavigateToSafety: _navigateToSafety,
         onNavigateToCatalogue: () => _navigateToBookings(),
+        onSearchSubmitted: (query) => _navigateToBookings(searchQuery: query),
       ),
       _buildTimelineView(),
       _buildFitToTripCatalogue(),
@@ -537,6 +540,63 @@ class _MainTripScreenState extends State<MainTripScreen> {
 
   // --- TAB 2: Bookings / Fit-to-Trip Catalogue ---
   Widget _buildFitToTripCatalogue() {
+    final allItems = [
+      {
+        'category': 'TRANSFER',
+        'title': 'Airport to Sigiriya Luxury Transfer',
+        'provider': 'Ceylon Chauffeurs Guild (Pvt) Ltd',
+        'license': 'SLTDA/CG/2026/102',
+        'price': 'LKR 18,500',
+        'policy': 'Free cancellation up to 24h before pickup',
+        'rating': '4.98 (124 reviews)',
+      },
+      {
+        'category': 'STAY',
+        'title': 'Sigiriya Water Garden Eco Villa',
+        'provider': 'Boutique Heritage Stays (Pvt) Ltd',
+        'license': 'SLTDA/SQ/2026/089',
+        'price': 'LKR 38,000 / night',
+        'policy': 'Standard 48h cancellation',
+        'rating': '4.95 (88 reviews)',
+      },
+      {
+        'category': 'GUIDE',
+        'title': 'Sacred City of Kandy Walking Tour',
+        'provider': 'Cultural Heritage Guide Guild',
+        'license': 'SLTDA/GD/2026/044',
+        'price': 'LKR 9,500',
+        'policy': 'Free cancellation up to 24h',
+        'rating': '4.92 (54 reviews)',
+      },
+      {
+        'category': 'ACTIVITY',
+        'title': 'Pedro Tea Estate Heritage Factory Walk',
+        'provider': 'Highland Tea Excursions (Pvt) Ltd',
+        'license': 'SLTDA/AC/2026/015',
+        'price': 'LKR 8,000',
+        'policy': 'Standard 24h policy',
+        'rating': '4.89 (42 reviews)',
+      },
+    ];
+
+    final filteredItems = allItems.where((item) {
+      if (_selectedCategory != null && _selectedCategory!.isNotEmpty) {
+        if (item['category'] != _selectedCategory &&
+            !(_selectedCategory == 'ACCOMMODATION' && item['category'] == 'STAY')) {
+          return false;
+        }
+      }
+      if (_searchQuery != null && _searchQuery!.trim().isNotEmpty) {
+        final q = _searchQuery!.toLowerCase();
+        final matches = item['title']!.toLowerCase().contains(q) ||
+            item['provider']!.toLowerCase().contains(q) ||
+            item['category']!.toLowerCase().contains(q) ||
+            item['license']!.toLowerCase().contains(q);
+        if (!matches) return false;
+      }
+      return true;
+    }).toList();
+
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
@@ -548,84 +608,119 @@ class _MainTripScreenState extends State<MainTripScreen> {
               children: const [
                 Text(
                   'Fit-to-Trip Verified Services',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: TraverzaColors.text),
                 ),
                 SizedBox(height: 4),
                 Text(
                   'Services matched against corridor route, dates, and party size.',
-                  style: TextStyle(fontSize: 12, color: Colors.white60),
+                  style: TextStyle(fontSize: 12, color: TraverzaColors.textMuted),
                 ),
               ],
             ),
           ],
         ),
-        if (_selectedCategory != null) ...[
+        if (_selectedCategory != null || _searchQuery != null) ...[
           const SizedBox(height: 10),
-          Row(
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: TraverzaColors.secondary.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: TraverzaColors.secondary),
+              if (_selectedCategory != null)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: TraverzaColors.secondary.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: TraverzaColors.secondary),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Filtered: $_selectedCategory',
+                        style: const TextStyle(fontSize: 11, color: TraverzaColors.primary, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(width: 6),
+                      InkWell(
+                        onTap: () => setState(() => _selectedCategory = null),
+                        child: const Icon(Icons.close, size: 14, color: TraverzaColors.primary),
+                      ),
+                    ],
+                  ),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Filtered: $_selectedCategory',
-                      style: const TextStyle(fontSize: 11, color: TraverzaColors.primary, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(width: 6),
-                    InkWell(
-                      onTap: () => setState(() => _selectedCategory = null),
-                      child: const Icon(Icons.close, size: 14, color: TraverzaColors.primary),
-                    ),
-                  ],
+              if (_searchQuery != null)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: TraverzaColors.accent.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: TraverzaColors.accent),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Search: "$_searchQuery"',
+                        style: const TextStyle(fontSize: 11, color: TraverzaColors.primary, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(width: 6),
+                      InkWell(
+                        onTap: () => setState(() => _searchQuery = null),
+                        child: const Icon(Icons.close, size: 14, color: TraverzaColors.primary),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
             ],
           ),
         ],
         const SizedBox(height: 16),
 
-        _buildCatalogueItem(
-          category: 'TRANSFER',
-          title: 'Airport to Sigiriya Luxury Transfer',
-          provider: 'Ceylon Chauffeurs Guild (Pvt) Ltd',
-          license: 'SLTDA/CG/2026/102',
-          price: 'LKR 18,500',
-          policy: 'Free cancellation up to 24h before pickup',
-          rating: '4.98 (124 reviews)',
-        ),
-        _buildCatalogueItem(
-          category: 'STAY',
-          title: 'Sigiriya Water Garden Eco Villa',
-          provider: 'Boutique Heritage Stays (Pvt) Ltd',
-          license: 'SLTDA/SQ/2026/089',
-          price: 'LKR 38,000 / night',
-          policy: 'Standard 48h cancellation',
-          rating: '4.95 (88 reviews)',
-        ),
-        _buildCatalogueItem(
-          category: 'GUIDE',
-          title: 'Sacred City of Kandy Walking Tour',
-          provider: 'Cultural Heritage Guide Guild',
-          license: 'SLTDA/GD/2026/044',
-          price: 'LKR 9,500',
-          policy: 'Free cancellation up to 24h',
-          rating: '4.92 (54 reviews)',
-        ),
-        _buildCatalogueItem(
-          category: 'ACTIVITY',
-          title: 'Pedro Tea Estate Heritage Factory Walk',
-          provider: 'Highland Tea Excursions (Pvt) Ltd',
-          license: 'SLTDA/AC/2026/015',
-          price: 'LKR 8,000',
-          policy: 'Standard 24h policy',
-          rating: '4.89 (42 reviews)',
-        ),
+        if (filteredItems.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 36),
+            child: Center(
+              child: Column(
+                children: [
+                  const Icon(Icons.search_off_rounded, size: 48, color: TraverzaColors.textMuted),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'No services match your filters',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: TraverzaColors.text),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Try resetting your search query or category filter.',
+                    style: TextStyle(fontSize: 12, color: TraverzaColors.textMuted),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => setState(() {
+                      _selectedCategory = null;
+                      _searchQuery = null;
+                    }),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: TraverzaColors.primary,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    child: const Text('Reset All Filters', style: TextStyle(color: Colors.white, fontSize: 12)),
+                  ),
+                ],
+              ),
+            ),
+          )
+        else
+          ...filteredItems.map(
+            (item) => _buildCatalogueItem(
+              category: item['category']!,
+              title: item['title']!,
+              provider: item['provider']!,
+              license: item['license']!,
+              price: item['price']!,
+              policy: item['policy']!,
+              rating: item['rating']!,
+            ),
+          ),
       ],
     );
   }

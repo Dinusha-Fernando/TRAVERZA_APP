@@ -144,4 +144,31 @@ void main() {
     expect(find.text('1912'), findsOneWidget); // Tourist Police
     expect(find.text('1990'), findsOneWidget); // Ambulance
   });
+
+  testWidgets('Search: entering query in Home Screen filters services and navigates', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(const TraverzaApp(showSplash: false));
+    await tester.pumpAndSettle();
+
+    // 1. Enter text in the search TextField
+    final searchInput = find.byType(TextField);
+    expect(searchInput, findsOneWidget);
+    await tester.enterText(searchInput, 'Sigiriya');
+    await tester.pumpAndSettle();
+
+    // 2. Verify in-page search results appear
+    expect(find.text('Found 3 results for "Sigiriya"'), findsOneWidget);
+    expect(find.text('Sigiriya Water Garden Eco Villa'), findsOneWidget);
+
+    // 3. Submit search
+    await tester.testTextInput.receiveAction(TextInputAction.search);
+    await tester.pumpAndSettle();
+
+    // 4. Verify navigation to filtered Bookings Catalogue
+    expect(find.text('Fit-to-Trip Verified Services'), findsOneWidget);
+    expect(find.text('Search: "Sigiriya"'), findsOneWidget);
+  });
 }
