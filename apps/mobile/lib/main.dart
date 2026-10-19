@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'models/route_waypoint.dart';
 import 'screens/home_screen.dart';
 import 'screens/splash_screen.dart';
 import 'theme/app_theme.dart';
+import 'utils/maps_launcher.dart';
+import 'widgets/sri_lanka_map_canvas.dart';
 
 void main() {
   runApp(const TraverzaApp());
@@ -310,6 +313,13 @@ class _MainTripScreenState extends State<MainTripScreen> {
             ),
           ),
 
+          // Creative Interactive Route Map Canvas with Google Maps Integration
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: SriLankaMapCanvas(),
+          ),
+          const SizedBox(height: 12),
+
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: Row(
@@ -348,6 +358,8 @@ class _MainTripScreenState extends State<MainTripScreen> {
             icon: Icons.flight_land,
             iconColor: Colors.blueAccent,
             price: null,
+            latitude: 7.1808,
+            longitude: 79.8841,
           ),
 
           // Transit buffer connector
@@ -366,6 +378,8 @@ class _MainTripScreenState extends State<MainTripScreen> {
             icon: Icons.directions_car,
             iconColor: TraverzaColors.emeraldSuccess,
             price: 'LKR 18,500',
+            latitude: 7.4863,
+            longitude: 80.3623,
           ),
 
           // Transit buffer connector
@@ -384,6 +398,8 @@ class _MainTripScreenState extends State<MainTripScreen> {
             icon: Icons.landscape,
             iconColor: Colors.amberAccent,
             price: 'LKR 12,000',
+            latitude: 7.9570,
+            longitude: 80.7603,
           ),
 
           // Stop 4: Eco Villa
@@ -396,6 +412,8 @@ class _MainTripScreenState extends State<MainTripScreen> {
             icon: Icons.hotel,
             iconColor: _hotelConfirmed ? TraverzaColors.emeraldSuccess : Colors.orangeAccent,
             price: 'LKR 38,000',
+            latitude: 7.9525,
+            longitude: 80.7480,
           ),
 
           const SizedBox(height: 30),
@@ -413,6 +431,8 @@ class _MainTripScreenState extends State<MainTripScreen> {
     required IconData icon,
     required Color iconColor,
     String? price,
+    double? latitude,
+    double? longitude,
   }) {
     Color badgeColor = Colors.grey;
     String badgeText = status;
@@ -501,6 +521,47 @@ class _MainTripScreenState extends State<MainTripScreen> {
                       color: TraverzaColors.primary,
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+            if (latitude != null && longitude != null) ...[
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  InkWell(
+                    onTap: () {
+                      TraverzaMapsLauncher.openDirections(
+                        destinationLat: latitude,
+                        destinationLng: longitude,
+                        destinationName: title,
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: TraverzaColors.secondary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: TraverzaColors.secondary.withValues(alpha: 0.3)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: const [
+                          Icon(Icons.directions_rounded, size: 14, color: TraverzaColors.secondary),
+                          SizedBox(width: 4),
+                          Text(
+                            'Google Maps Navigation',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: TraverzaColors.secondary,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -920,17 +981,170 @@ class _MainTripScreenState extends State<MainTripScreen> {
         ),
         const SizedBox(height: 16),
 
+        // Creative Emergency Map Locator Card
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: TraverzaColors.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: TraverzaColors.border),
+            boxShadow: [
+              BoxShadow(
+                color: TraverzaColors.primary.withValues(alpha: 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: const [
+                      Icon(Icons.near_me_rounded, color: TraverzaColors.roseEmergency, size: 18),
+                      SizedBox(width: 6),
+                      Text(
+                        'Nearest Emergency Facilities',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: TraverzaColors.text,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: TraverzaColors.secondary.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Text(
+                      'Sigiriya Sector',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: TraverzaColors.secondary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                'Instant Google Maps routing with pre-calculated off-grid coordinates.',
+                style: TextStyle(fontSize: 11, color: TraverzaColors.textMuted),
+              ),
+              const SizedBox(height: 14),
+
+              ...TraverzaWaypoints.emergencyFacilities.map((facility) {
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 10),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: TraverzaColors.background,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: TraverzaColors.border),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: facility['type'] == 'POLICE'
+                              ? Colors.blue.withValues(alpha: 0.12)
+                              : TraverzaColors.roseEmergency.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          facility['type'] == 'POLICE'
+                              ? Icons.local_police_rounded
+                              : Icons.local_hospital_rounded,
+                          color: facility['type'] == 'POLICE'
+                              ? Colors.blue
+                              : TraverzaColors.roseEmergency,
+                          size: 18,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              facility['title'] as String,
+                              style: const TextStyle(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.bold,
+                                color: TraverzaColors.text,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              facility['distance'] as String,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: TraverzaColors.textMuted,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          TraverzaMapsLauncher.openEmergencyRoute(
+                            lat: facility['lat'] as double,
+                            lng: facility['lng'] as double,
+                            facilityName: facility['title'] as String,
+                          );
+                        },
+                        icon: const Icon(Icons.directions_rounded, size: 13),
+                        label: const Text('Map', style: TextStyle(fontSize: 11)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: TraverzaColors.primary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          minimumSize: const Size(64, 30),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            ],
+          ),
+        ),
+        const SizedBox(height: 18),
+
+        const Text(
+          'Emergency Helplines & Desks',
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: TraverzaColors.text),
+        ),
+        const SizedBox(height: 8),
+
         _buildEmergencyContact(
           title: 'Sri Lanka Tourist Police Hotline',
           number: '1912',
           description: 'Official SLTDA emergency tourist assistance desk',
           icon: Icons.local_police_outlined,
+          latitude: 7.9542,
+          longitude: 80.7554,
         ),
         _buildEmergencyContact(
           title: 'Suwa Seriya Emergency Ambulance',
           number: '1990',
           description: 'Free nationwide medical paramedic dispatch',
           icon: Icons.medical_services_outlined,
+          latitude: 7.9210,
+          longitude: 80.6840,
         ),
         _buildEmergencyContact(
           title: 'TRAVERZA 24/7 Operations Rescue Desk',
@@ -953,6 +1167,8 @@ class _MainTripScreenState extends State<MainTripScreen> {
     required String number,
     required String description,
     required IconData icon,
+    double? latitude,
+    double? longitude,
   }) {
     return Card(
       child: ListTile(
@@ -968,20 +1184,39 @@ class _MainTripScreenState extends State<MainTripScreen> {
           description,
           style: const TextStyle(fontSize: 11, color: Colors.white60),
         ),
-        trailing: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          decoration: BoxDecoration(
-            color: TraverzaColors.roseEmergency.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Text(
-            number,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              color: TraverzaColors.roseEmergency,
-              fontSize: 12,
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (latitude != null && longitude != null) ...[
+              IconButton(
+                icon: const Icon(Icons.directions_outlined, color: TraverzaColors.secondary, size: 20),
+                tooltip: 'Open in Google Maps',
+                onPressed: () {
+                  TraverzaMapsLauncher.openEmergencyRoute(
+                    lat: latitude,
+                    lng: longitude,
+                    facilityName: title,
+                  );
+                },
+              ),
+              const SizedBox(width: 4),
+            ],
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: TraverzaColors.roseEmergency.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                number,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: TraverzaColors.roseEmergency,
+                  fontSize: 12,
+                ),
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );

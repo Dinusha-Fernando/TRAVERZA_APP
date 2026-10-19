@@ -132,7 +132,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Drag vertical scroll view so that Travel safety shortcut is in view
-    await tester.drag(find.byType(SingleChildScrollView), const Offset(0, -1000));
+    await tester.drag(find.byType(SingleChildScrollView), const Offset(0, -1400));
     await tester.pumpAndSettle();
 
     // Tap Travel safety
@@ -170,5 +170,37 @@ void main() {
     // 4. Verify navigation to filtered Bookings Catalogue
     expect(find.text('Fit-to-Trip Verified Services'), findsOneWidget);
     expect(find.text('Search: "Sigiriya"'), findsOneWidget);
+  });
+
+  testWidgets('Google Maps: renders interactive route map and emergency navigation in Mobile App', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(const TraverzaApp(showSplash: false));
+    await tester.pumpAndSettle();
+
+    // 1. Verify Google Maps Corridor Explorer appears on Home Screen
+    await tester.drag(find.byType(SingleChildScrollView), const Offset(0, -900));
+    await tester.pumpAndSettle();
+    expect(find.text('Google Maps Corridor Explorer'), findsOneWidget);
+    expect(find.text('Cultural Triangle (Sigiriya)'), findsOneWidget);
+
+    // 2. Navigate to Plan tab to verify Sri Lanka interactive map canvas
+    await tester.tap(find.byIcon(Icons.alt_route_outlined));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Interactive Route Map'), findsOneWidget);
+    expect(find.text('GPS Corridor & Google Maps Navigation'), findsOneWidget);
+    expect(find.text('Google Maps'), findsWidgets);
+    expect(find.text('Google Maps Navigation'), findsWidgets);
+
+    // 3. Navigate to Safety tab to verify Emergency Google Maps routing
+    await tester.tap(find.byIcon(Icons.shield_outlined));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Nearest Emergency Facilities'), findsOneWidget);
+    expect(find.text('Sigiriya Tourist Police Station'), findsOneWidget);
+    expect(find.text('Dambulla Base General Hospital (24/7 ER)'), findsOneWidget);
   });
 }

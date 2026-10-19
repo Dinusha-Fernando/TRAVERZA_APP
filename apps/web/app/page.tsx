@@ -14,6 +14,10 @@ interface ItineraryStop {
   status: 'CONFIRMED' | 'REQUEST_SUBMITTED' | 'UNCONFIRMED';
   priceLKR: number;
   bufferMins?: number;
+  lat?: number;
+  lng?: number;
+  altitude?: string;
+  mapQuery?: string;
 }
 
 const INITIAL_STOPS: ItineraryStop[] = [
@@ -28,6 +32,10 @@ const INITIAL_STOPS: ItineraryStop[] = [
     status: 'CONFIRMED',
     priceLKR: 0,
     bufferMins: 30,
+    lat: 7.1808,
+    lng: 79.8841,
+    altitude: '8m',
+    mapQuery: 'Bandaranaike+International+Airport+Katunayake+Sri+Lanka',
   },
   {
     id: 'stop-2',
@@ -40,6 +48,10 @@ const INITIAL_STOPS: ItineraryStop[] = [
     status: 'CONFIRMED',
     priceLKR: 18500,
     bufferMins: 45,
+    lat: 7.4863,
+    lng: 80.3623,
+    altitude: '116m',
+    mapQuery: 'Kurunegala+Central+Expressway+Interchange+Sri+Lanka',
   },
   {
     id: 'stop-3',
@@ -52,6 +64,10 @@ const INITIAL_STOPS: ItineraryStop[] = [
     status: 'CONFIRMED',
     priceLKR: 12000,
     bufferMins: 60,
+    lat: 7.9570,
+    lng: 80.7603,
+    altitude: '349m',
+    mapQuery: 'Sigiriya+Rock+Fortress+Sri+Lanka',
   },
   {
     id: 'stop-4',
@@ -63,6 +79,10 @@ const INITIAL_STOPS: ItineraryStop[] = [
     provider: 'Boutique Heritage Stays (Pvt) Ltd',
     status: 'REQUEST_SUBMITTED',
     priceLKR: 38000,
+    lat: 7.9525,
+    lng: 80.7480,
+    altitude: '195m',
+    mapQuery: 'Water+Garden+Sigiriya+Resort+Sri+Lanka',
   },
   {
     id: 'stop-5',
@@ -74,6 +94,10 @@ const INITIAL_STOPS: ItineraryStop[] = [
     provider: 'Kandyan Heritage Guild',
     status: 'CONFIRMED',
     priceLKR: 9500,
+    lat: 7.2936,
+    lng: 80.6413,
+    altitude: '500m',
+    mapQuery: 'Temple+of+the+Sacred+Tooth+Relic+Kandy+Sri+Lanka',
   },
 ];
 
@@ -118,7 +142,9 @@ const CORRIDOR_DESTINATIONS: DestinationInfo[] = [
 
 export default function HomePage() {
   const [stops, setStops] = useState<ItineraryStop[]>(INITIAL_STOPS);
-  const [activeTab, setActiveTab] = useState<'timeline' | 'corridor' | 'validation' | 'checkout'>('timeline');
+  const [activeTab, setActiveTab] = useState<'timeline' | 'map' | 'corridor' | 'validation' | 'checkout'>('timeline');
+  const [mapMode, setMapMode] = useState<'k' | 'p' | 'm'>('k'); // k = satellite, p = terrain, m = roadmap
+  const [selectedMapStopId, setSelectedMapStopId] = useState<string>('stop-3');
   const [simulatedWebhookState, setSimulatedWebhookState] = useState<'idle' | 'processing' | 'captured' | 'duplicate'>('idle');
   const [showNotification, setShowNotification] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -310,6 +336,12 @@ export default function HomePage() {
             className={`btn ${activeTab === 'timeline' ? 'btn-primary' : 'btn-secondary'}`}
           >
             Trip Canvas Timeline
+          </button>
+          <button
+            onClick={() => setActiveTab('map')}
+            className={`btn ${activeTab === 'map' ? 'btn-primary' : 'btn-secondary'}`}
+          >
+            🗺️ Google Maps & Route
           </button>
           <button
             onClick={() => setActiveTab('corridor')}
@@ -589,7 +621,311 @@ export default function HomePage() {
             </div>
           )}
 
-          {/* View 2: Pilot Corridor Hub */}
+          {/* View: Interactive Google Maps Route Canvas */}
+          {activeTab === 'map' && (
+            <div className="glass-panel" style={{ padding: '32px' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '20px',
+                  paddingBottom: '16px',
+                  borderBottom: '1px solid var(--border-glass)',
+                  flexWrap: 'wrap',
+                  gap: '12px',
+                }}
+              >
+                <div>
+                  <h2 style={{ fontSize: '1.4rem' }}>Sri Lanka GPS Corridor & Google Maps Navigator</h2>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
+                    Live GPS coordinates, elevation profiles, and 1-click turn-by-turn navigation across the Colombo-Sigiriya-Kandy-Highlands corridor.
+                  </p>
+                </div>
+                <a
+                  href="https://www.google.com/maps/dir/?api=1&origin=Bandaranaike+International+Airport+Katunayake&destination=Sigiriya+Water+Garden+Eco+Resort&waypoints=Sigiriya+Rock+Fortress&travelmode=driving"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-primary"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}
+                >
+                  <span>📍</span> Open Entire Route on Google Maps
+                </a>
+              </div>
+
+              {/* Map Layer Mode Toggles & Waypoint Quick Selector */}
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '16px',
+                  flexWrap: 'wrap',
+                  gap: '12px',
+                }}
+              >
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    onClick={() => setMapMode('k')}
+                    style={{
+                      padding: '6px 14px',
+                      borderRadius: 'var(--radius-pill)',
+                      border: '1px solid var(--color-border)',
+                      background: mapMode === 'k' ? 'var(--color-primary)' : 'var(--color-surface)',
+                      color: mapMode === 'k' ? '#FFFFFF' : 'var(--color-text)',
+                      fontSize: '0.82rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    🛰️ Satellite View
+                  </button>
+                  <button
+                    onClick={() => setMapMode('p')}
+                    style={{
+                      padding: '6px 14px',
+                      borderRadius: 'var(--radius-pill)',
+                      border: '1px solid var(--color-border)',
+                      background: mapMode === 'p' ? 'var(--color-primary)' : 'var(--color-surface)',
+                      color: mapMode === 'p' ? '#FFFFFF' : 'var(--color-text)',
+                      fontSize: '0.82rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    ⛰️ Highland Terrain
+                  </button>
+                  <button
+                    onClick={() => setMapMode('m')}
+                    style={{
+                      padding: '6px 14px',
+                      borderRadius: 'var(--radius-pill)',
+                      border: '1px solid var(--color-border)',
+                      background: mapMode === 'm' ? 'var(--color-primary)' : 'var(--color-surface)',
+                      color: mapMode === 'm' ? '#FFFFFF' : 'var(--color-text)',
+                      fontSize: '0.82rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    🗺️ Highway Road Map
+                  </button>
+                </div>
+
+                <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                  Active Focus: <strong>{stops.find((s) => s.id === selectedMapStopId)?.title.split('(')[0]}</strong>
+                </span>
+              </div>
+
+              {/* Responsive Embedded Google Map */}
+              <div
+                style={{
+                  position: 'relative',
+                  width: '100%',
+                  height: '380px',
+                  borderRadius: 'var(--radius-sm)',
+                  overflow: 'hidden',
+                  border: '1.5px solid var(--color-border)',
+                  boxShadow: 'var(--shadow-card)',
+                  marginBottom: '20px',
+                }}
+              >
+                <iframe
+                  title="Google Maps Sri Lanka Itinerary Route"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  loading="lazy"
+                  allowFullScreen
+                  referrerPolicy="no-referrer-when-downgrade"
+                  src={`https://maps.google.com/maps?q=${encodeURIComponent(
+                    stops.find((s) => s.id === selectedMapStopId)?.mapQuery || 'Sigiriya+Rock+Fortress+Sri+Lanka'
+                  )}&t=${mapMode}&z=13&ie=UTF8&iwloc=&output=embed`}
+                />
+              </div>
+
+              {/* Stop Selector Carousel / Horizontal Pills */}
+              <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '12px', marginBottom: '24px' }}>
+                {stops.map((stop) => {
+                  const isSelected = stop.id === selectedMapStopId;
+                  return (
+                    <button
+                      key={stop.id}
+                      onClick={() => setSelectedMapStopId(stop.id)}
+                      style={{
+                        flexShrink: 0,
+                        padding: '10px 14px',
+                        borderRadius: 'var(--radius-sm)',
+                        background: isSelected ? 'var(--color-primary)' : 'rgba(255, 255, 255, 0.04)',
+                        color: isSelected ? '#FFFFFF' : 'var(--color-text)',
+                        border: isSelected ? '1.5px solid var(--color-accent)' : '1px solid var(--border-glass)',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        transition: 'all 0.2s ease',
+                      }}
+                    >
+                      <div style={{ fontSize: '0.72rem', color: isSelected ? 'var(--color-accent)' : 'var(--text-muted)', fontWeight: 700 }}>
+                        DAY {stop.day} • {stop.category}
+                      </div>
+                      <div style={{ fontSize: '0.88rem', fontWeight: 700, marginTop: '2px', maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {stop.title}
+                      </div>
+                      <div style={{ fontSize: '0.75rem', marginTop: '2px', opacity: 0.85 }}>
+                        📍 {stop.altitude || 'Sea level'} • {stop.location}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Selected Stop Geo Card with Google Maps Navigation Links */}
+              {(() => {
+                const activeStop = stops.find((s) => s.id === selectedMapStopId) || stops[2];
+                return (
+                  <div
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.03)',
+                      border: '1px solid var(--border-glass)',
+                      borderRadius: 'var(--radius-sm)',
+                      padding: '24px',
+                      display: 'grid',
+                      gridTemplateColumns: 'minmax(0, 1fr) auto',
+                      gap: '20px',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <div>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '8px' }}>
+                        <span className="badge badge-sapphire" style={{ fontSize: '0.75rem' }}>
+                          Day {activeStop.day} • {activeStop.time}
+                        </span>
+                        <span className="badge badge-emerald" style={{ fontSize: '0.75rem' }}>
+                          Altitude: {activeStop.altitude || 'Highland'}
+                        </span>
+                        {activeStop.lat && (
+                          <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>
+                            {activeStop.lat.toFixed(4)}° N, {activeStop.lng?.toFixed(4)}° E
+                          </span>
+                        )}
+                      </div>
+                      <h3 style={{ fontSize: '1.25rem', marginBottom: '4px' }}>{activeStop.title}</h3>
+                      <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', marginBottom: '8px' }}>
+                        {activeStop.location} • Provider: <strong>{activeStop.provider}</strong>
+                      </p>
+                      {activeStop.bufferMins && (
+                        <div style={{ fontSize: '0.82rem', color: '#fbbf24', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span>⏱</span>
+                          <span>
+                            {activeStop.bufferMins} min transit buffer applied by Sri Lanka Terrain Speed Model.
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', minWidth: '220px' }}>
+                      <a
+                        href={`https://www.google.com/maps/dir/?api=1&destination=${activeStop.lat || 7.9570},${activeStop.lng || 80.7603}&travelmode=driving`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-primary"
+                        style={{ textAlign: 'center', textDecoration: 'none', fontSize: '0.85rem' }}
+                      >
+                        🚗 Navigate with Google Maps
+                      </a>
+                      <a
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activeStop.mapQuery || activeStop.title)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-secondary"
+                        style={{ textAlign: 'center', textDecoration: 'none', fontSize: '0.85rem' }}
+                      >
+                        🔍 Explore in Google Maps
+                      </a>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Emergency Safe-Zones Layer */}
+              <div
+                style={{
+                  marginTop: '24px',
+                  padding: '20px',
+                  borderRadius: 'var(--radius-sm)',
+                  background: 'rgba(225, 29, 72, 0.06)',
+                  border: '1px solid rgba(225, 29, 72, 0.25)',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '1.2rem' }}>🛡️</span>
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#f43f5e' }}>
+                        Nearest Emergency GPS Facilities (Sigiriya Sector)
+                      </div>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                        Instant Google Maps routes to verified tourist police stations and 24/7 general hospitals.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '12px' }}>
+                  <div
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.04)',
+                      padding: '14px',
+                      borderRadius: 'var(--radius-sm)',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>Sigiriya Tourist Police Station</div>
+                      <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>2.1 km away • 5 min drive</div>
+                    </div>
+                    <a
+                      href="https://www.google.com/maps/dir/?api=1&destination=7.9542,80.7554&travelmode=driving"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-secondary"
+                      style={{ fontSize: '0.78rem', padding: '6px 12px', textDecoration: 'none' }}
+                    >
+                      Maps Route
+                    </a>
+                  </div>
+
+                  <div
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.04)',
+                      padding: '14px',
+                      borderRadius: 'var(--radius-sm)',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>Dambulla Base General Hospital ER</div>
+                      <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>16.4 km away • 22 min drive</div>
+                    </div>
+                    <a
+                      href="https://www.google.com/maps/dir/?api=1&destination=7.8731,80.6517&travelmode=driving"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-secondary"
+                      style={{ fontSize: '0.78rem', padding: '6px 12px', textDecoration: 'none' }}
+                    >
+                      Maps Route
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* View 3: Pilot Corridor Hub */}
           {activeTab === 'corridor' && (
             <div className="glass-panel" style={{ padding: '32px' }}>
               <h2 style={{ fontSize: '1.4rem', marginBottom: '8px' }}>

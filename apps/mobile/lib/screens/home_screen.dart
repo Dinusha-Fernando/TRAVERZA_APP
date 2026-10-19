@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/service_category.dart';
 import '../theme/app_theme.dart';
+import '../utils/maps_launcher.dart';
 import '../widgets/photographic_card.dart';
 
 class SearchableTravelItem {
@@ -303,6 +304,46 @@ class _HomeScreenState extends State<HomeScreen> {
           fontSize: 12,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
           color: isSelected ? TraverzaColors.secondary : TraverzaColors.textMuted,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMapCorridorChip({
+    required String label,
+    required double lat,
+    required double lng,
+  }) {
+    return InkWell(
+      onTap: () {
+        TraverzaMapsLauncher.openLocation(
+          latitude: lat,
+          longitude: lng,
+          label: label,
+        );
+      },
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.place_rounded, size: 12, color: TraverzaColors.accent),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -919,6 +960,102 @@ class _HomeScreenState extends State<HomeScreen> {
                   onTap: widget.onNavigateToPlan,
                 );
               },
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          // Creative Google Maps Sri Lanka Corridor Explorer
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [TraverzaColors.primary, Color(0xFF0C4A6E)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: TraverzaColors.primary.withValues(alpha: 0.15),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: const [
+                          Icon(Icons.map_rounded, color: TraverzaColors.accent, size: 20),
+                          SizedBox(width: 8),
+                          Text(
+                            'Google Maps Corridor Explorer',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: TraverzaColors.secondary,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Text(
+                          'Live GPS',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Explore Sri Lanka’s curated corridors with verified routes, terrain warnings, and 1-tap Google Maps navigation.',
+                    style: TextStyle(color: Colors.white70, fontSize: 11.5, height: 1.3),
+                  ),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      _buildMapCorridorChip(
+                        label: 'Cultural Triangle (Sigiriya)',
+                        lat: 7.9570,
+                        lng: 80.7603,
+                      ),
+                      _buildMapCorridorChip(
+                        label: 'Kandy Highlands (Tooth Relic)',
+                        lat: 7.2936,
+                        lng: 80.6413,
+                      ),
+                      _buildMapCorridorChip(
+                        label: 'Nuwara Eliya (Tea Valleys)',
+                        lat: 6.9497,
+                        lng: 80.7891,
+                      ),
+                      _buildMapCorridorChip(
+                        label: 'Southern Galle Fort',
+                        lat: 6.0329,
+                        lng: 80.2168,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
 
