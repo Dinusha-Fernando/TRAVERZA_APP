@@ -2,7 +2,7 @@ import os
 from PIL import Image
 
 def main():
-    src_path = r"C:\Users\Dinusha\.gemini\antigravity-ide\brain\7eeaa6a4-4b29-484a-ac75-d1a718bdc140\traverza_app_icon_1792450659037.jpg"
+    src_path = os.path.join("assets", "branding", "traverza_ocean_icon.jpg")
     if not os.path.exists(src_path):
         print(f"Error: {src_path} not found")
         return
