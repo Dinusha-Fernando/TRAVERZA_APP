@@ -4,34 +4,48 @@
   --font-heading: 'Outfit', sans-serif;
   --font-body: 'Plus Jakarta Sans', sans-serif;
 
-  /* Color Palette - Sri Lankan Ceylon luxury theme */
-  --bg-main: #070b12;
-  --bg-surface: #0e1624;
-  --bg-surface-elevated: #152238;
-  --bg-glass: rgba(18, 28, 46, 0.65);
-  --border-glass: rgba(255, 255, 255, 0.08);
-  --border-focus: rgba(16, 185, 129, 0.4);
+  /* Traverza — Ocean Blue Color Palette */
+  --color-primary: #073B5C;
+  --color-primary-hover: #052B43;
+  --color-secondary: #087E8B;
+  --color-accent: #22B8CF;
+  --color-sand: #F4E7D0;
+  --color-background: #F7FAFC;
+  --color-surface: #FFFFFF;
+  --color-text: #102A43;
+  --color-text-muted: #627D98;
+  --color-border: #D9E5EC;
+  --color-rating: #F59E0B;
 
-  --accent-emerald: #10b981;
-  --accent-emerald-glow: rgba(16, 185, 129, 0.25);
-  --accent-amber: #f59e0b;
-  --accent-amber-glow: rgba(245, 158, 11, 0.25);
-  --accent-sapphire: #3b82f6;
-  --accent-sapphire-glow: rgba(59, 130, 246, 0.25);
-  --accent-ruby: #f43f5e;
+  /* Design System Semantic Tokens */
+  --bg-main: var(--color-background);
+  --bg-surface: var(--color-surface);
+  --bg-surface-elevated: #F0F4F8;
+  --bg-glass: rgba(255, 255, 255, 0.94);
+  --border-glass: var(--color-border);
+  --border-focus: var(--color-secondary);
 
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --accent-emerald: #087E8B;
+  --accent-emerald-glow: rgba(8, 126, 139, 0.18);
+  --accent-amber: #F59E0B;
+  --accent-amber-glow: rgba(245, 158, 11, 0.2);
+  --accent-sapphire: #073B5C;
+  --accent-sapphire-glow: rgba(7, 59, 92, 0.18);
+  --accent-ruby: #E11D48;
+  --accent-gold: #F59E0B;
+
+  --text-primary: var(--color-text);
+  --text-secondary: var(--color-text-muted);
+  --text-muted: #829AB1;
 
   --radius-sm: 8px;
   --radius-md: 14px;
   --radius-lg: 20px;
   --radius-pill: 9999px;
 
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
-  --shadow-glow: 0 0 25px rgba(16, 185, 129, 0.15);
-  --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  --shadow-sm: 0 2px 8px rgba(7, 59, 92, 0.05);
+  --shadow-glow: 0 0 25px rgba(34, 184, 207, 0.15);
+  --shadow-card: 0 10px 30px -10px rgba(7, 59, 92, 0.08), 0 2px 6px rgba(7, 59, 92, 0.03);
 
   --transition-fast: 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   --transition-normal: 0.28s cubic-bezier(0.16, 1, 0.3, 1);
@@ -45,22 +59,22 @@
 
 body {
   font-family: var(--font-body);
-  background-color: var(--bg-main);
-  color: var(--text-primary);
+  background-color: var(--color-background);
+  color: var(--color-text);
   min-height: 100vh;
   line-height: 1.6;
   overflow-x: hidden;
   background-image: 
-    radial-gradient(circle at 15% 10%, rgba(16, 185, 129, 0.08) 0%, transparent 40%),
-    radial-gradient(circle at 85% 20%, rgba(59, 130, 246, 0.07) 0%, transparent 45%),
-    radial-gradient(circle at 50% 80%, rgba(245, 158, 11, 0.05) 0%, transparent 50%);
+    radial-gradient(circle at 10% 10%, rgba(34, 184, 207, 0.07) 0%, transparent 40%),
+    radial-gradient(circle at 90% 20%, rgba(8, 126, 139, 0.06) 0%, transparent 45%),
+    radial-gradient(circle at 50% 85%, rgba(244, 231, 208, 0.35) 0%, transparent 50%);
   background-attachment: fixed;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--color-text);
   letter-spacing: -0.02em;
 }
 
@@ -71,10 +85,10 @@ a {
 
 /* Glassmorphic Components */
 .glass-panel {
-  background: var(--bg-glass);
+  background: var(--color-surface);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border-glass);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-card);
 }
@@ -83,10 +97,10 @@ a {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(7, 11, 18, 0.82);
+  background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border-glass);
+  border-bottom: 1px solid var(--color-border);
 }
 
 /* Buttons */
@@ -106,37 +120,41 @@ a {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: #ffffff;
-  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+  background: var(--color-primary);
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(7, 59, 92, 0.22);
 }
 
 .btn-primary:hover {
+  background: var(--color-primary-hover);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+  box-shadow: 0 6px 20px rgba(7, 59, 92, 0.32);
 }
 
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--text-primary);
-  border: 1px solid var(--border-glass);
+  background: var(--color-surface);
+  color: var(--color-primary);
+  border: 1px solid var(--color-border);
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--color-sand);
+  border-color: var(--color-secondary);
+  color: var(--color-primary);
   transform: translateY(-2px);
 }
 
 .btn-accent {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  color: #070b12;
+  background: var(--color-secondary);
+  color: #FFFFFF;
   font-weight: 700;
-  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+  box-shadow: 0 4px 14px rgba(8, 126, 139, 0.25);
 }
 
 .btn-accent:hover {
+  background: var(--color-primary);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.45);
+  box-shadow: 0 6px 20px rgba(7, 59, 92, 0.35);
 }
 
 /* Badges */
@@ -153,27 +171,33 @@ a {
 }
 
 .badge-emerald {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.3);
+  background: rgba(8, 126, 139, 0.1);
+  color: var(--color-secondary);
+  border: 1px solid rgba(8, 126, 139, 0.25);
 }
 
 .badge-amber {
-  background: rgba(245, 158, 11, 0.15);
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.3);
+  background: rgba(245, 158, 11, 0.12);
+  color: #D97706;
+  border: 1px solid rgba(245, 158, 11, 0.25);
 }
 
 .badge-sapphire {
-  background: rgba(59, 130, 246, 0.15);
-  color: #60a5fa;
-  border: 1px solid rgba(59, 130, 246, 0.3);
+  background: rgba(7, 59, 92, 0.08);
+  color: var(--color-primary);
+  border: 1px solid rgba(7, 59, 92, 0.2);
 }
 
 .badge-ruby {
-  background: rgba(244, 63, 94, 0.15);
-  color: #fb7185;
-  border: 1px solid rgba(244, 63, 94, 0.3);
+  background: rgba(225, 29, 72, 0.1);
+  color: var(--accent-ruby);
+  border: 1px solid rgba(225, 29, 72, 0.25);
+}
+
+.badge-sand {
+  background: var(--color-sand);
+  color: var(--color-primary);
+  border: 1px solid rgba(7, 59, 92, 0.15);
 }
 
 /* Animations */

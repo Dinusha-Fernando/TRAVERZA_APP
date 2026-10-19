@@ -121,7 +121,7 @@ class _SplashScreenState extends State<SplashScreen>
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: TraverzaColors.darkScaffold,
+      backgroundColor: TraverzaColors.primary,
       body: InkWell(
         onTap: _navigateToHome, // Tap anywhere to skip directly
         splashColor: Colors.transparent,
@@ -329,8 +329,7 @@ class _SplashScreenState extends State<SplashScreen>
                                 vertical: 8,
                               ),
                               decoration: BoxDecoration(
-                                color: TraverzaColors.surfaceNavy
-                                    .withValues(alpha: 0.75),
+                                color: TraverzaColors.primaryHover,
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
                                   color: Colors.white.withValues(alpha: 0.1),

@@ -47,8 +47,8 @@ export default function RootLayout({
                     height: '38px',
                     borderRadius: '10px',
                     objectFit: 'cover',
-                    boxShadow: '0 4px 14px rgba(11, 110, 142, 0.45)',
-                    border: '1.5px solid rgba(27, 166, 166, 0.4)',
+                    boxShadow: '0 4px 14px rgba(7, 59, 92, 0.15)',
+                    border: '1.5px solid var(--color-border)',
                   }}
                 />
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -58,7 +58,7 @@ export default function RootLayout({
                       fontWeight: 800,
                       fontSize: '1.3rem',
                       letterSpacing: '0.04em',
-                      color: '#ffffff',
+                      color: 'var(--color-primary)',
                     }}
                   >
                     TRAVERZA
@@ -66,7 +66,7 @@ export default function RootLayout({
                   <span
                     style={{
                       fontSize: '0.65rem',
-                      color: '#1BA6A6',
+                      color: 'var(--color-secondary)',
                       letterSpacing: '0.12em',
                       fontWeight: 700,
                     }}
@@ -184,7 +184,7 @@ export default function RootLayout({
               maxWidth: '1280px',
               margin: '32px auto 0',
               paddingTop: '20px',
-              borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+              borderTop: '1px solid var(--color-border)',
               textAlign: 'center',
               fontSize: '0.8rem',
               color: 'var(--text-muted)',

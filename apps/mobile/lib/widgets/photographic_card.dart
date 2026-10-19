@@ -380,12 +380,12 @@ class StyleCJourneyCard extends StatelessWidget {
         width: 250,
         margin: const EdgeInsets.only(right: 14),
         decoration: BoxDecoration(
-          color: TraverzaColors.surfaceNavy,
+          color: TraverzaColors.surface,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withOpacity(0.08)),
+          border: Border.all(color: TraverzaColors.border),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: TraverzaColors.primary.withValues(alpha: 0.06),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -414,7 +414,7 @@ class StyleCJourneyCard extends StatelessWidget {
                         gradient: LinearGradient(
                           colors: [
                             Colors.transparent,
-                            Colors.black.withOpacity(0.6),
+                            Colors.black.withValues(alpha: 0.6),
                           ],
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
@@ -427,7 +427,7 @@ class StyleCJourneyCard extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: TraverzaColors.oceanBlue.withOpacity(0.85),
+                          color: TraverzaColors.primary,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -447,7 +447,7 @@ class StyleCJourneyCard extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.7),
+                          color: Colors.black.withValues(alpha: 0.65),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -455,7 +455,7 @@ class StyleCJourneyCard extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
-                            color: TraverzaColors.warmSand,
+                            color: TraverzaColors.sand,
                           ),
                         ),
                       ),
@@ -475,7 +475,7 @@ class StyleCJourneyCard extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: TraverzaColors.text,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -485,7 +485,7 @@ class StyleCJourneyCard extends StatelessWidget {
                     item.corridor,
                     style: const TextStyle(
                       fontSize: 11,
-                      color: TraverzaColors.lagoonTeal,
+                      color: TraverzaColors.secondary,
                       fontWeight: FontWeight.w600,
                     ),
                     maxLines: 1,
@@ -496,7 +496,7 @@ class StyleCJourneyCard extends StatelessWidget {
                     item.description,
                     style: const TextStyle(
                       fontSize: 11,
-                      color: Colors.white70,
+                      color: TraverzaColors.textMuted,
                       height: 1.25,
                     ),
                     maxLines: 2,
@@ -526,7 +526,7 @@ class ManageJourneyShortcut extends StatelessWidget {
     required this.title,
     required this.description,
     required this.onTap,
-    this.iconColor = TraverzaColors.lagoonTeal,
+    this.iconColor = TraverzaColors.secondary,
   });
 
   @override
@@ -537,16 +537,23 @@ class ManageJourneyShortcut extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: TraverzaColors.surfaceNavy,
+          color: TraverzaColors.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withOpacity(0.07)),
+          border: Border.all(color: TraverzaColors.border),
+          boxShadow: [
+            BoxShadow(
+              color: TraverzaColors.primary.withValues(alpha: 0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: iconColor.withOpacity(0.15),
+                color: iconColor.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, color: iconColor, size: 20),
@@ -561,7 +568,7 @@ class ManageJourneyShortcut extends StatelessWidget {
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 13,
-                      color: Colors.white,
+                      color: TraverzaColors.text,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -569,7 +576,7 @@ class ManageJourneyShortcut extends StatelessWidget {
                     description,
                     style: const TextStyle(
                       fontSize: 11,
-                      color: Colors.white60,
+                      color: TraverzaColors.textMuted,
                     ),
                   ),
                 ],
@@ -577,7 +584,7 @@ class ManageJourneyShortcut extends StatelessWidget {
             ),
             const Icon(
               Icons.chevron_right_rounded,
-              color: Colors.white38,
+              color: TraverzaColors.textMuted,
               size: 18,
             ),
           ],

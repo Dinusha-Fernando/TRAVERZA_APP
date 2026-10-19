@@ -20,7 +20,7 @@ class TraverzaApp extends StatelessWidget {
     return MaterialApp(
       title: 'TRAVERZA',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
+      theme: AppTheme.theme,
       home: showSplash ? const SplashScreen() : const MainTripScreen(),
     );
   }
@@ -79,9 +79,9 @@ class _MainTripScreenState extends State<MainTripScreen> {
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
         type: BottomNavigationBarType.fixed,
-        backgroundColor: TraverzaColors.darkScaffold,
-        selectedItemColor: TraverzaColors.lagoonTeal,
-        unselectedItemColor: Colors.white54,
+        backgroundColor: TraverzaColors.surface,
+        selectedItemColor: TraverzaColors.secondary,
+        unselectedItemColor: TraverzaColors.textMuted,
         selectedFontSize: 11,
         unselectedFontSize: 11,
         items: const [
@@ -153,18 +153,18 @@ class _MainTripScreenState extends State<MainTripScreen> {
                   fontWeight: FontWeight.w900,
                   letterSpacing: 1.4,
                   fontSize: 15,
-                  color: Colors.white,
+                  color: TraverzaColors.primary,
                 ),
               ),
               Row(
                 children: const [
-                  Icon(Icons.location_on, size: 10, color: TraverzaColors.lagoonTeal),
+                  Icon(Icons.location_on, size: 10, color: TraverzaColors.secondary),
                   SizedBox(width: 2),
                   Text(
                     'SRI LANKA · CULTURAL TRIANGLE',
                     style: TextStyle(
                       fontSize: 8.5,
-                      color: TraverzaColors.warmSand,
+                      color: TraverzaColors.secondary,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.8,
                     ),
@@ -179,7 +179,7 @@ class _MainTripScreenState extends State<MainTripScreen> {
         IconButton(
           icon: Stack(
             children: [
-              const Icon(Icons.notifications_none_rounded, color: Colors.white70),
+              const Icon(Icons.notifications_none_rounded, color: TraverzaColors.primary),
               Positioned(
                 right: 2,
                 top: 2,
@@ -197,7 +197,7 @@ class _MainTripScreenState extends State<MainTripScreen> {
           onPressed: () {},
         ),
         IconButton(
-          icon: const Icon(Icons.account_circle_outlined, color: Colors.white70),
+          icon: const Icon(Icons.account_circle_outlined, color: TraverzaColors.primary),
           onPressed: () => setState(() => _currentIndex = 4),
         ),
       ],
@@ -221,13 +221,16 @@ class _MainTripScreenState extends State<MainTripScreen> {
             margin: const EdgeInsets.all(16),
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF10283E), Color(0xFF0C1929)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              color: TraverzaColors.surface,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: TraverzaColors.lagoonTeal.withOpacity(0.3)),
+              border: Border.all(color: TraverzaColors.border),
+              boxShadow: [
+                BoxShadow(
+                  color: TraverzaColors.primary.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -240,7 +243,7 @@ class _MainTripScreenState extends State<MainTripScreen> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: TraverzaColors.text,
                       ),
                     ),
                     Container(
@@ -278,7 +281,7 @@ class _MainTripScreenState extends State<MainTripScreen> {
                   'ID: TRIP-LK-2026-9041',
                   style: TextStyle(
                     fontFamily: 'monospace',
-                    color: TraverzaColors.lagoonTeal,
+                    color: TraverzaColors.secondary,
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
                   ),
@@ -286,18 +289,18 @@ class _MainTripScreenState extends State<MainTripScreen> {
                 const SizedBox(height: 6),
                 const Text(
                   'Colombo - Sigiriya - Kandy - Nuwara Eliya (3 Days)',
-                  style: TextStyle(color: Colors.white70, fontSize: 13),
+                  style: TextStyle(color: TraverzaColors.textMuted, fontSize: 13),
                 ),
                 const SizedBox(height: 14),
                 Row(
                   children: const [
-                    Icon(Icons.people_alt_outlined, size: 16, color: Colors.white54),
+                    Icon(Icons.people_alt_outlined, size: 16, color: TraverzaColors.secondary),
                     SizedBox(width: 6),
-                    Text('2 Travellers', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    Text('2 Travellers', style: TextStyle(color: TraverzaColors.textMuted, fontSize: 12)),
                     SizedBox(width: 16),
-                    Icon(Icons.payments_outlined, size: 16, color: Colors.white54),
+                    Icon(Icons.payments_outlined, size: 16, color: TraverzaColors.secondary),
                     SizedBox(width: 6),
-                    Text('LKR 68,500 Total', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    Text('LKR 68,500 Total', style: TextStyle(color: TraverzaColors.textMuted, fontSize: 12)),
                   ],
                 ),
               ],
@@ -314,7 +317,7 @@ class _MainTripScreenState extends State<MainTripScreen> {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: TraverzaColors.text,
                   ),
                 ),
                 TextButton(
@@ -325,7 +328,7 @@ class _MainTripScreenState extends State<MainTripScreen> {
                   },
                   child: Text(
                     _hotelConfirmed ? 'Simulate Unconfirmed' : 'Simulate Provider Accept',
-                    style: const TextStyle(color: TraverzaColors.lagoonTeal, fontSize: 12),
+                    style: const TextStyle(color: TraverzaColors.secondary, fontSize: 12, fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
@@ -439,7 +442,7 @@ class _MainTripScreenState extends State<MainTripScreen> {
                       Text(
                         time,
                         style: const TextStyle(
-                          color: Colors.white54,
+                          color: TraverzaColors.textMuted,
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
@@ -448,7 +451,7 @@ class _MainTripScreenState extends State<MainTripScreen> {
                       Text(
                         title,
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: TraverzaColors.text,
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                         ),
@@ -478,7 +481,7 @@ class _MainTripScreenState extends State<MainTripScreen> {
             const SizedBox(height: 10),
             Text(
               subtitle,
-              style: const TextStyle(color: Colors.white70, fontSize: 12),
+              style: const TextStyle(color: TraverzaColors.textMuted, fontSize: 12),
             ),
             if (price != null) ...[
               const SizedBox(height: 8),
@@ -492,7 +495,7 @@ class _MainTripScreenState extends State<MainTripScreen> {
                   Text(
                     price,
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: TraverzaColors.primary,
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
                     ),
@@ -514,16 +517,16 @@ class _MainTripScreenState extends State<MainTripScreen> {
           Container(
             width: 2,
             height: 28,
-            color: TraverzaColors.lagoonTeal.withOpacity(0.4),
+            color: TraverzaColors.secondary.withValues(alpha: 0.5),
           ),
           const SizedBox(width: 16),
-          Icon(Icons.directions_car_outlined, size: 14, color: Colors.white.withOpacity(0.4)),
+          Icon(Icons.directions_car_outlined, size: 14, color: TraverzaColors.textMuted),
           const SizedBox(width: 6),
           Text(
             '$duration • $note',
             style: TextStyle(
               fontSize: 11,
-              color: Colors.white.withOpacity(0.4),
+              color: TraverzaColors.textMuted,
               fontStyle: FontStyle.italic,
             ),
           ),
@@ -563,21 +566,21 @@ class _MainTripScreenState extends State<MainTripScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: TraverzaColors.oceanBlue.withOpacity(0.4),
+                  color: TraverzaColors.secondary.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: TraverzaColors.lagoonTeal),
+                  border: Border.all(color: TraverzaColors.secondary),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       'Filtered: $_selectedCategory',
-                      style: const TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.bold),
+                      style: const TextStyle(fontSize: 11, color: TraverzaColors.primary, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(width: 6),
                     InkWell(
                       onTap: () => setState(() => _selectedCategory = null),
-                      child: const Icon(Icons.close, size: 14, color: Colors.white),
+                      child: const Icon(Icons.close, size: 14, color: TraverzaColors.primary),
                     ),
                   ],
                 ),
@@ -649,13 +652,13 @@ class _MainTripScreenState extends State<MainTripScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: TraverzaColors.lagoonTeal.withOpacity(0.15),
+                    color: TraverzaColors.secondary.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     category,
                     style: const TextStyle(
-                      color: TraverzaColors.lagoonTeal,
+                      color: TraverzaColors.secondary,
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
                     ),
@@ -663,19 +666,19 @@ class _MainTripScreenState extends State<MainTripScreen> {
                 ),
                 Text(
                   rating,
-                  style: const TextStyle(color: Colors.white70, fontSize: 11),
+                  style: const TextStyle(color: TraverzaColors.textMuted, fontSize: 11, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
             const SizedBox(height: 8),
             Text(
               title,
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: TraverzaColors.text),
             ),
             const SizedBox(height: 4),
             Text(
               '$provider • $license',
-              style: const TextStyle(fontSize: 12, color: Colors.white60),
+              style: const TextStyle(fontSize: 12, color: TraverzaColors.textMuted),
             ),
             const SizedBox(height: 10),
             Row(
@@ -683,14 +686,14 @@ class _MainTripScreenState extends State<MainTripScreen> {
               children: [
                 Text(
                   policy,
-                  style: const TextStyle(fontSize: 11, color: Colors.white38),
+                  style: const TextStyle(fontSize: 11, color: TraverzaColors.textMuted),
                 ),
                 Text(
                   price,
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF34D399),
+                    color: TraverzaColors.primary,
                   ),
                 ),
               ],
@@ -708,12 +711,12 @@ class _MainTripScreenState extends State<MainTripScreen> {
       children: [
         const Text(
           'Trip Readiness Check',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: TraverzaColors.text),
         ),
         const SizedBox(height: 6),
         const Text(
           'Authoritative audit of booking statuses, highland transit feasibility, and compliance.',
-          style: TextStyle(fontSize: 12, color: Colors.white60),
+          style: TextStyle(fontSize: 12, color: TraverzaColors.textMuted),
         ),
         const SizedBox(height: 16),
 
@@ -753,11 +756,11 @@ class _MainTripScreenState extends State<MainTripScreen> {
         ),
         title: Text(
           title,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: TraverzaColors.text),
         ),
         subtitle: Text(
           subtitle,
-          style: const TextStyle(fontSize: 12, color: Colors.white60),
+          style: const TextStyle(fontSize: 12, color: TraverzaColors.textMuted),
         ),
       ),
     );
@@ -772,15 +775,22 @@ class _MainTripScreenState extends State<MainTripScreen> {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: TraverzaColors.surfaceNavy,
+            color: TraverzaColors.surface,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white10),
+            border: Border.all(color: TraverzaColors.border),
+            boxShadow: [
+              BoxShadow(
+                color: TraverzaColors.primary.withValues(alpha: 0.04),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: Row(
             children: [
               const CircleAvatar(
                 radius: 24,
-                backgroundColor: TraverzaColors.oceanBlue,
+                backgroundColor: TraverzaColors.primary,
                 child: Text('D', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20)),
               ),
               const SizedBox(width: 14),
@@ -790,11 +800,11 @@ class _MainTripScreenState extends State<MainTripScreen> {
                   children: const [
                     Text(
                       'Dinusha Wijesinghe',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: TraverzaColors.text),
                     ),
                     Text(
                       'Independent International Traveller • Pilot Member',
-                      style: TextStyle(fontSize: 11, color: Colors.white60),
+                      style: TextStyle(fontSize: 11, color: TraverzaColors.textMuted),
                     ),
                   ],
                 ),
@@ -806,12 +816,12 @@ class _MainTripScreenState extends State<MainTripScreen> {
 
         const Text(
           'Offline SOS & Emergency Vault',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: TraverzaColors.text),
         ),
         const SizedBox(height: 6),
         const Text(
           'Available 100% offline during low-connectivity travel across mountain tea routes.',
-          style: TextStyle(fontSize: 12, color: Colors.white60),
+          style: TextStyle(fontSize: 12, color: TraverzaColors.textMuted),
         ),
         const SizedBox(height: 16),
 
@@ -857,7 +867,7 @@ class _MainTripScreenState extends State<MainTripScreen> {
         ),
         title: Text(
           title,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: TraverzaColors.text),
         ),
         subtitle: Text(
           description,
@@ -866,14 +876,14 @@ class _MainTripScreenState extends State<MainTripScreen> {
         trailing: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
-            color: TraverzaColors.roseEmergency.withOpacity(0.2),
+            color: TraverzaColors.roseEmergency.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(
             number,
             style: const TextStyle(
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: TraverzaColors.roseEmergency,
               fontSize: 12,
             ),
           ),

@@ -62,7 +62,7 @@ class HomeScreen extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w900,
-                    color: Colors.white,
+                    color: TraverzaColors.text,
                     letterSpacing: -0.4,
                   ),
                 ),
@@ -71,7 +71,7 @@ class HomeScreen extends StatelessWidget {
                   'Discover places, find experiences and organise every part of your journey.',
                   style: TextStyle(
                     fontSize: 13,
-                    color: TraverzaColors.textSecondary,
+                    color: TraverzaColors.textMuted,
                     height: 1.3,
                   ),
                 ),
@@ -87,12 +87,12 @@ class HomeScreen extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
               decoration: BoxDecoration(
-                color: TraverzaColors.surfaceNavy,
+                color: TraverzaColors.surface,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withOpacity(0.09)),
+                border: Border.all(color: TraverzaColors.border),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
+                    color: TraverzaColors.primary.withValues(alpha: 0.05),
                     blurRadius: 8,
                     offset: const Offset(0, 3),
                   ),
@@ -100,7 +100,7 @@ class HomeScreen extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.search_rounded, color: TraverzaColors.lagoonTeal, size: 20),
+                  const Icon(Icons.search_rounded, color: TraverzaColors.secondary, size: 20),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Column(
@@ -110,15 +110,15 @@ class HomeScreen extends StatelessWidget {
                           'Where would you like to go?',
                           style: TextStyle(
                             fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: TraverzaColors.warmSand,
+                            fontWeight: FontWeight.w700,
+                            color: TraverzaColors.primary,
                           ),
                         ),
                         Text(
                           'Search destinations, stays and experiences',
                           style: TextStyle(
                             fontSize: 13,
-                            color: Colors.white70,
+                            color: TraverzaColors.textMuted,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -129,11 +129,11 @@ class HomeScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(7),
                     decoration: BoxDecoration(
-                      color: TraverzaColors.surfaceElevated,
+                      color: TraverzaColors.background,
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.white10),
+                      border: Border.all(color: TraverzaColors.border),
                     ),
-                    child: const Icon(Icons.tune_rounded, size: 16, color: Colors.white70),
+                    child: const Icon(Icons.tune_rounded, size: 16, color: TraverzaColors.primary),
                   ),
                 ],
               ),
@@ -154,16 +154,12 @@ class HomeScreen extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF10283E), Color(0xFF0A1828)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  color: TraverzaColors.surface,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: TraverzaColors.lagoonTeal.withOpacity(0.35)),
+                  border: Border.all(color: TraverzaColors.border),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.25),
+                      color: TraverzaColors.primary.withValues(alpha: 0.05),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -180,13 +176,13 @@ class HomeScreen extends StatelessWidget {
                             Container(
                               padding: const EdgeInsets.all(6),
                               decoration: BoxDecoration(
-                                color: TraverzaColors.oceanBlue.withOpacity(0.3),
+                                color: TraverzaColors.secondary.withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: const Icon(
                                 Icons.alt_route_rounded,
                                 size: 16,
-                                color: TraverzaColors.lagoonTeal,
+                                color: TraverzaColors.secondary,
                               ),
                             ),
                             const SizedBox(width: 8),
@@ -196,7 +192,7 @@ class HomeScreen extends StatelessWidget {
                                 fontSize: 11,
                                 fontWeight: FontWeight.w800,
                                 letterSpacing: 1.0,
-                                color: TraverzaColors.lagoonTeal,
+                                color: TraverzaColors.secondary,
                               ),
                             ),
                           ],
@@ -235,7 +231,7 @@ class HomeScreen extends StatelessWidget {
                       'ID: TRIP-LK-2026-9041',
                       style: TextStyle(
                         fontFamily: 'monospace',
-                        color: TraverzaColors.lagoonTeal,
+                        color: TraverzaColors.secondary,
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
@@ -246,13 +242,13 @@ class HomeScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: TraverzaColors.text,
                       ),
                     ),
                     const SizedBox(height: 6),
                     Row(
                       children: [
-                        const Icon(Icons.location_on_outlined, size: 14, color: TraverzaColors.warmSand),
+                        const Icon(Icons.location_on_outlined, size: 14, color: TraverzaColors.secondary),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
@@ -261,7 +257,7 @@ class HomeScreen extends StatelessWidget {
                                 : 'Awaiting confirmation: Sigiriya Water Garden Eco Villa (12h SLA)',
                             style: const TextStyle(
                               fontSize: 11,
-                              color: Colors.white70,
+                              color: TraverzaColors.textMuted,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -275,14 +271,14 @@ class HomeScreen extends StatelessWidget {
                       children: [
                         const Text(
                           '2 Travellers • LKR 68,500 Committed',
-                          style: TextStyle(fontSize: 11, color: Colors.white54),
+                          style: TextStyle(fontSize: 11, color: TraverzaColors.textMuted),
                         ),
                         InkWell(
                           onTap: onNavigateToPlan,
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                             decoration: BoxDecoration(
-                              color: TraverzaColors.oceanBlue,
+                              color: TraverzaColors.primary,
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Row(
@@ -325,20 +321,20 @@ class HomeScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: TraverzaColors.text,
                         letterSpacing: -0.2,
                       ),
                     ),
                     Text(
                       'All curated providers across the island',
-                      style: TextStyle(fontSize: 11, color: TraverzaColors.textSecondary),
+                      style: TextStyle(fontSize: 11, color: TraverzaColors.textMuted),
                     ),
                   ],
                 ),
                 TextButton(
                   onPressed: onNavigateToCatalogue,
                   style: TextButton.styleFrom(
-                    foregroundColor: TraverzaColors.lagoonTeal,
+                    foregroundColor: TraverzaColors.secondary,
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                   ),
                   child: Row(
@@ -395,13 +391,13 @@ class HomeScreen extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: TraverzaColors.text,
                     letterSpacing: -0.2,
                   ),
                 ),
                 Text(
                   'Expertly paced multi-day corridors with verified drivers',
-                  style: TextStyle(fontSize: 11, color: TraverzaColors.textSecondary),
+                  style: TextStyle(fontSize: 11, color: TraverzaColors.textMuted),
                 ),
               ],
             ),
@@ -440,13 +436,13 @@ class HomeScreen extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: TraverzaColors.text,
                     letterSpacing: -0.2,
                   ),
                 ),
                 const Text(
                   'Intelligent trip coordination & safety utilities',
-                  style: TextStyle(fontSize: 11, color: TraverzaColors.textSecondary),
+                  style: TextStyle(fontSize: 11, color: TraverzaColors.textMuted),
                 ),
                 const SizedBox(height: 12),
                 ManageJourneyShortcut(
@@ -516,7 +512,7 @@ class HomeScreen extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: TraverzaColors.text,
                             ),
                           ),
                           SizedBox(height: 2),
@@ -524,7 +520,7 @@ class HomeScreen extends StatelessWidget {
                             'Sigiriya Eco Villa requested. Response guaranteed within 12h SLA. Operations Rescue Desk is active.',
                             style: TextStyle(
                               fontSize: 10,
-                              color: Colors.white70,
+                              color: TraverzaColors.textMuted,
                               height: 1.25,
                             ),
                           ),
