@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
+import 'screens/splash_screen.dart';
 import 'theme/app_theme.dart';
 
 void main() {
@@ -7,7 +8,12 @@ void main() {
 }
 
 class TraverzaApp extends StatelessWidget {
-  const TraverzaApp({super.key});
+  final bool showSplash;
+
+  const TraverzaApp({
+    super.key,
+    this.showSplash = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +21,7 @@ class TraverzaApp extends StatelessWidget {
       title: 'TRAVERZA',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
-      home: const MainTripScreen(),
+      home: showSplash ? const SplashScreen() : const MainTripScreen(),
     );
   }
 }
