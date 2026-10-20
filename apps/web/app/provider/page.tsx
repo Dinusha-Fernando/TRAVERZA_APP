@@ -91,14 +91,60 @@ const INITIAL_DOCS: ProviderDoc[] = [
   },
 ];
 
+interface ProviderPackage {
+  id: string;
+  title: string;
+  type: 'OPERATOR_PACKAGE' | 'ITINERARY_TEMPLATE';
+  duration: string;
+  priceBasis: string;
+  priceLKR: number;
+  status: 'PUBLISHED' | 'IN_REVIEW' | 'DRAFT' | 'CHANGES_REQUESTED';
+  corridor: string;
+  version: number;
+  sltdaLicense: string;
+}
+
+const INITIAL_PACKAGES: ProviderPackage[] = [
+  {
+    id: 'pkg-1',
+    title: '3-Day Cultural Triangle Signature Escape',
+    type: 'OPERATOR_PACKAGE',
+    duration: '3 Days / 2 Nights',
+    priceBasis: 'PER_PERSON (Bundled)',
+    priceLKR: 68500,
+    status: 'PUBLISHED',
+    corridor: 'Colombo · Sigiriya · Kandy · Nuwara Eliya',
+    version: 1,
+    sltdaLicense: 'SLTDA/SQA/2026/044',
+  },
+  {
+    id: 'pkg-2',
+    title: '4-Day Heritage & Minneriya Safari Tour',
+    type: 'OPERATOR_PACKAGE',
+    duration: '4 Days / 3 Nights',
+    priceBasis: 'PER_PERSON (Bundled)',
+    priceLKR: 94000,
+    status: 'IN_REVIEW',
+    corridor: 'Sigiriya · Polonnaruwa · Minneriya',
+    version: 2,
+    sltdaLicense: 'SLTDA/SQA/2026/108',
+  },
+];
+
 export default function ProviderPortalPage() {
   const [requests, setRequests] = useState<BookingRequest[]>(INITIAL_REQUESTS);
   const [docs, setDocs] = useState<ProviderDoc[]>(INITIAL_DOCS);
-  const [activeTab, setActiveTab] = useState<'inbox' | 'compliance' | 'finance'>('inbox');
+  const [packages, setPackages] = useState<ProviderPackage[]>(INITIAL_PACKAGES);
+  const [activeTab, setActiveTab] = useState<'inbox' | 'compliance' | 'finance' | 'packages'>('inbox');
   const [notification, setNotification] = useState<string | null>(null);
   const [newDocType, setNewDocType] = useState('Vehicle Fleet Commercial Permit');
   const [newDocNumber, setNewDocNumber] = useState('');
   const [showDocModal, setShowDocModal] = useState(false);
+  const [showPackageModal, setShowPackageModal] = useState(false);
+  const [pkgTitle, setPkgTitle] = useState('');
+  const [pkgType, setPkgType] = useState<'OPERATOR_PACKAGE' | 'ITINERARY_TEMPLATE'>('OPERATOR_PACKAGE');
+  const [pkgPrice, setPkgPrice] = useState('72000');
+  const [pkgDuration, setPkgDuration] = useState('3 Days / 2 Nights');
 
   const handleAction = (id: string, action: 'ACCEPT' | 'DECLINE') => {
     setRequests((prev) =>
@@ -194,6 +240,9 @@ export default function ProviderPortalPage() {
           <Link href="/" className="btn btn-secondary">
             View Traveller Canvas
           </Link>
+          <button onClick={() => setShowPackageModal(true)} className="btn btn-secondary" style={{ borderColor: 'var(--secondary)' }}>
+            + Create Package
+          </button>
           <button onClick={() => setShowDocModal(true)} className="btn btn-primary">
             + Upload Credentials
           </button>
@@ -201,12 +250,18 @@ export default function ProviderPortalPage() {
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
+      <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
         <button
           onClick={() => setActiveTab('inbox')}
           className={`btn ${activeTab === 'inbox' ? 'btn-primary' : 'btn-secondary'}`}
         >
           Request Inbox ({requests.filter((r) => r.status === 'PENDING').length})
+        </button>
+        <button
+          onClick={() => setActiveTab('packages')}
+          className={`btn ${activeTab === 'packages' ? 'btn-primary' : 'btn-secondary'}`}
+        >
+          Packages & Routes ({packages.length})
         </button>
         <button
           onClick={() => setActiveTab('compliance')}
@@ -493,6 +548,235 @@ export default function ProviderPortalPage() {
             }}
           >
             ℹ️ <strong>Settlement Cycle:</strong> Payouts are reconciled and transferred weekly to Commercial Bank of Ceylon A/C 1000-8409-2211 under SLTDA compliance rules.
+          </div>
+        </div>
+      )}
+
+      {/* TAB: PACKAGES & ROUTES */}
+      {activeTab === 'packages' && (
+        <div className="glass-panel" style={{ padding: '24px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <div>
+              <h2 style={{ fontSize: '1.3rem', margin: 0 }}>Published Packages & Route Templates</h2>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '4px' }}>
+                Curated offers submitted for SLTDA regulatory and TripGraph operational validation.
+              </p>
+            </div>
+            <button onClick={() => setShowPackageModal(true)} className="btn btn-primary" style={{ fontSize: '0.85rem' }}>
+              + Create New Journey
+            </button>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {packages.map((pkg) => (
+              <div
+                key={pkg.id}
+                style={{
+                  padding: '20px',
+                  background: 'rgba(255, 255, 255, 0.02)',
+                  borderRadius: 'var(--radius-sm)',
+                  border: '1px solid var(--border-glass)',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: '16px',
+                }}
+              >
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <span
+                      className={`badge ${
+                        pkg.type === 'OPERATOR_PACKAGE' ? 'badge-primary' : 'badge-secondary'
+                      }`}
+                      style={{ fontSize: '0.72rem' }}
+                    >
+                      {pkg.type === 'OPERATOR_PACKAGE' ? 'OPERATOR BUNDLE' : 'ITINERARY TEMPLATE'}
+                    </span>
+                    <span
+                      className={`badge ${
+                        pkg.status === 'PUBLISHED'
+                          ? 'badge-emerald'
+                          : pkg.status === 'IN_REVIEW'
+                          ? 'badge-amber'
+                          : 'badge-secondary'
+                      }`}
+                    >
+                      {pkg.status}
+                    </span>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>v{pkg.version}.0</span>
+                  </div>
+                  <h3 style={{ fontSize: '1.15rem', marginTop: '8px', marginBottom: '4px' }}>{pkg.title}</h3>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.82rem', margin: 0 }}>
+                    Corridor: <strong>{pkg.corridor}</strong> • Duration: <strong>{pkg.duration}</strong> • SLTDA: <strong>{pkg.sltdaLicense}</strong>
+                  </p>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--accent-cyan)' }}>
+                      LKR {pkg.priceLKR.toLocaleString()}
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{pkg.priceBasis}</div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setNotification(`Opened editor for ${pkg.title} (v${pkg.version}.0).`);
+                      setTimeout(() => setNotification(null), 4000);
+                    }}
+                    className="btn btn-secondary"
+                    style={{ fontSize: '0.8rem', padding: '8px 14px' }}
+                  >
+                    Edit Package
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Create Package Modal */}
+      {showPackageModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.75)',
+            backdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+          }}
+        >
+          <div
+            className="glass-panel"
+            style={{ width: '540px', padding: '32px', border: '1px solid var(--secondary)' }}
+          >
+            <h3 style={{ fontSize: '1.3rem', marginBottom: '16px' }}>Create Travel Package / Route</h3>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!pkgTitle.trim()) return;
+
+                const newP: ProviderPackage = {
+                  id: `pkg-${Date.now().toString().slice(-4)}`,
+                  title: pkgTitle,
+                  type: pkgType,
+                  duration: pkgDuration,
+                  priceBasis: pkgType === 'OPERATOR_PACKAGE' ? 'PER_PERSON (Bundled)' : 'ESTIMATED_PER_PERSON',
+                  priceLKR: parseFloat(pkgPrice) || 68500,
+                  status: 'IN_REVIEW',
+                  corridor: 'Colombo · Sigiriya · Kandy · Nuwara Eliya',
+                  version: 1,
+                  sltdaLicense: 'SLTDA/SQA/2026/089',
+                };
+
+                setPackages((prev) => [newP, ...prev]);
+                setShowPackageModal(false);
+                setPkgTitle('');
+                setNotification(`Package "${newP.title}" created & submitted for Admin Approval (Queue Ref: #REV-${Date.now().toString().slice(-4)}).`);
+                setTimeout(() => setNotification(null), 5000);
+              }}
+            >
+              <div style={{ marginBottom: '14px' }}>
+                <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                  Package Classification (Spec §3)
+                </label>
+                <select
+                  value={pkgType}
+                  onChange={(e) => setPkgType(e.target.value as any)}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    borderRadius: 'var(--radius-sm)',
+                    background: '#070b12',
+                    border: '1px solid var(--border-glass)',
+                    color: '#fff',
+                  }}
+                >
+                  <option value="OPERATOR_PACKAGE">Type 1 — Operator Package (Bundled single seller offer)</option>
+                  <option value="ITINERARY_TEMPLATE">Type 2 — Itinerary Template (Editorial route inspiration)</option>
+                </select>
+              </div>
+
+              <div style={{ marginBottom: '14px' }}>
+                <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                  Journey Title
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. 3-Day Cultural Triangle Heritage & Safari Escape"
+                  value={pkgTitle}
+                  onChange={(e) => setPkgTitle(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    borderRadius: 'var(--radius-sm)',
+                    background: '#070b12',
+                    border: '1px solid var(--border-glass)',
+                    color: '#fff',
+                  }}
+                  required
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                    Duration
+                  </label>
+                  <input
+                    type="text"
+                    value={pkgDuration}
+                    onChange={(e) => setPkgDuration(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      borderRadius: 'var(--radius-sm)',
+                      background: '#070b12',
+                      border: '1px solid var(--border-glass)',
+                      color: '#fff',
+                    }}
+                    required
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                    Price Basis (LKR)
+                  </label>
+                  <input
+                    type="number"
+                    value={pkgPrice}
+                    onChange={(e) => setPkgPrice(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      borderRadius: 'var(--radius-sm)',
+                      background: '#070b12',
+                      border: '1px solid var(--border-glass)',
+                      color: '#fff',
+                    }}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '20px' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowPackageModal(false)}
+                  className="btn btn-secondary"
+                  style={{ fontSize: '0.85rem' }}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="btn btn-primary" style={{ fontSize: '0.85rem' }}>
+                  Submit for Admin Review
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

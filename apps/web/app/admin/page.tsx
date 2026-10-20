@@ -26,6 +26,43 @@ interface ProviderVerificationItem {
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
 }
 
+interface PackageReviewItem {
+  id: string;
+  packageTitle: string;
+  providerOrg: string;
+  type: 'OPERATOR_PACKAGE' | 'ITINERARY_TEMPLATE';
+  priceLKR: number;
+  corridor: string;
+  sltdaLicense: string;
+  submittedAt: string;
+  status: 'IN_REVIEW' | 'APPROVED' | 'CHANGES_REQUESTED' | 'REJECTED';
+}
+
+const INITIAL_PACKAGE_REVIEWS: PackageReviewItem[] = [
+  {
+    id: 'REV-801',
+    packageTitle: '4-Day Heritage & Minneriya Safari Tour',
+    providerOrg: 'Wild Ceylon Safaris & Expeditions',
+    type: 'OPERATOR_PACKAGE',
+    priceLKR: 94000,
+    corridor: 'Sigiriya · Polonnaruwa · Minneriya',
+    sltdaLicense: 'SLTDA/SQA/2026/108',
+    submittedAt: 'Today, 07:45 UTC',
+    status: 'IN_REVIEW',
+  },
+  {
+    id: 'REV-802',
+    packageTitle: '3-Day Cultural Triangle Signature Escape',
+    providerOrg: 'Ceylon Heritage Travel Guild',
+    type: 'OPERATOR_PACKAGE',
+    priceLKR: 68500,
+    corridor: 'Colombo · Sigiriya · Kandy · Nuwara Eliya',
+    sltdaLicense: 'SLTDA/SQA/2026/044',
+    submittedAt: 'Yesterday, 14:10 UTC',
+    status: 'APPROVED',
+  },
+];
+
 const INITIAL_EXCEPTIONS: ExceptionItem[] = [
   {
     id: 'CASE-401',
@@ -86,10 +123,27 @@ const INITIAL_VERIFICATIONS: ProviderVerificationItem[] = [
 export default function AdminOpsPage() {
   const [exceptions, setExceptions] = useState<ExceptionItem[]>(INITIAL_EXCEPTIONS);
   const [verifications, setVerifications] = useState<ProviderVerificationItem[]>(INITIAL_VERIFICATIONS);
+  const [packageReviews, setPackageReviews] = useState<PackageReviewItem[]>(INITIAL_PACKAGE_REVIEWS);
   const [activeCaseId, setActiveCaseId] = useState<string>('CASE-401');
-  const [adminTab, setAdminTab] = useState<'exceptions' | 'verification' | 'audit'>('exceptions');
+  const [adminTab, setAdminTab] = useState<'exceptions' | 'verification' | 'packages' | 'audit'>('exceptions');
   const [resolutionInput, setResolutionInput] = useState('');
   const [notification, setNotification] = useState<string | null>(null);
+
+  const handlePackageDecision = (id: string, decision: 'APPROVED' | 'CHANGES_REQUESTED' | 'REJECTED' | 'IN_REVIEW') => {
+    setPackageReviews((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, status: decision } : p))
+    );
+    const msg =
+      decision === 'APPROVED'
+        ? `Package ${id} approved & published to traveller marketplace! Immutable snapshot created.`
+        : decision === 'CHANGES_REQUESTED'
+        ? `Changes requested for package ${id}. Provider notified with audit checklist.`
+        : decision === 'IN_REVIEW'
+        ? `Package ${id} returned to IN_REVIEW status.`
+        : `Package ${id} rejected. Reason logged in regulatory audit trail.`;
+    setNotification(msg);
+    setTimeout(() => setNotification(null), 5000);
+  };
 
   const activeCase = exceptions.find((c) => c.id === activeCaseId) || exceptions[0];
 
@@ -177,12 +231,18 @@ export default function AdminOpsPage() {
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
+      <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
         <button
           onClick={() => setAdminTab('exceptions')}
           className={`btn ${adminTab === 'exceptions' ? 'btn-primary' : 'btn-secondary'}`}
         >
           Urgent Exception Queue ({exceptions.filter((e) => e.status !== 'RESOLVED').length})
+        </button>
+        <button
+          onClick={() => setAdminTab('packages')}
+          className={`btn ${adminTab === 'packages' ? 'btn-primary' : 'btn-secondary'}`}
+        >
+          Package Review Queue ({packageReviews.filter((p) => p.status === 'IN_REVIEW').length})
         </button>
         <button
           onClick={() => setAdminTab('verification')}
@@ -480,6 +540,105 @@ export default function AdminOpsPage() {
                     </div>
                   ) : (
                     <span className="badge badge-emerald">Verified</span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Tab: Package Review Queue (Spec §3.3 & §10.2) */}
+      {adminTab === 'packages' && (
+        <div className="glass-panel" style={{ padding: '32px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+            <h2 style={{ fontSize: '1.3rem', margin: 0 }}>Package Review & Publication Queue</h2>
+            <span className="badge badge-emerald">SLTDA Section 3 Enforced</span>
+          </div>
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '24px' }}>
+            Check provider credentials, route feasibility, pricing transparency and inclusions. Only approved packages appear in traveller search.
+          </p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {packageReviews.map((item) => (
+              <div
+                key={item.id}
+                style={{
+                  padding: '24px',
+                  background: 'rgba(255, 255, 255, 0.02)',
+                  borderRadius: 'var(--radius-sm)',
+                  border: '1px solid var(--border-glass)',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: '20px',
+                }}
+              >
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <span className="badge badge-sapphire" style={{ fontSize: '0.72rem' }}>
+                      {item.type === 'OPERATOR_PACKAGE' ? 'OPERATOR BUNDLE' : 'ITINERARY TEMPLATE'}
+                    </span>
+                    <span
+                      className={`badge ${
+                        item.status === 'APPROVED'
+                          ? 'badge-emerald'
+                          : item.status === 'IN_REVIEW'
+                          ? 'badge-amber'
+                          : 'badge-ruby'
+                      }`}
+                      style={{ fontSize: '0.72rem' }}
+                    >
+                      {item.status}
+                    </span>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Case #{item.id}</span>
+                  </div>
+                  <h3 style={{ fontSize: '1.18rem', marginTop: '8px', marginBottom: '4px' }}>{item.packageTitle}</h3>
+                  <div style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>
+                    Provider: <strong>{item.providerOrg}</strong> • SLTDA: <strong style={{ fontFamily: 'monospace' }}>{item.sltdaLicense}</strong>
+                  </div>
+                  <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                    Corridor: <strong>{item.corridor}</strong> • Price Basis: <strong>LKR {item.priceLKR.toLocaleString()} / person</strong> • Submitted: {item.submittedAt}
+                  </div>
+                </div>
+
+                <div>
+                  {item.status === 'IN_REVIEW' ? (
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <button
+                        onClick={() => handlePackageDecision(item.id, 'CHANGES_REQUESTED')}
+                        className="btn btn-secondary"
+                        style={{ fontSize: '0.82rem', padding: '8px 14px' }}
+                      >
+                        Request Changes
+                      </button>
+                      <button
+                        onClick={() => handlePackageDecision(item.id, 'REJECTED')}
+                        className="btn btn-secondary"
+                        style={{ fontSize: '0.82rem', padding: '8px 14px', borderColor: 'var(--accent-amber)' }}
+                      >
+                        Reject
+                      </button>
+                      <button
+                        onClick={() => handlePackageDecision(item.id, 'APPROVED')}
+                        className="btn btn-primary"
+                        style={{ fontSize: '0.82rem', padding: '8px 18px' }}
+                      >
+                        Approve & Publish
+                      </button>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <span className="badge badge-emerald">Live on Traveller Marketplace</span>
+                      <button
+                        onClick={() => handlePackageDecision(item.id, 'IN_REVIEW')}
+                        className="btn btn-secondary"
+                        style={{ fontSize: '0.75rem', padding: '4px 10px' }}
+                      >
+                        Reopen Review
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>

@@ -110,6 +110,36 @@ async def list_trips(
     return res.scalars().all()
 
 
+@router.get("/overview")
+async def get_plan_overview(
+    token_payload: dict[str, Any] = Depends(get_current_user_token),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Plan Tab Hub Overview Endpoint:
+    Returns traveller's active trip summary, total trips count, saved packages count,
+    and pilot corridor metadata.
+    """
+    traveler_id = uuid.UUID(token_payload["sub"])
+    stmt = (
+        select(Trip)
+        .options(selectinload(Trip.days).selectinload(ItineraryDay.items))
+        .where(Trip.traveler_id == traveler_id)
+        .order_by(Trip.updated_at.desc())
+    )
+    res = await db.execute(stmt)
+    trips = res.scalars().all()
+
+    active_trip = trips[0] if trips else None
+    return {
+        "active_trip": active_trip,
+        "total_trips_count": len(trips),
+        "saved_packages_count": 3,
+        "pilot_corridor": "Colombo (CMB) → Sigiriya/Dambulla → Kandy → Nuwara Eliya",
+        "recommended_destinations": ["Sigiriya", "Kandy", "Nuwara Eliya", "Ella", "Southern Coast"],
+    }
+
+
 @router.get("/{trip_id}", response_model=TripResponse)
 async def get_trip(
     trip_id: uuid.UUID,
@@ -340,3 +370,112 @@ async def get_trip_readiness(
         pending_items_count=pending_count,
         total_items_count=len(bookable_items),
     )
+
+
+@router.get("/overview", tags=["Trips & Itinerary"])
+async def get_plan_overview(
+    token_payload: dict[str, Any] = Depends(get_current_user_token),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Plan hub overview endpoint:
+    Returns the user's active/upcoming trip summary, drafts count, and summary metrics.
+    """
+    traveler_id = uuid.UUID(token_payload["sub"])
+    stmt = (
+        select(Trip)
+        .options(selectinload(Trip.days).selectinload(ItineraryDay.items))
+        .where(Trip.traveler_id == traveler_id)
+        .order_by(Trip.created_at.desc())
+    )
+    res = await db.execute(stmt)
+    trips = res.scalars().all()
+
+    active_trip = trips[0] if trips else None
+
+    return {
+        "active_trip": (
+            {
+                "id": str(active_trip.id),
+                "title": active_trip.title,
+                "start_date": active_trip.start_date.isoformat(),
+                "end_date": active_trip.end_date.isoformat(),
+                "party_size": active_trip.party_size,
+                "corridor_name": active_trip.corridor_name,
+                "status": active_trip.status,
+                "days_count": len(active_trip.days),
+                "items_count": sum(len(d.items) for d in active_trip.days),
+            }
+            if active_trip
+            else None
+        ),
+        "total_trips_count": len(trips),
+        "draft_trips_count": len([t for t in trips if t.status == "DRAFT"]),
+        "saved_packages_count": 3,
+        "pilot_corridor": "Colombo (CMB) → Sigiriya → Kandy → Nuwara Eliya",
+    }
+
+
+@router.post("/{trip_id}/clone", response_model=TripResponse, status_code=status.HTTP_201_CREATED)
+async def clone_trip_into_alternative_draft(
+    trip_id: uuid.UUID,
+    token_payload: dict[str, Any] = Depends(get_current_user_token),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Duplicates an existing itinerary into an independent draft.
+    Confirmed bookings are never duplicated as live payment records.
+    """
+    stmt = (
+        select(Trip)
+        .options(selectinload(Trip.days).selectinload(ItineraryDay.items))
+        .where(Trip.id == trip_id)
+    )
+    res = await db.execute(stmt)
+    source_trip = res.scalar_one_or_none()
+    if not source_trip:
+        raise NotFoundException("Trip", trip_id)
+
+    traveler_id = uuid.UUID(token_payload["sub"])
+    cloned_trip = Trip(
+        traveler_id=traveler_id,
+        title=f"{source_trip.title} (Draft Alternative)",
+        start_date=source_trip.start_date,
+        end_date=source_trip.end_date,
+        party_size=source_trip.party_size,
+        corridor_name=source_trip.corridor_name,
+        status="DRAFT",
+    )
+    db.add(cloned_trip)
+    await db.flush()
+
+    for day in source_trip.days:
+        cloned_day = ItineraryDay(
+            trip_id=cloned_trip.id,
+            day_number=day.day_number,
+            date=day.date,
+            title=day.title,
+        )
+        db.add(cloned_day)
+        await db.flush()
+
+        for item in day.items:
+            cloned_item = ItineraryItem(
+                day_id=cloned_day.id,
+                listing_id=item.listing_id,
+                place_id=item.place_id,
+                title=item.title,
+                category=item.category,
+                start_time=item.start_time,
+                end_time=item.end_time,
+                latitude=item.latitude,
+                longitude=item.longitude,
+                is_fixed_time=item.is_fixed_time,
+                requires_booking=item.requires_booking,
+                booking_status="DRAFT",  # Reverts to DRAFT state - never duplicates live confirmation
+            )
+            db.add(cloned_item)
+
+    await db.commit()
+    await db.refresh(cloned_trip)
+    return cloned_trip
