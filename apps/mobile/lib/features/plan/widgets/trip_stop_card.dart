@@ -167,25 +167,22 @@ class TripStopCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                if (price != null)
-                  Text(
-                    price!,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      color: TraverzaColors.text,
-                    ),
-                  )
-                else
-                  const Text(
-                    'Included in Package / Schedule',
+                Expanded(
+                  child: Text(
+                    price ?? 'Included in Package',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontSize: 11,
-                      color: TraverzaColors.textMuted,
-                      fontStyle: FontStyle.italic,
+                      fontSize: price != null ? 12.5 : 11,
+                      fontWeight: price != null ? FontWeight.bold : FontWeight.w500,
+                      color: price != null ? TraverzaColors.text : TraverzaColors.textMuted,
+                      fontStyle: price != null ? FontStyle.normal : FontStyle.italic,
                     ),
                   ),
+                ),
+                const SizedBox(width: 8),
                 Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     if (latitude != null && longitude != null)
                       InkWell(
@@ -198,7 +195,7 @@ class TripStopCard extends StatelessWidget {
                         },
                         borderRadius: BorderRadius.circular(8),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
                             color: TraverzaColors.secondary.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
@@ -207,12 +204,12 @@ class TripStopCard extends StatelessWidget {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: const [
-                              Icon(Icons.directions_rounded, size: 14, color: TraverzaColors.secondary),
+                              Icon(Icons.directions_rounded, size: 13, color: TraverzaColors.secondary),
                               SizedBox(width: 4),
                               Text(
                                 'Google Maps Navigation',
                                 style: TextStyle(
-                                  fontSize: 11,
+                                  fontSize: 10.5,
                                   fontWeight: FontWeight.w700,
                                   color: TraverzaColors.secondary,
                                 ),
@@ -221,13 +218,15 @@ class TripStopCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                    const SizedBox(width: 6),
-                    IconButton(
-                      icon: const Icon(Icons.more_horiz, size: 18, color: TraverzaColors.textMuted),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                      onPressed: onDetailsTap,
-                    ),
+                    if (onDetailsTap != null) ...[
+                      const SizedBox(width: 6),
+                      IconButton(
+                        icon: const Icon(Icons.more_horiz, size: 18, color: TraverzaColors.textMuted),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        onPressed: onDetailsTap,
+                      ),
+                    ],
                   ],
                 ),
               ],
