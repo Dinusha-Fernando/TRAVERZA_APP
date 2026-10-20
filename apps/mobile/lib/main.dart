@@ -6,6 +6,7 @@ import 'theme/app_theme.dart';
 import 'utils/maps_launcher.dart';
 import 'features/plan/plan_tab_screen.dart';
 import 'features/bookings/presentation/bookings_tab_screen.dart';
+import 'features/saved/presentation/saved_tab_screen.dart';
 
 void main() {
   runApp(const TraverzaApp());
@@ -85,7 +86,14 @@ class _MainTripScreenState extends State<MainTripScreen> {
         initialCategory: _selectedCategory,
         initialSearchQuery: _searchQuery,
       ),
-      _buildReadinessView(),
+      SavedTabScreen(
+        isHotelConfirmed: _hotelConfirmed,
+        onToggleHotelConfirmation: () {
+          setState(() {
+            _hotelConfirmed = !_hotelConfirmed;
+          });
+        },
+      ),
       _buildProfileAndEmergencyVault(),
     ];
 
@@ -221,68 +229,6 @@ class _MainTripScreenState extends State<MainTripScreen> {
     );
   }
 
-
-  // --- TAB 3: Saved / Trip Readiness Audit ---
-  Widget _buildReadinessView() {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        const Text(
-          'Trip Readiness Check',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: TraverzaColors.text),
-        ),
-        const SizedBox(height: 6),
-        const Text(
-          'Authoritative audit of booking statuses, highland transit feasibility, and compliance.',
-          style: TextStyle(fontSize: 12, color: TraverzaColors.textMuted),
-        ),
-        const SizedBox(height: 16),
-
-        _buildCheckItem(
-          title: 'Transit Buffer Feasibility',
-          subtitle: 'All travel gaps exceed Sri Lanka terrain transit calculator requirements.',
-          isOk: true,
-        ),
-        _buildCheckItem(
-          title: 'SLTDA Provider Verification',
-          subtitle: 'All 3 booked providers hold active, audited SLTDA licenses.',
-          isOk: true,
-        ),
-        _buildCheckItem(
-          title: 'Booking Confirmation Coverage',
-          subtitle: _hotelConfirmed
-              ? '3 of 3 services fully confirmed.'
-              : '2 of 3 confirmed. Sigiriya Eco Villa is in REQUEST_SUBMITTED status.',
-          isOk: _hotelConfirmed,
-        ),
-        _buildCheckItem(
-          title: 'Opening Hours & Schedule Invariants',
-          subtitle: 'Zero overlapping activities detected by TripGraph.',
-          isOk: true,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCheckItem({required String title, required String subtitle, required bool isOk}) {
-    return Card(
-      child: ListTile(
-        leading: Icon(
-          isOk ? Icons.check_circle : Icons.warning_amber_rounded,
-          color: isOk ? TraverzaColors.emeraldSuccess : TraverzaColors.amberWarning,
-          size: 28,
-        ),
-        title: Text(
-          title,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: TraverzaColors.text),
-        ),
-        subtitle: Text(
-          subtitle,
-          style: const TextStyle(fontSize: 12, color: TraverzaColors.textMuted),
-        ),
-      ),
-    );
-  }
 
   // --- TAB 4: Profile & Offline Emergency Vault ---
   Widget _buildProfileAndEmergencyVault() {
