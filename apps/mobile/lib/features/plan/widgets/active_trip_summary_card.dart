@@ -6,6 +6,8 @@ class ActiveTripSummaryCard extends StatelessWidget {
   final VoidCallback onToggleSimulation;
   final VoidCallback? onOpenCanvas;
   final VoidCallback? onOpenReadiness;
+  final bool isCanvasView;
+  final VoidCallback? onBackToHub;
 
   const ActiveTripSummaryCard({
     super.key,
@@ -13,6 +15,8 @@ class ActiveTripSummaryCard extends StatelessWidget {
     required this.onToggleSimulation,
     this.onOpenCanvas,
     this.onOpenReadiness,
+    this.isCanvasView = false,
+    this.onBackToHub,
   });
 
   @override
@@ -147,9 +151,20 @@ class ActiveTripSummaryCard extends StatelessWidget {
             children: [
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: onOpenCanvas,
-                  icon: const Icon(Icons.map_outlined, size: 16, color: Colors.white),
-                  label: const Text('Open Trip Canvas', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                  onPressed: isCanvasView ? (onBackToHub ?? onOpenCanvas) : onOpenCanvas,
+                  icon: Icon(
+                    isCanvasView ? Icons.arrow_back : Icons.map_outlined,
+                    size: 16,
+                    color: Colors.white,
+                  ),
+                  label: Text(
+                    isCanvasView ? 'Back to Plan Hub' : 'Open Trip Canvas',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: TraverzaColors.primary,
                     padding: const EdgeInsets.symmetric(vertical: 11),

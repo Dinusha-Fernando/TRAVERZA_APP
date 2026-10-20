@@ -10,12 +10,16 @@ class TripCanvasScreen extends StatefulWidget {
   final bool isHotelConfirmed;
   final VoidCallback onToggleSimulation;
   final VoidCallback onBackToHub;
+  final VoidCallback? onNavigateToPackages;
+  final VoidCallback? onNavigateToCustomBuilder;
 
   const TripCanvasScreen({
     super.key,
     required this.isHotelConfirmed,
     required this.onToggleSimulation,
     required this.onBackToHub,
+    this.onNavigateToPackages,
+    this.onNavigateToCustomBuilder,
   });
 
   @override
@@ -124,10 +128,96 @@ class _TripCanvasScreenState extends State<TripCanvasScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Active Trip Summary Card
+          // Navigation Header with Back Button
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8, 8, 16, 4),
+            child: Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back, color: TraverzaColors.text),
+                  tooltip: 'Back to Plan Hub',
+                  onPressed: widget.onBackToHub,
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Text(
+                            'Trip Canvas',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: TraverzaColors.text,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: TraverzaColors.secondary.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Text(
+                              'Active Workspace',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: TraverzaColors.secondary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Text(
+                        'Connected corridor: Colombo (CMB) → Sigiriya → Kandy',
+                        style: TextStyle(fontSize: 11, color: TraverzaColors.textMuted),
+                      ),
+                    ],
+                  ),
+                ),
+                TextButton.icon(
+                  onPressed: widget.onBackToHub,
+                  icon: const Icon(Icons.hub_outlined, size: 14, color: TraverzaColors.secondary),
+                  label: const Text(
+                    'Plan Hub',
+                    style: TextStyle(
+                      color: TraverzaColors.secondary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Sub-navigation mode bar (Switch between Plan Hub, Trip Canvas, Packages, Custom Builder)
+          Container(
+            margin: const EdgeInsets.fromLTRB(16, 2, 16, 8),
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: TraverzaColors.surface,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: TraverzaColors.border),
+            ),
+            child: Row(
+              children: [
+                _buildModeTab('Plan Hub', false, Icons.hub_outlined, widget.onBackToHub),
+                _buildModeTab('Trip Canvas', true, Icons.alt_route, () {}),
+                _buildModeTab('Packages', false, Icons.card_travel_outlined, widget.onNavigateToPackages),
+                _buildModeTab('Custom Builder', false, Icons.edit_note_outlined, widget.onNavigateToCustomBuilder),
+              ],
+            ),
+          ),
+
+          // Active Trip Summary Card with Back to Plan Hub button
           ActiveTripSummaryCard(
             isHotelConfirmed: widget.isHotelConfirmed,
             onToggleSimulation: widget.onToggleSimulation,
+            isCanvasView: true,
+            onBackToHub: widget.onBackToHub,
             onOpenReadiness: _showReadinessDialog,
           ),
 
@@ -345,6 +435,41 @@ class _TripCanvasScreenState extends State<TripCanvasScreen> {
 
           const SizedBox(height: 30),
         ],
+      ),
+    );
+  }
+
+  Widget _buildModeTab(String title, bool isSelected, IconData icon, VoidCallback? onTap) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          decoration: BoxDecoration(
+            color: isSelected ? TraverzaColors.primary : Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Column(
+            children: [
+              Icon(
+                icon,
+                size: 16,
+                color: isSelected ? Colors.white : TraverzaColors.textMuted,
+              ),
+              const SizedBox(height: 3),
+              Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                  color: isSelected ? Colors.white : TraverzaColors.textMuted,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

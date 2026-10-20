@@ -7,11 +7,13 @@ import 'widgets/package_offer_card.dart';
 class PackageExplorerScreen extends StatefulWidget {
   final VoidCallback onBackToHub;
   final Function(TraverzaPackage package) onCustomizePackage;
+  final VoidCallback? onNavigateToCanvas;
 
   const PackageExplorerScreen({
     super.key,
     required this.onBackToHub,
     required this.onCustomizePackage,
+    this.onNavigateToCanvas,
   });
 
   @override
@@ -175,6 +177,12 @@ class _PackageExplorerScreenState extends State<PackageExplorerScreen> {
                 'Compare (${_selectedForComparison.length})',
                 style: const TextStyle(color: TraverzaColors.secondary, fontWeight: FontWeight.bold, fontSize: 12),
               ),
+            ),
+          if (widget.onNavigateToCanvas != null)
+            IconButton(
+              tooltip: 'Trip Canvas',
+              icon: const Icon(Icons.alt_route, color: TraverzaColors.secondary, size: 20),
+              onPressed: widget.onNavigateToCanvas,
             ),
         ],
       ),

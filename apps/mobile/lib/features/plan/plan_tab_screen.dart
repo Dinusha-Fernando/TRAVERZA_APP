@@ -56,10 +56,13 @@ class _PlanTabScreenState extends State<PlanTabScreen> {
         isHotelConfirmed: widget.isHotelConfirmed,
         onToggleSimulation: widget.onToggleSimulation,
         onBackToHub: () => _navigateToSubView(PlanSubView.hub),
+        onNavigateToPackages: () => _navigateToSubView(PlanSubView.packages),
+        onNavigateToCustomBuilder: () => _navigateToSubView(PlanSubView.customBuilder),
       );
     } else if (_currentSubView == PlanSubView.packages) {
       return PackageExplorerScreen(
         onBackToHub: () => _navigateToSubView(PlanSubView.hub),
+        onNavigateToCanvas: () => _navigateToSubView(PlanSubView.canvas),
         onCustomizePackage: (pkg) {
           _navigateToSubView(PlanSubView.customBuilder);
           ScaffoldMessenger.of(context).showSnackBar(

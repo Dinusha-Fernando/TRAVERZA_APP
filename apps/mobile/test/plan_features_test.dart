@@ -86,6 +86,72 @@ void main() {
     expect(find.text('Trip Name'), findsOneWidget);
   });
 
+  testWidgets('PlanTabScreen: Trip Canvas provides back button and mode switcher to others', (tester) async {
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.theme,
+        home: Scaffold(
+          body: PlanTabScreen(
+            isHotelConfirmed: false,
+            onToggleSimulation: () {},
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // 1. Switch to Trip Canvas from Hub
+    await tester.tap(find.text('Trip Canvas'));
+    await tester.pumpAndSettle();
+
+    // Verify Trip Canvas header and back navigation are present
+    expect(find.text('Active Workspace'), findsOneWidget);
+    expect(find.text('Back to Plan Hub'), findsOneWidget); // On ActiveTripSummaryCard
+    expect(find.byIcon(Icons.arrow_back), findsWidgets); // Back arrow in header and card
+
+    // 2. Tap back button to return to Hub
+    await tester.tap(find.byIcon(Icons.arrow_back).first);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Plan your Sri Lanka journey'), findsOneWidget);
+    expect(find.text('Three Ways to Plan'), findsOneWidget);
+
+    // 3. Open Trip Canvas again via "Open Trip Canvas" on active card
+    await tester.tap(find.text('Open Trip Canvas'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Active Workspace'), findsOneWidget);
+
+    // 4. Test switching directly to "Packages" from within Trip Canvas ("others")
+    await tester.tap(find.text('Packages'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Packages Marketplace'), findsOneWidget);
+
+    // Return to Hub
+    await tester.tap(find.byIcon(Icons.arrow_back));
+    await tester.pumpAndSettle();
+
+    // 5. Open Trip Canvas again, and test switching to "Custom Builder" directly from within Trip Canvas ("others")
+    await tester.tap(find.text('Trip Canvas'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Custom Builder'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Stage 1 of 5: Trip Basics'), findsOneWidget);
+
+    // Exit Draft back to Hub
+    await tester.tap(find.text('Exit Draft'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Plan your Sri Lanka journey'), findsOneWidget);
+  });
+
   testWidgets('PackageExplorerScreen: filters packages and triggers compare modal', (tester) async {
     tester.view.physicalSize = const Size(1080, 2400);
     tester.view.devicePixelRatio = 1.0;
