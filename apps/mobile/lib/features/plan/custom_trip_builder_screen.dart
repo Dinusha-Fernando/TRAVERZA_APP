@@ -218,7 +218,7 @@ class _CustomTripBuilderScreenState extends State<CustomTripBuilderScreen> {
           children: [
             Expanded(
               child: Container(
-                padding: const EdgeInsets.all(14),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
                 decoration: BoxDecoration(
                   color: TraverzaColors.surface,
                   borderRadius: BorderRadius.circular(12),
@@ -230,25 +230,35 @@ class _CustomTripBuilderScreenState extends State<CustomTripBuilderScreen> {
                     const Text('Duration', style: TextStyle(fontSize: 11, color: TraverzaColors.textMuted)),
                     const SizedBox(height: 4),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('$_durationDays Days', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                        Row(
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.remove, size: 16),
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                              onPressed: _durationDays > 1 ? () => setState(() => _durationDays--) : null,
-                            ),
-                            const SizedBox(width: 8),
-                            IconButton(
-                              icon: const Icon(Icons.add, size: 16),
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                              onPressed: () => setState(() => _durationDays++),
-                            ),
-                          ],
+                        Expanded(
+                          child: Text(
+                            '$_durationDays Days',
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: IconButton(
+                            icon: const Icon(Icons.remove, size: 14),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            onPressed: _durationDays > 1 ? () => setState(() => _durationDays--) : null,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: IconButton(
+                            icon: const Icon(Icons.add, size: 14),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            onPressed: () => setState(() => _durationDays++),
+                          ),
                         ),
                       ],
                     ),
@@ -256,10 +266,10 @@ class _CustomTripBuilderScreenState extends State<CustomTripBuilderScreen> {
                 ),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             Expanded(
               child: Container(
-                padding: const EdgeInsets.all(14),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
                 decoration: BoxDecoration(
                   color: TraverzaColors.surface,
                   borderRadius: BorderRadius.circular(12),
@@ -271,25 +281,35 @@ class _CustomTripBuilderScreenState extends State<CustomTripBuilderScreen> {
                     const Text('Travellers', style: TextStyle(fontSize: 11, color: TraverzaColors.textMuted)),
                     const SizedBox(height: 4),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('$_travellers People', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                        Row(
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.remove, size: 16),
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                              onPressed: _travellers > 1 ? () => setState(() => _travellers--) : null,
-                            ),
-                            const SizedBox(width: 8),
-                            IconButton(
-                              icon: const Icon(Icons.add, size: 16),
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                              onPressed: () => setState(() => _travellers++),
-                            ),
-                          ],
+                        Expanded(
+                          child: Text(
+                            '$_travellers People',
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: IconButton(
+                            icon: const Icon(Icons.remove, size: 14),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            onPressed: _travellers > 1 ? () => setState(() => _travellers--) : null,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: IconButton(
+                            icon: const Icon(Icons.add, size: 14),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            onPressed: () => setState(() => _travellers++),
+                          ),
                         ),
                       ],
                     ),
@@ -437,9 +457,11 @@ class _CustomTripBuilderScreenState extends State<CustomTripBuilderScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'Stage C: Add Stays, Drivers & Guides',
-              style: TextStyle(fontSize: 16.5, fontWeight: FontWeight.bold, color: TraverzaColors.text),
+            const Expanded(
+              child: Text(
+                'Stage C: Add Stays, Drivers & Guides',
+                style: TextStyle(fontSize: 16.5, fontWeight: FontWeight.bold, color: TraverzaColors.text),
+              ),
             ),
             TextButton.icon(
               onPressed: () {
@@ -556,12 +578,14 @@ class _CustomTripBuilderScreenState extends State<CustomTripBuilderScreen> {
                     size: 20,
                   ),
                   const SizedBox(width: 8),
-                  Text(
-                    _bufferIssueResolved ? 'Buffer Resolved: 30m Customs Buffer Added' : 'Warning: Tight Airport Transfer Window',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13.5,
-                      color: _bufferIssueResolved ? TraverzaColors.emeraldSuccess : TraverzaColors.amberWarning,
+                  Expanded(
+                    child: Text(
+                      _bufferIssueResolved ? 'Buffer Resolved: 30m Customs Buffer Added' : 'Warning: Tight Airport Transfer Window',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13.5,
+                        color: _bufferIssueResolved ? TraverzaColors.emeraldSuccess : TraverzaColors.amberWarning,
+                      ),
                     ),
                   ),
                 ],
