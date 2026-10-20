@@ -140,23 +140,25 @@ class _SavedTabScreenState extends State<SavedTabScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text(
-                    'Saved & Wishlist Hub',
-                    style: TextStyle(
-                      fontSize: 19,
-                      fontWeight: FontWeight.bold,
-                      color: TraverzaColors.text,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text(
+                      'Saved & Wishlist Hub',
+                      style: TextStyle(
+                        fontSize: 19,
+                        fontWeight: FontWeight.bold,
+                        color: TraverzaColors.text,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 2),
-                  Text(
-                    'Curated shortlist & trip readiness audit for your corridor',
-                    style: TextStyle(fontSize: 11.5, color: TraverzaColors.textMuted),
-                  ),
-                ],
+                    SizedBox(height: 2),
+                    Text(
+                      'Curated shortlist & trip readiness audit for your corridor',
+                      style: TextStyle(fontSize: 11.5, color: TraverzaColors.textMuted),
+                    ),
+                  ],
+                ),
               ),
               IconButton(
                 icon: const Icon(Icons.share_outlined, color: TraverzaColors.secondary),
@@ -655,25 +657,29 @@ class _SavedTabScreenState extends State<SavedTabScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item.price,
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: TraverzaColors.primary),
-                          ),
-                          Text(
-                            item.priceBasis,
-                            style: const TextStyle(fontSize: 10, color: TraverzaColors.textMuted),
-                          ),
-                        ],
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              item.price,
+                              style: const TextStyle(fontSize: 15.5, fontWeight: FontWeight.bold, color: TraverzaColors.primary),
+                            ),
+                            Text(
+                              item.priceBasis,
+                              style: const TextStyle(fontSize: 10, color: TraverzaColors.textMuted),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
                       ),
+                      const SizedBox(width: 8),
                       Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          IconButton(
-                            icon: const Icon(Icons.drive_file_move_outline, size: 18, color: TraverzaColors.secondary),
-                            tooltip: 'Move to Collection',
-                            onPressed: () {
+                          InkWell(
+                            onTap: () {
                               MoveCollectionSheet.show(
                                 context,
                                 item: item,
@@ -692,11 +698,14 @@ class _SavedTabScreenState extends State<SavedTabScreen> {
                                 },
                               );
                             },
+                            borderRadius: BorderRadius.circular(8),
+                            child: const Padding(
+                              padding: EdgeInsets.all(5),
+                              child: Icon(Icons.drive_file_move_outline, size: 18, color: TraverzaColors.secondary),
+                            ),
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.edit_note_outlined, size: 20, color: TraverzaColors.secondary),
-                            tooltip: 'Add/Edit Notes',
-                            onPressed: () {
+                          InkWell(
+                            onTap: () {
                               ItemNotesSheet.show(
                                 context,
                                 item: item,
@@ -705,18 +714,27 @@ class _SavedTabScreenState extends State<SavedTabScreen> {
                                 },
                               );
                             },
+                            borderRadius: BorderRadius.circular(8),
+                            child: const Padding(
+                              padding: EdgeInsets.all(5),
+                              child: Icon(Icons.edit_note_outlined, size: 20, color: TraverzaColors.secondary),
+                            ),
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.delete_outline, size: 18, color: Colors.redAccent),
-                            tooltip: 'Remove',
-                            onPressed: () => _handleDeleteItem(item),
+                          InkWell(
+                            onTap: () => _handleDeleteItem(item),
+                            borderRadius: BorderRadius.circular(8),
+                            child: const Padding(
+                              padding: EdgeInsets.all(5),
+                              child: Icon(Icons.delete_outline, size: 18, color: Colors.redAccent),
+                            ),
                           ),
                           const SizedBox(width: 4),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: TraverzaColors.primary,
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              visualDensity: VisualDensity.compact,
                             ),
                             onPressed: () {
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -727,7 +745,7 @@ class _SavedTabScreenState extends State<SavedTabScreen> {
                                 ),
                               );
                             },
-                            child: const Text('Add to Trip', style: TextStyle(color: Colors.white, fontSize: 11.5, fontWeight: FontWeight.bold)),
+                            child: const Text('Add to Trip', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
                           ),
                         ],
                       ),
@@ -779,27 +797,34 @@ class _SavedTabScreenState extends State<SavedTabScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          isAllConfirmed ? Icons.check_circle : Icons.warning_amber_rounded,
-                          color: isAllConfirmed ? TraverzaColors.emeraldSuccess : TraverzaColors.amberWarning,
-                          size: 14,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          isAllConfirmed ? '100% TRIP READY' : '85% READY · 1 PENDING',
-                          style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 0.5),
-                        ),
-                      ],
+                  Flexible(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            isAllConfirmed ? Icons.check_circle : Icons.warning_amber_rounded,
+                            color: isAllConfirmed ? TraverzaColors.emeraldSuccess : TraverzaColors.amberWarning,
+                            size: 14,
+                          ),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              isAllConfirmed ? '100% TRIP READY' : '85% READY · 1 PENDING',
+                              style: const TextStyle(color: Colors.white, fontSize: 10.5, fontWeight: FontWeight.bold, letterSpacing: 0.4),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
+                  const SizedBox(width: 8),
                   InkWell(
                     onTap: widget.onToggleHotelConfirmation,
                     child: Container(
@@ -933,10 +958,13 @@ class _SavedTabScreenState extends State<SavedTabScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      title,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5, color: TraverzaColors.text),
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5, color: TraverzaColors.text),
+                      ),
                     ),
+                    const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
