@@ -4,6 +4,7 @@ from app.modules.audit.router import router as audit_router
 from app.modules.bookings.router import router as bookings_router
 from app.modules.catalogue.router import router as catalogue_router
 from app.modules.identity.router import router as identity_router
+from app.modules.notifications.router import router as notifications_router
 from app.modules.packages.router import router as packages_router
 from app.modules.payments.router import router as payments_router
 from app.modules.support.router import router as support_router
@@ -19,4 +20,5 @@ api_v1_router.include_router(bookings_router)
 api_v1_router.include_router(payments_router)
 api_v1_router.include_router(support_router)
 api_v1_router.include_router(audit_router)
+api_v1_router.include_router(notifications_router)
 

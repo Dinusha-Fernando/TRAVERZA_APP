@@ -6,6 +6,9 @@ import 'features/plan/plan_tab_screen.dart';
 import 'features/bookings/presentation/bookings_tab_screen.dart';
 import 'features/saved/presentation/saved_tab_screen.dart';
 import 'features/profile/presentation/profile_tab_screen.dart';
+import 'features/notifications/data/notification_model.dart';
+import 'features/notifications/services/notification_service.dart';
+import 'features/notifications/presentation/notification_center_sheet.dart';
 
 void main() {
   runApp(const TraverzaApp());
@@ -61,6 +64,27 @@ class _MainTripScreenState extends State<MainTripScreen> {
     setState(() => _currentIndex = 4);
   }
 
+  void _handleNotificationNavigation(String route) {
+    setState(() {
+      switch (route) {
+        case 'plan':
+          _currentIndex = 1;
+          break;
+        case 'bookings':
+          _currentIndex = 2;
+          break;
+        case 'saved':
+          _currentIndex = 3;
+          break;
+        case 'safety':
+          _currentIndex = 4;
+          break;
+        default:
+          _currentIndex = 0;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final screens = [
@@ -79,6 +103,21 @@ class _MainTripScreenState extends State<MainTripScreen> {
           setState(() {
             _hotelConfirmed = !_hotelConfirmed;
           });
+          if (_hotelConfirmed) {
+            TraverzaNotificationService.instance.addNotification(
+              TraverzaNotification(
+                id: 'NOTIF-CONFIRM-${DateTime.now().millisecondsSinceEpoch}',
+                title: 'Sigiriya Water Garden: Fully Confirmed',
+                body: 'Eco Villa reservation confirmed by provider. Voucher #VOUCH-LK-9041 is ready.',
+                category: NotificationCategory.booking,
+                timestamp: DateTime.now(),
+                isRead: false,
+                actionRoute: 'bookings',
+                actionLabel: 'View Voucher',
+                priority: 'high',
+              ),
+            );
+          }
         },
       ),
       BookingsTabScreen(
@@ -200,25 +239,49 @@ class _MainTripScreenState extends State<MainTripScreen> {
         ],
       ),
       actions: [
-        IconButton(
-          icon: Stack(
-            children: [
-              const Icon(Icons.notifications_none_rounded, color: TraverzaColors.primary),
-              Positioned(
-                right: 2,
-                top: 2,
-                child: Container(
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(
-                    color: TraverzaColors.amberWarning,
-                    shape: BoxShape.circle,
-                  ),
-                ),
+        ListenableBuilder(
+          listenable: TraverzaNotificationService.instance,
+          builder: (context, _) {
+            final unread = TraverzaNotificationService.instance.unreadCount;
+            return IconButton(
+              tooltip: 'Notifications ($unread unread)',
+              icon: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  const Icon(Icons.notifications_none_rounded, color: TraverzaColors.primary),
+                  if (unread > 0)
+                    Positioned(
+                      right: -2,
+                      top: -2,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                        constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                        decoration: BoxDecoration(
+                          color: TraverzaColors.roseEmergency,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.white, width: 1.5),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          unread > 9 ? '9+' : '$unread',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 8.5,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
-            ],
-          ),
-          onPressed: () {},
+              onPressed: () {
+                NotificationCenterSheet.show(
+                  context,
+                  onNavigate: _handleNotificationNavigation,
+                );
+              },
+            );
+          },
         ),
         IconButton(
           icon: const Icon(Icons.account_circle_outlined, color: TraverzaColors.primary),
