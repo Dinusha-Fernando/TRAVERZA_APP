@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import '../../../../models/route_waypoint.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../../utils/maps_launcher.dart';
+import '../../auth/services/auth_service.dart';
+import '../../auth/presentation/auth_sheet.dart';
 import '../data/profile_models.dart';
 import 'widgets/digital_passport_card.dart';
 import 'widgets/profile_sheets.dart';
+import 'widgets/edit_profile_sheet.dart';
+import 'widgets/delete_profile_dialog.dart';
 
 class ProfileTabScreen extends StatefulWidget {
   final int initialSegment;
@@ -21,12 +25,28 @@ class ProfileTabScreen extends StatefulWidget {
 class _ProfileTabScreenState extends State<ProfileTabScreen> {
   late int _selectedSegment;
   late TravellerProfile _profile;
+  final TraverzaAuthService _authService = TraverzaAuthService.instance;
 
   @override
   void initState() {
     super.initState();
     _selectedSegment = widget.initialSegment;
-    _profile = TravellerProfile.defaultProfile;
+    _profile = _authService.currentProfile;
+    _authService.addListener(_onAuthChanged);
+  }
+
+  @override
+  void dispose() {
+    _authService.removeListener(_onAuthChanged);
+    super.dispose();
+  }
+
+  void _onAuthChanged() {
+    if (mounted) {
+      setState(() {
+        _profile = _authService.currentProfile;
+      });
+    }
   }
 
   void _showFeedback(String message, {bool isSuccess = true}) {
@@ -45,11 +65,46 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
       children: [
+        // Guest mode banner if not signed in
+        if (!_authService.isAuthenticated) ...[
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: TraverzaColors.sand.withValues(alpha: 0.35),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: TraverzaColors.amberWarning.withValues(alpha: 0.4)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.info_outline_rounded, color: TraverzaColors.primary, size: 18),
+                const SizedBox(width: 10),
+                const Expanded(
+                  child: Text(
+                    'Guest Explorer Mode · Sign in to save digital passport and sync bookings.',
+                    style: TextStyle(fontSize: 11.5, color: TraverzaColors.text, fontWeight: FontWeight.w500),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => AuthSheet.show(context),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    minimumSize: Size.zero,
+                  ),
+                  child: const Text('Sign In', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: TraverzaColors.primary)),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
+
         // 1. Digital Passport & Status Card
         DigitalPassportCard(
           profile: _profile,
           onShowQrPass: () => ProfileSheets.showQrBoardingPassModal(context, _profile),
           onEditProfile: () => setState(() => _selectedSegment = 1),
+          onEditDetails: () => EditProfileSheet.show(context, _profile),
+          onSignIn: () => AuthSheet.show(context),
         ),
         const SizedBox(height: 16),
 
@@ -1066,6 +1121,153 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
           style: TextStyle(fontSize: 11.5, color: TraverzaColors.textMuted),
         ),
         const SizedBox(height: 14),
+
+        // Account & Profile Management Card
+        Card(
+          margin: EdgeInsets.zero,
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Account & Profile',
+                      style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.bold, color: TraverzaColors.text),
+                    ),
+                    if (_authService.isAuthenticated)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: TraverzaColors.emeraldSuccess.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Text(
+                          'Signed In',
+                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: TraverzaColors.emeraldSuccess),
+                        ),
+                      )
+                    else
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: TraverzaColors.amberWarning.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Text(
+                          'Guest Mode',
+                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: TraverzaColors.primary),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: TraverzaColors.surfaceWarm,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: TraverzaColors.border),
+                  ),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 20,
+                        backgroundColor: TraverzaColors.primary,
+                        child: Text(
+                          _authService.isAuthenticated && _profile.fullName.isNotEmpty
+                              ? _profile.fullName.substring(0, 1).toUpperCase()
+                              : 'G',
+                          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 16),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _authService.isAuthenticated ? _profile.fullName : 'Guest Explorer',
+                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: TraverzaColors.text),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              _authService.isAuthenticated ? _profile.email : 'Explore as guest or sign in to sync',
+                              style: const TextStyle(fontSize: 11, color: TraverzaColors.textMuted),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (_authService.isAuthenticated)
+                        IconButton(
+                          tooltip: 'Edit Profile Details',
+                          icon: const Icon(Icons.edit_note_rounded, color: TraverzaColors.primary, size: 22),
+                          onPressed: () => EditProfileSheet.show(context, _profile),
+                        )
+                      else
+                        TextButton(
+                          onPressed: () => AuthSheet.show(context),
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            minimumSize: Size.zero,
+                          ),
+                          child: const Text('Sign In', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const Divider(height: 1),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.edit_outlined, color: TraverzaColors.primary, size: 20),
+                  title: const Text('Edit Personal Profile', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold)),
+                  subtitle: const Text('Full name, phone, nationality & emergency contact', style: TextStyle(fontSize: 10.5, color: TraverzaColors.textMuted)),
+                  trailing: const Icon(Icons.chevron_right_rounded, size: 18, color: TraverzaColors.textMuted),
+                  onTap: () => EditProfileSheet.show(context, _profile),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.switch_account_outlined, color: TraverzaColors.secondary, size: 20),
+                  title: Text(
+                    _authService.isAuthenticated ? 'Switch Account / Login' : 'Sign In / Register',
+                    style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: const Text('1-tap demo logins or email authentication', style: TextStyle(fontSize: 10.5, color: TraverzaColors.textMuted)),
+                  trailing: const Icon(Icons.chevron_right_rounded, size: 18, color: TraverzaColors.textMuted),
+                  onTap: () => AuthSheet.show(context),
+                ),
+                if (_authService.isAuthenticated) ...[
+                  const Divider(height: 1),
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.logout_rounded, color: TraverzaColors.amberWarning, size: 20),
+                    title: const Text('Sign Out to Guest Mode', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: TraverzaColors.amberWarning)),
+                    subtitle: const Text('Return to guest state while preserving emergency features', style: TextStyle(fontSize: 10.5, color: TraverzaColors.textMuted)),
+                    trailing: const Icon(Icons.chevron_right_rounded, size: 18, color: TraverzaColors.textMuted),
+                    onTap: () {
+                      _authService.signOut();
+                      _showFeedback('Signed out to Guest Mode');
+                    },
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.delete_forever_rounded, color: TraverzaColors.roseEmergency, size: 20),
+                    title: const Text('Delete Profile & Account', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: TraverzaColors.roseEmergency)),
+                    subtitle: const Text('Permanently wipe traveller profile and reset session', style: TextStyle(fontSize: 10.5, color: TraverzaColors.textMuted)),
+                    trailing: const Icon(Icons.chevron_right_rounded, size: 18, color: TraverzaColors.textMuted),
+                    onTap: () => DeleteProfileDialog.show(context),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
 
         // Device Security Settings Group
         Card(

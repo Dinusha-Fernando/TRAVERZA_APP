@@ -26,6 +26,7 @@ from app.modules.identity.schemas import (
     UserLoginRequest,
     UserRegisterRequest,
     UserResponse,
+    UserUpdateRequest,
 )
 
 router = APIRouter(prefix="/auth", tags=["Authentication & Identity"])
@@ -102,6 +103,44 @@ async def get_me(
     if not user:
         raise UnauthorizedException("User not found")
     return user
+
+
+@router.put("/me", response_model=UserResponse)
+async def update_me(
+    req: UserUpdateRequest,
+    token_payload: dict[str, Any] = Depends(get_current_user_token),
+    db: AsyncSession = Depends(get_db),
+):
+    """Updates traveller full name and phone number."""
+    user_id = uuid.UUID(token_payload["sub"])
+    user = await db.get(User, user_id)
+    if not user:
+        raise UnauthorizedException("User not found")
+
+    if req.full_name is not None:
+        user.full_name = req.full_name
+    if req.phone_number is not None:
+        user.phone_number = req.phone_number
+
+    await db.commit()
+    await db.refresh(user)
+    return user
+
+
+@router.delete("/me", status_code=status.HTTP_200_OK)
+async def delete_me(
+    token_payload: dict[str, Any] = Depends(get_current_user_token),
+    db: AsyncSession = Depends(get_db),
+):
+    """Soft deactivates traveller account and clears sensitive session context."""
+    user_id = uuid.UUID(token_payload["sub"])
+    user = await db.get(User, user_id)
+    if not user:
+        raise UnauthorizedException("User not found")
+
+    user.is_active = False
+    await db.commit()
+    return {"status": "DELETED", "user_id": str(user.id), "message": "Account successfully deactivated"}
 
 
 @router.post("/organizations", response_model=OrganizationResponse, status_code=status.HTTP_201_CREATED)

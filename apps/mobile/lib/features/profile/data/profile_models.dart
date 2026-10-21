@@ -289,4 +289,43 @@ class TravellerProfile {
           ),
         ],
       );
+
+  /// Guest profile when signed out
+  static TravellerProfile get guestProfile => const TravellerProfile(
+        id: 'TRV-GUEST-001',
+        fullName: 'Guest Traveller',
+        email: 'guest@traverza.lk',
+        phone: '+94 00 000 0000',
+        nationality: 'International Visitor',
+        membershipTier: 'Guest Explorer',
+        tierLevel: 1,
+        sltdaLicenseNo: 'GUEST_UNREGISTERED',
+        isSltdaRegistered: false,
+        isKycVerified: false,
+        memberSince: 'October 2026',
+        activeCorridor: 'Colombo (CMB) → Cultural Triangle',
+        tripsCompleted: 0,
+        provincesVisited: 1,
+        carbonOffsetKg: 0.0,
+        safetyReadinessScore: 60,
+        emergencyContact: EmergencyContact(
+          name: 'SLTDA Tourist Police Desk',
+          relationship: 'Emergency Authority',
+          phone: '1912',
+          email: 'safety@sltda.gov.lk',
+          isPrimary: true,
+        ),
+        preferences: TravelPreferences(
+          hillPacing: 'Standard (+20m)',
+          preferredVehicle: 'Comfort Sedan',
+          dietary: 'No Restrictions',
+          spiceTolerance: 'Mild (Foreign Palate)',
+          guideLanguage: 'English (Fluent)',
+          settlementCurrency: 'USD (\$)',
+          offlineMapCaching: true,
+          biometricLock: false,
+          motionSicknessKit: true,
+        ),
+        documents: [],
+      );
 }

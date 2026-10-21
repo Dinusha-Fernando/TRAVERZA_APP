@@ -6,12 +6,16 @@ class DigitalPassportCard extends StatelessWidget {
   final TravellerProfile profile;
   final VoidCallback onShowQrPass;
   final VoidCallback onEditProfile;
+  final VoidCallback? onEditDetails;
+  final VoidCallback? onSignIn;
 
   const DigitalPassportCard({
     super.key,
     required this.profile,
     required this.onShowQrPass,
     required this.onEditProfile,
+    this.onEditDetails,
+    this.onSignIn,
   });
 
   @override
@@ -189,14 +193,30 @@ class DigitalPassportCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            profile.fullName,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w800,
-                              fontSize: 18,
-                              color: Colors.white,
-                              letterSpacing: 0.2,
-                            ),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  profile.fullName,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 18,
+                                    color: Colors.white,
+                                    letterSpacing: 0.2,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              if (onEditDetails != null)
+                                IconButton(
+                                  icon: const Icon(Icons.edit_note_rounded, size: 20, color: TraverzaColors.sand),
+                                  tooltip: 'Edit Profile Details',
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
+                                  onPressed: onEditDetails,
+                                ),
+                            ],
                           ),
                           const SizedBox(height: 3),
                           const Text(
@@ -268,46 +288,66 @@ class DigitalPassportCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
 
-                // Action Buttons: Digital QR Pass & Edit Profile
-                Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: onShowQrPass,
-                        icon: const Icon(Icons.qr_code_rounded, size: 16),
-                        label: const Text(
-                          'Digital QR Pass',
-                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                // Action Buttons: Digital QR Pass & Edit Profile or Guest Sign In
+                if (profile.id == 'TRV-GUEST-001' && onSignIn != null) ...[
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: onSignIn,
+                      icon: const Icon(Icons.login_rounded, size: 16),
+                      label: const Text(
+                        'Sign In or Register Account',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: TraverzaColors.sand,
+                        foregroundColor: TraverzaColors.primary,
+                        padding: const EdgeInsets.symmetric(vertical: 11),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                    ),
+                  ),
+                ] else ...[
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: onShowQrPass,
+                          icon: const Icon(Icons.qr_code_rounded, size: 16),
+                          label: const Text(
+                            'Digital QR Pass',
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: TraverzaColors.primary,
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
                         ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: TraverzaColors.primary,
-                          elevation: 0,
-                          padding: const EdgeInsets.symmetric(vertical: 10),
+                      ),
+                      const SizedBox(width: 10),
+                      OutlinedButton.icon(
+                        onPressed: onEditProfile,
+                        icon: const Icon(Icons.tune_rounded, size: 15, color: Colors.white),
+                        label: const Text(
+                          'Edit Preferences',
+                          style: TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.w600),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: Colors.white.withValues(alpha: 0.4)),
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    OutlinedButton.icon(
-                      onPressed: onEditProfile,
-                      icon: const Icon(Icons.tune_rounded, size: 15, color: Colors.white),
-                      label: const Text(
-                        'Edit Preferences',
-                        style: TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.w600),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Colors.white.withValues(alpha: 0.4)),
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),

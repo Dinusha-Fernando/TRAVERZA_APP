@@ -10,6 +10,11 @@ class UserRegisterRequest(BaseModel):
     phone_number: str | None = None
 
 
+class UserUpdateRequest(BaseModel):
+    full_name: str | None = None
+    phone_number: str | None = None
+
+
 class UserLoginRequest(BaseModel):
     email: EmailStr
     password: str

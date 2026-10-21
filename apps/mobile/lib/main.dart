@@ -9,6 +9,7 @@ import 'features/profile/presentation/profile_tab_screen.dart';
 import 'features/notifications/data/notification_model.dart';
 import 'features/notifications/services/notification_service.dart';
 import 'features/notifications/presentation/notification_center_sheet.dart';
+import 'features/auth/services/auth_service.dart';
 
 void main() {
   runApp(const TraverzaApp());
@@ -283,9 +284,33 @@ class _MainTripScreenState extends State<MainTripScreen> {
             );
           },
         ),
-        IconButton(
-          icon: const Icon(Icons.account_circle_outlined, color: TraverzaColors.primary),
-          onPressed: () => setState(() => _currentIndex = 4),
+        ListenableBuilder(
+          listenable: TraverzaAuthService.instance,
+          builder: (context, _) {
+            final auth = TraverzaAuthService.instance;
+            final isAuth = auth.isAuthenticated;
+            final profile = auth.currentProfile;
+            final initial = profile.fullName.isNotEmpty ? profile.fullName.substring(0, 1).toUpperCase() : 'U';
+
+            return IconButton(
+              tooltip: isAuth ? '${profile.fullName} (Profile)' : 'Guest Explorer (Profile & Sign In)',
+              icon: isAuth
+                  ? CircleAvatar(
+                      radius: 13,
+                      backgroundColor: TraverzaColors.primary,
+                      child: Text(
+                        initial,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    )
+                  : const Icon(Icons.account_circle_outlined, color: TraverzaColors.primary),
+              onPressed: () => setState(() => _currentIndex = 4),
+            );
+          },
         ),
       ],
     );

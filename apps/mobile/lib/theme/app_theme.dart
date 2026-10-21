@@ -11,6 +11,7 @@ class TraverzaColors {
   static const Color sand = Color(0xFFF4E7D0); // BACKGROUND ACCENT — Coastal Sand (Destination cards, warm surfaces)
   static const Color background = Color(0xFFF7FAFC); // MAIN BACKGROUND — Sea Mist (App screens, cards, content areas)
   static const Color surface = Color(0xFFFFFFFF); // Card background & Bottom navigation
+  static const Color surfaceWarm = Color(0xFFF8FAFC); // Subtle card tint for user badges & nested containers
   static const Color text = Color(0xFF102A43); // Main text
   static const Color textMuted = Color(0xFF627D98); // Secondary text
   static const Color border = Color(0xFFD9E5EC); // Borders and dividers
