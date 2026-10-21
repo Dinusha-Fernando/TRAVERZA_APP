@@ -79,6 +79,7 @@ class TraverzaAuthService extends ChangeNotifier {
     required String password,
     required String phone,
     required String nationality,
+    String? avatarUrl,
   }) async {
     await Future.delayed(const Duration(milliseconds: 300));
 
@@ -108,6 +109,7 @@ class TraverzaAuthService extends ChangeNotifier {
       ),
       preferences: TravellerProfile.defaultProfile.preferences,
       documents: TravellerProfile.defaultProfile.documents,
+      avatarUrl: avatarUrl,
     );
 
     _isAuthenticated = true;
@@ -128,6 +130,15 @@ class TraverzaAuthService extends ChangeNotifier {
   /// Update existing profile attributes
   void updateProfile(TravellerProfile updated) {
     _currentProfile = updated;
+    notifyListeners();
+  }
+
+  /// Update traveller profile picture
+  void updateAvatar(String? avatarUrl) {
+    _currentProfile = _currentProfile.copyWith(
+      avatarUrl: avatarUrl,
+      clearAvatar: avatarUrl == null || avatarUrl.isEmpty,
+    );
     notifyListeners();
   }
 

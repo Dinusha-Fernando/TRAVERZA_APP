@@ -73,6 +73,63 @@ void main() {
 
       expect(find.text('Captain Dinusha'), findsAtLeastNWidgets(1));
     });
+
+    testWidgets('EditProfileSheet allows updating profile picture via AvatarPickerSheet', (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
+      final auth = TraverzaAuthService.instance;
+      expect(auth.currentProfile.avatarUrl, isNull);
+
+      await tester.pumpWidget(
+        buildTestableWidget(
+          EditProfileSheet(profile: auth.currentProfile),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Find Change Profile Picture button
+      expect(find.text('Change Profile Picture'), findsOneWidget);
+
+      await tester.tap(find.text('Change Profile Picture'));
+      await tester.pumpAndSettle();
+
+      // Verify AvatarPickerSheet modal opened
+      expect(find.text('Update Profile Picture'), findsOneWidget);
+      expect(find.text('CURATED SRI LANKA EXPLORER STYLES'), findsOneWidget);
+      expect(find.text('Custom Photo URL'), findsOneWidget);
+      expect(find.text('Apply Profile Picture'), findsOneWidget);
+
+      // Tap on the Coastal Surfer avatar preset
+      final coastalFinder = find.textContaining('Coastal Surfer');
+      expect(coastalFinder, findsOneWidget);
+      await tester.tap(coastalFinder);
+      await tester.pumpAndSettle();
+
+      // Tap Apply Profile Picture
+      await tester.tap(find.text('Apply Profile Picture'));
+      await tester.pumpAndSettle();
+
+      // Tap Save Profile Changes
+      await tester.tap(find.text('Save Profile Changes'));
+      await tester.pumpAndSettle();
+
+      // Verify profile in auth service now has avatarUrl
+      expect(auth.currentProfile.avatarUrl, isNotNull);
+      expect(auth.currentProfile.avatarUrl, contains('images.unsplash.com'));
+    });
+
+    testWidgets('updateAvatar helper method toggles and clears photo properly', (tester) async {
+      final auth = TraverzaAuthService.instance;
+
+      auth.updateAvatar('https://custom.photos/dinusha.jpg');
+      expect(auth.currentProfile.avatarUrl, 'https://custom.photos/dinusha.jpg');
+
+      // Clear avatar (reverts to monogram initial)
+      auth.updateAvatar(null);
+      expect(auth.currentProfile.avatarUrl, isNull);
+    });
   });
 
   group('TRAVERZA Authentication Flow (Sign In, Demo Switch, Sign Out)', () {

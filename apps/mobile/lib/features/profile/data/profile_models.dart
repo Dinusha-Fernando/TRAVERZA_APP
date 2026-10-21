@@ -135,6 +135,7 @@ class TravellerProfile {
   final EmergencyContact emergencyContact;
   final TravelPreferences preferences;
   final List<TravelDocument> documents;
+  final String? avatarUrl;
 
   const TravellerProfile({
     required this.id,
@@ -156,6 +157,7 @@ class TravellerProfile {
     required this.emergencyContact,
     required this.preferences,
     required this.documents,
+    this.avatarUrl,
   });
 
   TravellerProfile copyWith({
@@ -178,6 +180,8 @@ class TravellerProfile {
     EmergencyContact? emergencyContact,
     TravelPreferences? preferences,
     List<TravelDocument>? documents,
+    String? avatarUrl,
+    bool clearAvatar = false,
   }) {
     return TravellerProfile(
       id: id ?? this.id,
@@ -199,6 +203,7 @@ class TravellerProfile {
       emergencyContact: emergencyContact ?? this.emergencyContact,
       preferences: preferences ?? this.preferences,
       documents: documents ?? this.documents,
+      avatarUrl: clearAvatar ? null : (avatarUrl ?? this.avatarUrl),
     );
   }
 

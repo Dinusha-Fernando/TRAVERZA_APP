@@ -8,11 +8,13 @@ class UserRegisterRequest(BaseModel):
     password: str = Field(min_length=8)
     full_name: str
     phone_number: str | None = None
+    avatar_url: str | None = None
 
 
 class UserUpdateRequest(BaseModel):
     full_name: str | None = None
     phone_number: str | None = None
+    avatar_url: str | None = None
 
 
 class UserLoginRequest(BaseModel):
@@ -36,6 +38,7 @@ class UserResponse(BaseModel):
     email: EmailStr
     full_name: str
     phone_number: str | None
+    avatar_url: str | None = None
     is_active: bool
     is_staff: bool
     staff_role: str | None

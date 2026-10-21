@@ -157,16 +157,27 @@ class DigitalPassportCard extends StatelessWidget {
                               ),
                             ],
                           ),
-                          child: CircleAvatar(
-                            radius: 27,
-                            backgroundColor: TraverzaColors.primaryHover,
-                            child: Text(
-                              profile.fullName.isNotEmpty ? profile.fullName[0] : 'T',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 24,
-                              ),
+                          child: GestureDetector(
+                            onTap: onEditDetails,
+                            child: CircleAvatar(
+                              radius: 27,
+                              backgroundColor: TraverzaColors.primaryHover,
+                              backgroundImage: (profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty)
+                                  ? NetworkImage(profile.avatarUrl!)
+                                  : null,
+                              onBackgroundImageError: (profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty)
+                                  ? (e, s) {}
+                                  : null,
+                              child: (profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty)
+                                  ? null
+                                  : Text(
+                                      profile.fullName.isNotEmpty ? profile.fullName[0] : 'T',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 24,
+                                      ),
+                                    ),
                             ),
                           ),
                         ),

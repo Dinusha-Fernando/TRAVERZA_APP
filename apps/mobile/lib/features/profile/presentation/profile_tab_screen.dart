@@ -1176,12 +1176,20 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                       CircleAvatar(
                         radius: 20,
                         backgroundColor: TraverzaColors.primary,
-                        child: Text(
-                          _authService.isAuthenticated && _profile.fullName.isNotEmpty
-                              ? _profile.fullName.substring(0, 1).toUpperCase()
-                              : 'G',
-                          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 16),
-                        ),
+                        backgroundImage: (_authService.isAuthenticated && _profile.avatarUrl != null && _profile.avatarUrl!.isNotEmpty)
+                            ? NetworkImage(_profile.avatarUrl!)
+                            : null,
+                        onBackgroundImageError: (_authService.isAuthenticated && _profile.avatarUrl != null && _profile.avatarUrl!.isNotEmpty)
+                            ? (e, s) {}
+                            : null,
+                        child: (_authService.isAuthenticated && _profile.avatarUrl != null && _profile.avatarUrl!.isNotEmpty)
+                            ? null
+                            : Text(
+                                _authService.isAuthenticated && _profile.fullName.isNotEmpty
+                                    ? _profile.fullName.substring(0, 1).toUpperCase()
+                                    : 'G',
+                                style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 16),
+                              ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(

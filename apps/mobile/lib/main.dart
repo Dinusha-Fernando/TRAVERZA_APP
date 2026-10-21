@@ -298,14 +298,22 @@ class _MainTripScreenState extends State<MainTripScreen> {
                   ? CircleAvatar(
                       radius: 13,
                       backgroundColor: TraverzaColors.primary,
-                      child: Text(
-                        initial,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      backgroundImage: (profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty)
+                          ? NetworkImage(profile.avatarUrl!)
+                          : null,
+                      onBackgroundImageError: (profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty)
+                          ? (e, s) {}
+                          : null,
+                      child: (profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty)
+                          ? null
+                          : Text(
+                              initial,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                     )
                   : const Icon(Icons.account_circle_outlined, color: TraverzaColors.primary),
               onPressed: () => setState(() => _currentIndex = 4),

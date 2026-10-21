@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../auth/services/auth_service.dart';
 import '../../data/profile_models.dart';
+import 'avatar_picker_sheet.dart';
 
 class EditProfileSheet extends StatefulWidget {
   final TravellerProfile profile;
@@ -34,11 +35,13 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
   late TextEditingController _emergencyNameController;
   late TextEditingController _emergencyRelationController;
   late TextEditingController _emergencyPhoneController;
+  String? _avatarUrl;
 
   @override
   void initState() {
     super.initState();
     final p = widget.profile;
+    _avatarUrl = p.avatarUrl;
     _nameController = TextEditingController(text: p.fullName);
     _emailController = TextEditingController(text: p.email);
     _phoneController = TextEditingController(text: p.phone);
@@ -60,6 +63,19 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
     super.dispose();
   }
 
+  Future<void> _changeAvatar() async {
+    final result = await AvatarPickerSheet.show(
+      context,
+      currentAvatarUrl: _avatarUrl,
+      fallbackInitial: _nameController.text.trim().isNotEmpty ? _nameController.text.trim()[0].toUpperCase() : 'T',
+    );
+    if (result != null) {
+      setState(() {
+        _avatarUrl = result.isEmpty ? null : result;
+      });
+    }
+  }
+
   void _saveProfile() {
     if (!_formKey.currentState!.validate()) return;
 
@@ -68,6 +84,8 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
       email: _emailController.text.trim(),
       phone: _phoneController.text.trim(),
       nationality: _nationalityController.text.trim(),
+      avatarUrl: _avatarUrl,
+      clearAvatar: _avatarUrl == null || _avatarUrl!.isEmpty,
       emergencyContact: widget.profile.emergencyContact.copyWith(
         name: _emergencyNameController.text.trim(),
         relationship: _emergencyRelationController.text.trim(),
@@ -115,23 +133,25 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text(
-                      'Edit Traveller Profile',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: TraverzaColors.text,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text(
+                        'Edit Traveller Profile',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: TraverzaColors.text,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 2),
-                    Text(
-                      'Update personal details and emergency contact',
-                      style: TextStyle(fontSize: 11.5, color: TraverzaColors.textMuted),
-                    ),
-                  ],
+                      SizedBox(height: 2),
+                      Text(
+                        'Update personal details and emergency contact',
+                        style: TextStyle(fontSize: 11.5, color: TraverzaColors.textMuted),
+                      ),
+                    ],
+                  ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.close_rounded, color: TraverzaColors.textMuted),
@@ -151,6 +171,85 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Profile Photo Avatar Section
+                    Center(
+                      child: Column(
+                        children: [
+                          Stack(
+                            children: [
+                              GestureDetector(
+                                onTap: _changeAvatar,
+                                child: Container(
+                                  width: 82,
+                                  height: 82,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: TraverzaColors.secondary, width: 2.5),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: TraverzaColors.primary.withValues(alpha: 0.15),
+                                        blurRadius: 10,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: CircleAvatar(
+                                    radius: 39,
+                                    backgroundColor: TraverzaColors.primary,
+                                    backgroundImage: (_avatarUrl != null && _avatarUrl!.isNotEmpty)
+                                        ? NetworkImage(_avatarUrl!)
+                                        : null,
+                                    onBackgroundImageError: (_avatarUrl != null && _avatarUrl!.isNotEmpty)
+                                        ? (e, s) {}
+                                        : null,
+                                    child: (_avatarUrl != null && _avatarUrl!.isNotEmpty)
+                                        ? null
+                                        : Text(
+                                            _nameController.text.trim().isNotEmpty
+                                                ? _nameController.text.trim()[0].toUpperCase()
+                                                : 'T',
+                                            style: const TextStyle(
+                                              fontSize: 30,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                right: 0,
+                                bottom: 0,
+                                child: GestureDetector(
+                                  onTap: _changeAvatar,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: const BoxDecoration(
+                                      color: TraverzaColors.secondary,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(Icons.camera_alt_rounded, size: 15, color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          TextButton.icon(
+                            onPressed: _changeAvatar,
+                            icon: const Icon(Icons.photo_library_outlined, size: 14),
+                            label: const Text('Change Profile Picture', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                            style: TextButton.styleFrom(
+                              foregroundColor: TraverzaColors.secondary,
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              minimumSize: Size.zero,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
                     const Text(
                       'PERSONAL IDENTITY',
                       style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 0.8, color: TraverzaColors.secondary),

@@ -47,6 +47,7 @@ async def register(req: UserRegisterRequest, db: AsyncSession = Depends(get_db))
         hashed_password=hash_password(req.password),
         full_name=req.full_name,
         phone_number=req.phone_number,
+        avatar_url=req.avatar_url,
     )
     db.add(user)
     await db.commit()
@@ -121,6 +122,8 @@ async def update_me(
         user.full_name = req.full_name
     if req.phone_number is not None:
         user.phone_number = req.phone_number
+    if req.avatar_url is not None:
+        user.avatar_url = req.avatar_url
 
     await db.commit()
     await db.refresh(user)
