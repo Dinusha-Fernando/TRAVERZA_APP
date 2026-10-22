@@ -124,8 +124,9 @@ void main() {
 
     // 3. Verify Offline Emergency Contacts
     expect(find.text('OFFLINE EMERGENCY CONTACTS'), findsOneWidget);
-    expect(find.text('Sri Lanka Tourist Police'), findsOneWidget);
+    expect(find.text('Sri Lanka Tourism Hotline (SLTDA)'), findsOneWidget);
     expect(find.text('1912 (24/7 Toll-Free)'), findsOneWidget);
+    expect(find.text('Tourist Police Division Direct'), findsOneWidget);
   });
 
   testWidgets('Journey Command Center: AI Companion sheet opens and answers grounded prompt', (tester) async {

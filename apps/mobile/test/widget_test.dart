@@ -142,7 +142,7 @@ void main() {
 
     // Verify Emergency Vault opens
     expect(find.text('Offline SOS & Emergency Vault'), findsOneWidget);
-    expect(find.text('1912'), findsOneWidget); // Tourist Police
+    expect(find.text('1912'), findsOneWidget); // Tourist Assistance (SLTDA)
     expect(find.text('1990'), findsOneWidget); // Ambulance
   });
 

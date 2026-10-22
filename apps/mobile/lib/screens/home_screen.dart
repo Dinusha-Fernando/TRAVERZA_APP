@@ -1626,7 +1626,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ManageJourneyShortcut(
                   icon: Icons.shield_outlined,
                   title: 'Travel safety',
-                  description: 'Access 1912 Tourist Police, 1990 Ambulance & SOS Vault.',
+                  description: 'Access 1912 Tourism Hotline, 1990 Ambulance & Emergency Vault.',
                   onTap: widget.onNavigateToSafety,
                   iconColor: TraverzaColors.roseEmergency,
                 ),

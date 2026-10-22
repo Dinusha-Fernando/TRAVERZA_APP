@@ -91,7 +91,7 @@ class _AICompanionSheetState extends State<AICompanionSheet> {
     if (lower.contains('escalat') || lower.contains('human') || lower.contains('support') || lower.contains('emergency')) {
       return ChatMessage(
         text:
-            '🚨 Connecting you to the TRAVERZA Priority Operations Desk in Colombo.\n\n• Duty Operator: Nimali (Trip Operations)\n• SLTDA Grievance Compliance SLA: < 15 minutes\n• Emergency Hotline: 1912 (Sri Lanka Tourist Police)\n• Operations Desk direct token generated. An operator has been alerted to your session.',
+            '🚨 Connecting you to the TRAVERZA Priority Operations Desk in Colombo.\n\n• Duty Operator: Nimali (Trip Operations)\n• SLTDA Grievance Compliance SLA: < 15 minutes\n• Emergency Hotlines: 1912 (SLTDA Tourism Assistance) & +94 11 242 1052 (Tourist Police Direct)\n• Operations Desk direct token generated. An operator has been alerted to your session.',
         isUser: false,
         timestamp: DateTime.now(),
         badgeText: 'OPERATIONS DESK ESCALATION',

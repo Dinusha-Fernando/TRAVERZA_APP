@@ -519,12 +519,20 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
         const SizedBox(height: 8),
 
         _buildEmergencyContactCard(
-          title: 'Sri Lanka Tourist Police Hotline',
+          title: 'Sri Lanka Tourism Hotline (SLTDA)',
           number: '1912',
-          description: 'Official SLTDA emergency tourist assistance desk',
+          description: 'Official 24/7 tourist information & emergency assistance',
+          icon: Icons.support_agent_outlined,
+          latitude: 6.9147,
+          longitude: 79.8523,
+        ),
+        _buildEmergencyContactCard(
+          title: 'Tourist Police Division Direct',
+          number: '+94 11 242 1052',
+          description: 'Dedicated tourist police division HQ (Colombo 03) / 119',
           icon: Icons.local_police_outlined,
-          latitude: 7.9542,
-          longitude: 80.7554,
+          latitude: 6.9271,
+          longitude: 79.8465,
         ),
         _buildEmergencyContactCard(
           title: 'Suwa Seriya Emergency Ambulance',

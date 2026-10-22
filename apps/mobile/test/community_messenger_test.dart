@@ -314,7 +314,7 @@ void main() {
 
       expect(find.text('Travel Messenger'), findsOneWidget);
       expect(find.text('All Inboxes'), findsOneWidget);
-      expect(find.text('🌍 District Lounges'), findsOneWidget);
+      expect(find.text('🌍 Province & Regional Lounges'), findsOneWidget);
       expect(find.text('💬 Travellers & Guides'), findsOneWidget);
       expect(find.text('Join Lounge / Chat'), findsOneWidget);
       expect(find.textContaining('Ella & Uva Travellers Lounge'), findsOneWidget);

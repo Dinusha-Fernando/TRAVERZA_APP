@@ -314,7 +314,7 @@ class TravellerProfile {
         carbonOffsetKg: 0.0,
         safetyReadinessScore: 60,
         emergencyContact: EmergencyContact(
-          name: 'SLTDA Tourist Police Desk',
+          name: 'SLTDA Tourism Assistance Desk',
           relationship: 'Emergency Authority',
           phone: '1912',
           email: 'safety@sltda.gov.lk',

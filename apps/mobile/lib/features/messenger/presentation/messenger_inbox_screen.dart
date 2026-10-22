@@ -40,7 +40,7 @@ class _MessengerInboxScreenState extends State<MessengerInboxScreen> {
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: TraverzaColors.primary),
             ),
             Text(
-              'District Lounges · Travellers · Guides · Providers',
+              'Province & Regional Lounges · Travellers · Guides · Providers',
               style: TextStyle(fontSize: 10, color: TraverzaColors.secondary, fontWeight: FontWeight.w600),
             ),
           ],
@@ -107,7 +107,7 @@ class _MessengerInboxScreenState extends State<MessengerInboxScreen> {
                       child: Row(
                         children: [
                           _buildFilterChip(null, 'All Inboxes'),
-                          _buildFilterChip(ConversationTypeEnum.districtLounge, '🌍 District Lounges'),
+                          _buildFilterChip(ConversationTypeEnum.districtLounge, '🌍 Province & Regional Lounges'),
                           _buildFilterChip(ConversationTypeEnum.direct, '💬 Travellers & Guides'),
                           _buildFilterChip(ConversationTypeEnum.providerInquiry, '🏨 Provider Inquiries'),
                           _buildFilterChip(ConversationTypeEnum.tripGroup, '👥 Trip Groups'),
@@ -353,7 +353,7 @@ class _MessengerInboxScreenState extends State<MessengerInboxScreen> {
               ),
               const SizedBox(height: 16),
               const Text(
-                'Explore District Lounges & Travellers',
+                'Explore Province & Regional Lounges',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: TraverzaColors.primary),
               ),
               const Text(
@@ -362,12 +362,12 @@ class _MessengerInboxScreenState extends State<MessengerInboxScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Section 1: District Lounges
+              // Section 1: Regional & Province Lounges
               Row(
                 children: const [
                   Icon(Icons.public_rounded, size: 16, color: TraverzaColors.secondary),
                   SizedBox(width: 6),
-                  Text('REGIONAL DISTRICT LOUNGES', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: TraverzaColors.secondary, letterSpacing: 0.6)),
+                  Text('REGIONAL & PROVINCE LOUNGES', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: TraverzaColors.secondary, letterSpacing: 0.6)),
                 ],
               ),
               const SizedBox(height: 10),

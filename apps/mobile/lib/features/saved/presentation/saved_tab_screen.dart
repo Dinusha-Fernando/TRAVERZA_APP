@@ -913,7 +913,7 @@ class _SavedTabScreenState extends State<SavedTabScreen> {
         ),
         _buildDiagnosticTile(
           title: 'Offline Emergency Cache & SOS',
-          subtitle: 'Emergency contact vault (119 Police, 1912 Tourist Police, 110 Ambulance) cached for hill zones without cell reception.',
+          subtitle: 'Emergency contact vault (119 Police, 1912 Tourism Hotline, 1990 Ambulance) cached locally.',
           icon: Icons.offline_pin_outlined,
           isPassed: true,
           badgeText: 'OFFLINE CACHED',
