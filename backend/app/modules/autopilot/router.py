@@ -22,6 +22,7 @@ router = APIRouter(prefix="/autopilot", tags=["Journey Autopilot (TRAVERZA 2.0)"
 
 
 @router.post("/events", response_model=AutopilotRunResult, status_code=status.HTTP_201_CREATED)
+@router.post("/telemetry/ingest", response_model=AutopilotRunResult, status_code=status.HTTP_201_CREATED)
 async def ingest_disruption_event(
     req: DisruptionEventCreate,
     token_payload: dict[str, Any] = Depends(get_current_user_token),
@@ -29,8 +30,8 @@ async def ingest_disruption_event(
 ):
     """
     Step 1 (Observe), Step 2 (Assess), & Step 3 (Propose):
-    Consumes a verified disruption event, performs downstream impact assessment,
-    and returns viable candidate proposals.
+    Consumes a verified disruption event from live telemetry (DMC weather, flight radar, driver dispatch),
+    performs downstream impact assessment, and returns viable candidate proposals.
     """
     event = await JourneyAutopilotEngine.observe_disruption_event(db, req)
     proposals = await JourneyAutopilotEngine.assess_and_propose(db, event)

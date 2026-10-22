@@ -112,33 +112,47 @@ async def list_trips(
     return res.scalars().all()
 
 
-@router.get("/overview")
+@router.get("/overview", tags=["Trips & Itinerary"])
 async def get_plan_overview(
     token_payload: dict[str, Any] = Depends(get_current_user_token),
     db: AsyncSession = Depends(get_db),
 ):
     """
-    Plan Tab Hub Overview Endpoint:
-    Returns traveller's active trip summary, total trips count, saved packages count,
-    and pilot corridor metadata.
+    Plan hub overview endpoint:
+    Returns the user's active/upcoming trip summary, drafts count, and summary metrics.
     """
     traveler_id = uuid.UUID(token_payload["sub"])
     stmt = (
         select(Trip)
         .options(selectinload(Trip.days).selectinload(ItineraryDay.items))
         .where(Trip.traveler_id == traveler_id)
-        .order_by(Trip.updated_at.desc())
+        .order_by(Trip.created_at.desc())
     )
     res = await db.execute(stmt)
     trips = res.scalars().all()
 
     active_trip = trips[0] if trips else None
+
     return {
-        "active_trip": active_trip,
+        "active_trip": (
+            {
+                "id": str(active_trip.id),
+                "title": active_trip.title,
+                "start_date": active_trip.start_date.isoformat(),
+                "end_date": active_trip.end_date.isoformat(),
+                "party_size": active_trip.party_size,
+                "corridor_name": active_trip.corridor_name,
+                "status": active_trip.status,
+                "days_count": len(active_trip.days),
+                "items_count": sum(len(d.items) for d in active_trip.days),
+            }
+            if active_trip
+            else None
+        ),
         "total_trips_count": len(trips),
+        "draft_trips_count": len([t for t in trips if t.status == "DRAFT"]),
         "saved_packages_count": 3,
-        "pilot_corridor": "Colombo (CMB) → Sigiriya/Dambulla → Kandy → Nuwara Eliya",
-        "recommended_destinations": ["Sigiriya", "Kandy", "Nuwara Eliya", "Ella", "Southern Coast"],
+        "pilot_corridor": "Colombo (CMB) → Sigiriya → Kandy → Nuwara Eliya",
     }
 
 
@@ -480,51 +494,6 @@ async def get_trip_command_center(
         travel_wallet_ready=True,
         autopilot_status="ACTIVE_MONITORING" if len(disruptions) == 0 else "ADAPTING",
     )
-
-
-
-@router.get("/overview", tags=["Trips & Itinerary"])
-async def get_plan_overview(
-    token_payload: dict[str, Any] = Depends(get_current_user_token),
-    db: AsyncSession = Depends(get_db),
-):
-    """
-    Plan hub overview endpoint:
-    Returns the user's active/upcoming trip summary, drafts count, and summary metrics.
-    """
-    traveler_id = uuid.UUID(token_payload["sub"])
-    stmt = (
-        select(Trip)
-        .options(selectinload(Trip.days).selectinload(ItineraryDay.items))
-        .where(Trip.traveler_id == traveler_id)
-        .order_by(Trip.created_at.desc())
-    )
-    res = await db.execute(stmt)
-    trips = res.scalars().all()
-
-    active_trip = trips[0] if trips else None
-
-    return {
-        "active_trip": (
-            {
-                "id": str(active_trip.id),
-                "title": active_trip.title,
-                "start_date": active_trip.start_date.isoformat(),
-                "end_date": active_trip.end_date.isoformat(),
-                "party_size": active_trip.party_size,
-                "corridor_name": active_trip.corridor_name,
-                "status": active_trip.status,
-                "days_count": len(active_trip.days),
-                "items_count": sum(len(d.items) for d in active_trip.days),
-            }
-            if active_trip
-            else None
-        ),
-        "total_trips_count": len(trips),
-        "draft_trips_count": len([t for t in trips if t.status == "DRAFT"]),
-        "saved_packages_count": 3,
-        "pilot_corridor": "Colombo (CMB) → Sigiriya → Kandy → Nuwara Eliya",
-    }
 
 
 @router.post("/{trip_id}/clone", response_model=TripResponse, status_code=status.HTTP_201_CREATED)

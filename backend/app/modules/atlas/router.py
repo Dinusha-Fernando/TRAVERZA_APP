@@ -114,6 +114,49 @@ async def list_districts(
     return results
 
 
+@router.get("/geography/nearby", response_model=list[DestinationSummary])
+async def list_nearby_destinations(
+    lat: float = Query(..., ge=-90, le=90, description="Observer latitude"),
+    lon: float = Query(..., ge=-180, le=180, description="Observer longitude"),
+    radius_km: float = Query(50.0, ge=1.0, le=250.0, description="Search radius in kilometers"),
+    limit: int = Query(10, ge=1, le=50),
+) -> list[DestinationSummary]:
+    """
+    Spatial radius search across Island Atlas destinations.
+    Calculates geodesic haversine distance and returns destinations within radius_km.
+    """
+    candidates = []
+    for d in _destinations.values():
+        dist = haversine_distance_km(lat, lon, d["latitude"], d["longitude"])
+        if dist <= radius_km:
+            candidates.append((dist, d))
+
+    candidates.sort(key=lambda x: x[0])
+    results = []
+    for dist, d in candidates[:limit]:
+        results.append(
+            DestinationSummary(
+                id=d["id"],
+                slug=d["slug"],
+                name=d["name"],
+                name_si=d["name_si"],
+                name_ta=d["name_ta"],
+                place_type=d.get("place_type", "iconic"),
+                category=d["category"],
+                latitude=d["latitude"],
+                longitude=d["longitude"],
+                summary=f"[{dist:.1f} km away] {d['summary']}",
+                dwell_duration_mins=d.get("dwell_duration_mins", 90),
+                access_state=d.get("access_state", "OPEN"),
+                review_status=d.get("review_status", "APPROVED"),
+                photo_url=d["photo_url"],
+                district_id=d["district_id"],
+                province_id=d["province_id"],
+            )
+        )
+    return results
+
+
 @router.get("/districts/{slug}/overview", response_model=DistrictOverviewResponse)
 async def get_district_overview(slug: str) -> DistrictOverviewResponse:
     """

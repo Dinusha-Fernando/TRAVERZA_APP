@@ -170,3 +170,109 @@ async def receive_payment_webhook(
 
     await db.commit()
     return {"status": "processed", "event_id": payload.event_id}
+
+
+@router.post("/escrow/release/{booking_id}")
+async def release_escrow_to_provider(
+    booking_id: uuid.UUID,
+    token_payload: dict[str, Any] = Depends(get_current_user_token),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Authoritative Escrow Payout (Gate 5 Invariant):
+    Releases held escrow funds to provider upon service completion.
+    Double-entry accounting:
+      Debit: PLATFORM_ESCROW (100% of GBV)
+      Credit: PROVIDER_PAYABLE (90% provider net payable)
+      Credit: PLATFORM_REVENUE (10% agreed platform commission)
+    Guarantees sum(debit) == sum(credit).
+    """
+    booking = await db.get(ServiceBooking, booking_id)
+    if not booking:
+        raise NotFoundException("ServiceBooking", booking_id)
+
+    role = token_payload.get("role")
+    if role != "SUPER_ADMIN":
+        raise TraverzaException(
+            code="UNAUTHORIZED_ESCROW_RELEASE",
+            message="Only authorized platform finance officers can release escrow funds",
+            status_code=status.HTTP_403_FORBIDDEN,
+        )
+
+    if booking.status not in ("CONFIRMED", "COMPLETED"):
+        raise TraverzaException(
+            code="INVALID_BOOKING_STATE",
+            message=f"Cannot release escrow for booking in state '{booking.status}'",
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # Calculate 10% platform commission and 90% provider payable
+    total_minor = booking.amount_minor
+    commission_minor = int(total_minor * 0.10)
+    provider_minor = total_minor - commission_minor
+
+    # Ensure accounts exist
+    escrow_acc = (await db.execute(select(LedgerAccount).where(LedgerAccount.code == "PLATFORM_ESCROW"))).scalar_one_or_none()
+    if not escrow_acc:
+        escrow_acc = LedgerAccount(code="PLATFORM_ESCROW", name="Customer Escrow Liability", type="LIABILITY")
+        db.add(escrow_acc)
+        await db.flush()
+
+    provider_acc = (await db.execute(select(LedgerAccount).where(LedgerAccount.code == "PROVIDER_PAYABLE"))).scalar_one_or_none()
+    if not provider_acc:
+        provider_acc = LedgerAccount(code="PROVIDER_PAYABLE", name="Provider Settlement Payable", type="LIABILITY")
+        db.add(provider_acc)
+        await db.flush()
+
+    revenue_acc = (await db.execute(select(LedgerAccount).where(LedgerAccount.code == "PLATFORM_REVENUE"))).scalar_one_or_none()
+    if not revenue_acc:
+        revenue_acc = LedgerAccount(code="PLATFORM_REVENUE", name="Platform Commission Revenue", type="REVENUE")
+        db.add(revenue_acc)
+        await db.flush()
+
+    tx_id = uuid.uuid4()
+    # 1. Debit PLATFORM_ESCROW (Decreasing platform liability)
+    entry_debit_escrow = LedgerEntry(
+        transaction_id=tx_id,
+        account_id=escrow_acc.id,
+        debit_minor=total_minor,
+        credit_minor=0,
+        currency=booking.currency,
+        memo=f"Escrow release for Booking {booking.id}",
+    )
+    # 2. Credit PROVIDER_PAYABLE (Payable to operator)
+    entry_credit_provider = LedgerEntry(
+        transaction_id=tx_id,
+        account_id=provider_acc.id,
+        debit_minor=0,
+        credit_minor=provider_minor,
+        currency=booking.currency,
+        memo=f"Settlement payable for Org {booking.organization_id}",
+    )
+    # 3. Credit PLATFORM_REVENUE (10% commission revenue)
+    entry_credit_revenue = LedgerEntry(
+        transaction_id=tx_id,
+        account_id=revenue_acc.id,
+        debit_minor=0,
+        credit_minor=commission_minor,
+        currency=booking.currency,
+        memo=f"10% Platform commission on Booking {booking.id}",
+    )
+
+    db.add(entry_debit_escrow)
+    db.add(entry_credit_provider)
+    db.add(entry_credit_revenue)
+
+    booking.status = "COMPLETED"
+    await db.commit()
+
+    return {
+        "status": "ESCROW_RELEASED",
+        "booking_id": str(booking.id),
+        "total_amount_minor": total_minor,
+        "provider_payable_minor": provider_minor,
+        "platform_commission_minor": commission_minor,
+        "currency": booking.currency,
+        "transaction_id": str(tx_id),
+        "ledger_balanced": True,
+    }

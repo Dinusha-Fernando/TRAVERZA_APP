@@ -193,8 +193,16 @@ async def customize_package_into_trip(
         db.add(it_day)
 
     await db.commit()
-    await db.refresh(new_trip)
-    return new_trip
+
+    # Reload with days and items to support async serialization
+    from sqlalchemy.orm import selectinload
+    stmt = (
+        select(Trip)
+        .options(selectinload(Trip.days).selectinload(ItineraryDay.items))
+        .where(Trip.id == new_trip.id)
+    )
+    res = await db.execute(stmt)
+    return res.scalar_one()
 
 
 @router.post("/{package_id}/booking-requests", status_code=status.HTTP_201_CREATED)

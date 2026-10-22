@@ -81,3 +81,49 @@ async def test_plan_overview():
         assert "total_trips_count" in overview
         assert "saved_packages_count" in overview
         assert "Colombo" in overview["pilot_corridor"]
+
+
+@pytest.mark.asyncio
+async def test_package_customization_into_draft_trip(test_db):
+    """
+    Test converting a curated operator package into a customizable traveler-owned Trip Canvas.
+    Enforces that the created Trip has status 'DRAFT' and copies duration_days days.
+    """
+    from app.modules.identity.models import User
+    user = User(
+        email="customizer@example.com",
+        hashed_password="hashed_dummy",
+        full_name="Customizer Traveler",
+    )
+    test_db.add(user)
+    await test_db.commit()
+
+    token = create_access_token(
+        subject=str(user.id),
+        extra_claims={"email": user.email, "role": "TRAVELER"},
+    )
+    headers = {"Authorization": f"Bearer {token}"}
+
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        # Get first package
+        res_pkgs = await client.get("/api/v1/packages")
+        assert res_pkgs.status_code == 200
+        pkg = res_pkgs.json()[0]
+
+        req_payload = {
+            "party_size": 3,
+            "start_date": "2026-12-01",
+            "trip_title": "My Personalized Cultural Adventure",
+        }
+        res_cust = await client.post(
+            f"/api/v1/packages/{pkg['id']}/customize",
+            json=req_payload,
+            headers=headers,
+        )
+        assert res_cust.status_code == 200, res_cust.text
+        data = res_cust.json()
+        assert data["title"] == "My Personalized Cultural Adventure"
+        assert data["status"] == "DRAFT"
+        assert data["party_size"] == 3
+        assert len(data["days"]) == pkg["duration_days"]
+

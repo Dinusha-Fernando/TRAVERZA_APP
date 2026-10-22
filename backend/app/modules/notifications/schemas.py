@@ -30,3 +30,8 @@ class NotificationBroadcastResponse(BaseModel):
     subject: str
     dispatched_at: str
     task_id: str | None = None
+
+
+class DeviceTokenRegisterRequest(BaseModel):
+    token: str
+    platform: str = "FCM"

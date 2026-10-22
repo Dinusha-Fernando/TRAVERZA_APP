@@ -18,10 +18,16 @@ depends_on: str | Sequence[str] | None = None
 
 def upgrade() -> None:
     """Upgrade schema."""
+    import app.modules.atlas.models  # noqa
     import app.modules.audit.models  # noqa
+    import app.modules.autopilot.models  # noqa
     import app.modules.bookings.models  # noqa
     import app.modules.catalogue.models  # noqa
+    import app.modules.community.models  # noqa
     import app.modules.identity.models  # noqa
+    import app.modules.messenger.models  # noqa
+    import app.modules.notifications.models  # noqa
+    import app.modules.packages.models  # noqa
     import app.modules.payments.models  # noqa
     import app.modules.support.models  # noqa
     import app.modules.tripgraph.models  # noqa
@@ -34,10 +40,16 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     """Downgrade schema."""
+    import app.modules.atlas.models  # noqa
     import app.modules.audit.models  # noqa
+    import app.modules.autopilot.models  # noqa
     import app.modules.bookings.models  # noqa
     import app.modules.catalogue.models  # noqa
+    import app.modules.community.models  # noqa
     import app.modules.identity.models  # noqa
+    import app.modules.messenger.models  # noqa
+    import app.modules.notifications.models  # noqa
+    import app.modules.packages.models  # noqa
     import app.modules.payments.models  # noqa
     import app.modules.support.models  # noqa
     import app.modules.tripgraph.models  # noqa

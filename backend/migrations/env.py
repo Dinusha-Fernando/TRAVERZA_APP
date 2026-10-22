@@ -18,6 +18,22 @@ if config.config_file_name is not None:
 from app.core.config import settings
 from app.core.database import Base
 
+# Import all domain models to register tables with Base.metadata
+import app.modules.atlas.models  # noqa
+import app.modules.audit.models  # noqa
+import app.modules.autopilot.models  # noqa
+import app.modules.bookings.models  # noqa
+import app.modules.catalogue.models  # noqa
+import app.modules.community.models  # noqa
+import app.modules.identity.models  # noqa
+import app.modules.messenger.models  # noqa
+import app.modules.notifications.models  # noqa
+import app.modules.packages.models  # noqa
+import app.modules.payments.models  # noqa
+import app.modules.support.models  # noqa
+import app.modules.tripgraph.models  # noqa
+import app.modules.trips.models  # noqa
+
 target_metadata = Base.metadata
 
 
