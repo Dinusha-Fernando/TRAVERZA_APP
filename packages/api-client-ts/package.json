@@ -1,0 +1,30 @@
+{
+  "name": "@dinusha-fernando/traverza-api-client",
+  "version": "1.0.0",
+  "description": "Strongly-typed TypeScript API client for the TRAVERZA Sri Lanka Operating Platform",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dinusha-Fernando/TRAVERZA_APP.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "keywords": [
+    "traverza",
+    "sri-lanka",
+    "travel-api",
+    "api-client",
+    "tripgraph"
+  ],
+  "author": "TRAVERZA Engineering Team",
+  "license": "Proprietary",
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  }
+}

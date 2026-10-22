@@ -76,6 +76,34 @@ flutter pub get
 flutter run
 ```
 
+## CI/CD & GitHub Packages
+
+[![TRAVERZA CI](https://github.com/Dinusha-Fernando/TRAVERZA_APP/actions/workflows/ci.yml/badge.svg)](https://github.com/Dinusha-Fernando/TRAVERZA_APP/actions/workflows/ci.yml)
+[![CD & Packages](https://github.com/Dinusha-Fernando/TRAVERZA_APP/actions/workflows/publish-packages.yml/badge.svg)](https://github.com/Dinusha-Fernando/TRAVERZA_APP/actions/workflows/publish-packages.yml)
+[![Security Audit](https://github.com/Dinusha-Fernando/TRAVERZA_APP/actions/workflows/security-audit.yml/badge.svg)](https://github.com/Dinusha-Fernando/TRAVERZA_APP/actions/workflows/security-audit.yml)
+
+### Published Packages & Container Images
+- **Backend API Container (GHCR):** `ghcr.io/dinusha-fernando/traverza-backend:latest`
+- **Web Portal Container (GHCR):** `ghcr.io/dinusha-fernando/traverza-web:latest`
+- **TypeScript API Client (GitHub Packages):** `@dinusha-fernando/traverza-api-client`
+- **Android Mobile App:** Release APK generated and attached to version tags (`v*`).
+
+### Pulling Containers from GitHub Container Registry
+```bash
+# Pull backend container
+docker pull ghcr.io/dinusha-fernando/traverza-backend:latest
+
+# Pull web portal container
+docker pull ghcr.io/dinusha-fernando/traverza-web:latest
+```
+
+### Installing TypeScript Client from GitHub Packages
+```bash
+npm install @dinusha-fernando/traverza-api-client --registry=https://npm.pkg.github.com
+```
+
 ## Key Documentation
-- [Master Implementation Plan](file:///C:/Users/Dinusha/.gemini/antigravity-ide/brain/e5e2783d-def8-4f4a-bad1-4d37662d5313/master_implementation_plan.md)
-- [Architecture Decision Records (ADRs)](file:///c:/Users/Dinusha/Desktop/TRAVERZA/docs/adr/)
+- [Architecture Decision Records (ADRs)](docs/adr/)
+- [Compliance Checklists (SLTDA, PDPA 2027)](docs/compliance/)
+- [Strategy Blueprint](docs/strategy/TRAVERZA_2.0_ADVANCED_PRODUCT_STRATEGY.md)
+
