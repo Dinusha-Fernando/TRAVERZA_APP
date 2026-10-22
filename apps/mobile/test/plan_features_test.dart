@@ -5,6 +5,7 @@ import 'package:mobile/features/plan/data/package_model.dart';
 import 'package:mobile/features/plan/package_details_screen.dart';
 import 'package:mobile/features/plan/package_explorer_screen.dart';
 import 'package:mobile/features/plan/plan_tab_screen.dart';
+import 'package:mobile/features/plan/widgets/active_trip_summary_card.dart';
 import 'package:mobile/features/plan/widgets/add_to_trip_sheet.dart';
 import 'package:mobile/theme/app_theme.dart';
 
@@ -299,5 +300,29 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(addedTitle, 'Dambulla Golden Rock Temple');
+  });
+
+  testWidgets('ActiveTripSummaryCard renders without RenderFlex overflow on narrow 337px width', (tester) async {
+    tester.view.physicalSize = const Size(337, 750);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.theme,
+        home: Scaffold(
+          body: ActiveTripSummaryCard(
+            isHotelConfirmed: false,
+            onToggleSimulation: () {},
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('2 Travellers'), findsOneWidget);
+    expect(find.text('LKR 68,500 Total'), findsOneWidget);
+    expect(find.text('SLTDA Protected'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 }

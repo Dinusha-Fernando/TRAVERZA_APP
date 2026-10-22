@@ -10,6 +10,7 @@ import 'features/notifications/data/notification_model.dart';
 import 'features/notifications/services/notification_service.dart';
 import 'features/notifications/presentation/notification_center_sheet.dart';
 import 'features/auth/services/auth_service.dart';
+import 'features/messenger/presentation/widgets/creative_messenger_button.dart';
 
 void main() {
   runApp(const TraverzaApp());
@@ -181,18 +182,19 @@ class _MainTripScreenState extends State<MainTripScreen> {
 
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
+      titleSpacing: 12,
       title: Row(
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: Image.asset(
               'assets/traverza_logo.jpg',
-              width: 36,
-              height: 36,
+              width: 34,
+              height: 34,
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) => Container(
-                width: 36,
-                height: 36,
+                width: 34,
+                height: 34,
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [TraverzaColors.oceanBlue, TraverzaColors.lagoonTeal],
@@ -202,44 +204,53 @@ class _MainTripScreenState extends State<MainTripScreen> {
                 alignment: Alignment.center,
                 child: const Text(
                   'T',
-                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: Colors.white),
+                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 17, color: Colors.white),
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 10),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'TRAVERZA',
-                style: TextStyle(
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1.4,
-                  fontSize: 15,
-                  color: TraverzaColors.primary,
-                ),
-              ),
-              Row(
-                children: const [
-                  Icon(Icons.location_on, size: 10, color: TraverzaColors.secondary),
-                  SizedBox(width: 2),
-                  Text(
-                    'SRI LANKA · CULTURAL TRIANGLE',
-                    style: TextStyle(
-                      fontSize: 8.5,
-                      color: TraverzaColors.secondary,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.8,
-                    ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'TRAVERZA',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.2,
+                    fontSize: 14.5,
+                    color: TraverzaColors.primary,
                   ),
-                ],
-              ),
-            ],
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    Icon(Icons.location_on, size: 10, color: TraverzaColors.secondary),
+                    SizedBox(width: 2),
+                    Expanded(
+                      child: Text(
+                        'SRI LANKA · CULTURAL TRIANGLE',
+                        style: TextStyle(
+                          fontSize: 8.5,
+                          color: TraverzaColors.secondary,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.6,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),
       actions: [
+        const CreativeMessengerButton(compact: true),
         ListenableBuilder(
           listenable: TraverzaNotificationService.instance,
           builder: (context, _) {

@@ -11,12 +11,14 @@ import 'widgets/package_offer_card.dart';
 import 'widgets/planning_path_card.dart';
 import 'widgets/transit_buffer_connector.dart';
 import 'widgets/trip_stop_card.dart';
+import '../command_center/presentation/journey_command_center_screen.dart';
 
 enum PlanSubView {
   hub,
   canvas,
   packages,
   customBuilder,
+  commandCenter,
 }
 
 class PlanTabScreen extends StatefulWidget {
@@ -88,6 +90,8 @@ class _PlanTabScreenState extends State<PlanTabScreen> {
           );
         },
       );
+    } else if (_currentSubView == PlanSubView.commandCenter) {
+      return const JourneyCommandCenterScreen();
     }
 
     // Default: Planning Hub Landing Page
@@ -148,7 +152,7 @@ class _PlanTabScreenState extends State<PlanTabScreen> {
             isHotelConfirmed: widget.isHotelConfirmed,
             onToggleSimulation: widget.onToggleSimulation,
             onOpenCanvas: () => _navigateToSubView(PlanSubView.canvas),
-            onOpenReadiness: () => _navigateToSubView(PlanSubView.canvas),
+            onOpenReadiness: () => _navigateToSubView(PlanSubView.commandCenter),
           ),
 
           // 2. Interactive Route Map Canvas with Google Maps Integration

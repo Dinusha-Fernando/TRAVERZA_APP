@@ -28,7 +28,7 @@ class ActiveTripSummaryCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: TraverzaColors.surface,
         borderRadius: BorderRadius.circular(20),
@@ -44,10 +44,14 @@ class ActiveTripSummaryCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8,
+            runSpacing: 6,
             children: [
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
                     padding: const EdgeInsets.all(6),
@@ -61,7 +65,7 @@ class ActiveTripSummaryCard extends StatelessWidget {
                   const Text(
                     'Trip Timeline',
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: TraverzaColors.text,
                     ),
@@ -99,18 +103,14 @@ class ActiveTripSummaryCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 10),
-          Row(
-            children: const [
-              Text(
-                'ID: TRIP-LK-2026-9041',
-                style: TextStyle(
-                  fontFamily: 'monospace',
-                  color: TraverzaColors.secondary,
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
+          const Text(
+            'ID: TRIP-LK-2026-9041',
+            style: TextStyle(
+              fontFamily: 'monospace',
+              color: TraverzaColors.secondary,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 6),
           const Text(
@@ -122,27 +122,43 @@ class ActiveTripSummaryCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          Row(
+          Wrap(
+            spacing: 12,
+            runSpacing: 6,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: const [
-              Icon(Icons.people_alt_outlined, size: 15, color: TraverzaColors.secondary),
-              SizedBox(width: 5),
-              Text(
-                '2 Travellers',
-                style: TextStyle(color: TraverzaColors.textMuted, fontSize: 12),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.people_alt_outlined, size: 15, color: TraverzaColors.secondary),
+                  SizedBox(width: 5),
+                  Text(
+                    '2 Travellers',
+                    style: TextStyle(color: TraverzaColors.textMuted, fontSize: 12),
+                  ),
+                ],
               ),
-              SizedBox(width: 16),
-              Icon(Icons.payments_outlined, size: 15, color: TraverzaColors.secondary),
-              SizedBox(width: 5),
-              Text(
-                'LKR 68,500 Total',
-                style: TextStyle(color: TraverzaColors.textMuted, fontSize: 12, fontWeight: FontWeight.w600),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.payments_outlined, size: 15, color: TraverzaColors.secondary),
+                  SizedBox(width: 5),
+                  Text(
+                    'LKR 68,500 Total',
+                    style: TextStyle(color: TraverzaColors.textMuted, fontSize: 12, fontWeight: FontWeight.w600),
+                  ),
+                ],
               ),
-              SizedBox(width: 16),
-              Icon(Icons.verified_outlined, size: 15, color: TraverzaColors.emeraldSuccess),
-              SizedBox(width: 4),
-              Text(
-                'SLTDA Protected',
-                style: TextStyle(color: TraverzaColors.emeraldSuccess, fontSize: 11, fontWeight: FontWeight.bold),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.verified_outlined, size: 15, color: TraverzaColors.emeraldSuccess),
+                  SizedBox(width: 4),
+                  Text(
+                    'SLTDA Protected',
+                    style: TextStyle(color: TraverzaColors.emeraldSuccess, fontSize: 11, fontWeight: FontWeight.bold),
+                  ),
+                ],
               ),
             ],
           ),
@@ -164,6 +180,8 @@ class ActiveTripSummaryCard extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                       fontSize: 13,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: TraverzaColors.primary,

@@ -142,12 +142,18 @@ const CORRIDOR_DESTINATIONS: DestinationInfo[] = [
 
 export default function HomePage() {
   const [stops, setStops] = useState<ItineraryStop[]>(INITIAL_STOPS);
-  const [activeTab, setActiveTab] = useState<'timeline' | 'map' | 'corridor' | 'validation' | 'checkout'>('timeline');
+  const [activeTab, setActiveTab] = useState<'timeline' | 'map' | 'corridor' | 'validation' | 'checkout' | 'autopilot'>('timeline');
   const [mapMode, setMapMode] = useState<'k' | 'p' | 'm'>('k'); // k = satellite, p = terrain, m = roadmap
   const [selectedMapStopId, setSelectedMapStopId] = useState<string>('stop-3');
   const [simulatedWebhookState, setSimulatedWebhookState] = useState<'idle' | 'processing' | 'captured' | 'duplicate'>('idle');
   const [showNotification, setShowNotification] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // TRAVERZA 2.0 Journey Autopilot Simulation State
+  const [autopilotDisruption, setAutopilotDisruption] = useState<'none' | 'flight_delay' | 'driver_breakdown' | 'mountain_weather'>('none');
+  const [autopilotStep, setAutopilotStep] = useState<number>(0);
+  const [autopilotAuthorized, setAutopilotAuthorized] = useState<boolean>(false);
+
 
   // Compute truthful trip status (Gate 6 invariant)
   const bookableStops = stops.filter((s) => s.category !== 'FLIGHT');
@@ -208,7 +214,54 @@ export default function HomePage() {
     }, 700);
   };
 
+  const triggerAutopilotDisruption = (type: 'flight_delay' | 'driver_breakdown' | 'mountain_weather') => {
+    setAutopilotDisruption(type);
+    setAutopilotStep(3); // Ingested (Step 1), Assessed (Step 2), Proposed (Step 3)
+    setAutopilotAuthorized(false);
+    const msg =
+      type === 'flight_delay'
+        ? '⚡ Autopilot Alert: Flight UL-504 delay (+90m) ingested from SriLankan Airlines live feed. Proposal generated.'
+        : type === 'driver_breakdown'
+        ? '⚡ Autopilot Alert: Assigned chauffeur breakdown reported near Kadawatha. Emergency backup dispatch prepared.'
+        : '⚡ Autopilot Alert: DMC heavy rain advisory on Ramboda pass. Highland transit buffer (+45m) proposed.';
+    setShowNotification(msg);
+    setTimeout(() => setShowNotification(null), 6000);
+  };
+
+  const handleAuthorizeAutopilot = (decision: 'APPROVE' | 'REJECT') => {
+    if (decision === 'APPROVE') {
+      setAutopilotStep(6); // Executed (Step 5) & Verified (Step 6)
+      setAutopilotAuthorized(true);
+      if (autopilotDisruption === 'flight_delay') {
+        setStops((prev) =>
+          prev.map((s) => {
+            if (s.id === 'stop-1') return { ...s, time: '10:30 - 11:30' };
+            if (s.id === 'stop-2') return { ...s, time: '12:00 - 15:30' };
+            return s;
+          })
+        );
+      }
+      setShowNotification('✓ Autopilot Proposal Authorized & Executed! TripGraph mathematically verified 0 hard errors.');
+    } else {
+      setAutopilotStep(0);
+      setAutopilotDisruption('none');
+      setAutopilotAuthorized(false);
+      setShowNotification('Autopilot Proposal Rejected by User. Original itinerary preserved.');
+    }
+    setTimeout(() => setShowNotification(null), 6000);
+  };
+
+  const resetAutopilot = () => {
+    setAutopilotDisruption('none');
+    setAutopilotStep(0);
+    setAutopilotAuthorized(false);
+    setStops(INITIAL_STOPS);
+    setShowNotification('Autopilot reset to baseline active monitoring.');
+    setTimeout(() => setShowNotification(null), 4000);
+  };
+
   return (
+
     <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '40px 24px' }}>
       {/* Hero Section */}
       <section
@@ -356,6 +409,20 @@ export default function HomePage() {
             TripGraph Validator
           </button>
           <button
+            onClick={() => setActiveTab('autopilot')}
+            className={`btn ${activeTab === 'autopilot' ? 'btn-primary' : 'btn-secondary'}`}
+            style={{
+              background:
+                activeTab === 'autopilot'
+                  ? 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)'
+                  : 'rgba(2, 132, 199, 0.12)',
+              border: '1px solid rgba(2, 132, 199, 0.4)',
+              color: activeTab === 'autopilot' ? '#ffffff' : '#38bdf8',
+            }}
+          >
+            ⚡ Journey Autopilot 2.0
+          </button>
+          <button
             onClick={() => setActiveTab('checkout')}
             className={`btn ${activeTab === 'checkout' ? 'btn-accent' : 'btn-secondary'}`}
           >
@@ -363,6 +430,7 @@ export default function HomePage() {
           </button>
         </div>
       </section>
+
 
       {/* Real-time Notification Banner */}
       {showNotification && (
@@ -1168,7 +1236,323 @@ export default function HomePage() {
               )}
             </div>
           )}
+
+          {/* View 5: TRAVERZA 2.0 Journey Autopilot Panel */}
+          {activeTab === 'autopilot' && (
+            <div className="glass-panel" style={{ padding: '32px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                    <span className="badge badge-sapphire" style={{ fontSize: '0.75rem' }}>
+                      TRAVERZA 2.0 Flagship Innovation
+                    </span>
+                    <span className="badge badge-emerald" style={{ fontSize: '0.75rem' }}>
+                      Active Autopilot Engine
+                    </span>
+                  </div>
+                  <h2 style={{ fontSize: '1.5rem', background: 'linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                    Journey Autopilot™ — Disruption Recovery & Adaptation
+                  </h2>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', marginTop: '4px' }}>
+                    A closed-loop coordination engine: <strong>Observe → Assess → Propose → Authorize → Execute → Verify</strong>.
+                  </p>
+                </div>
+              </div>
+
+              {/* Simulation Action Triggers */}
+              <div
+                style={{
+                  background: 'rgba(2, 132, 199, 0.08)',
+                  border: '1px solid rgba(2, 132, 199, 0.25)',
+                  borderRadius: 'var(--radius-sm)',
+                  padding: '20px',
+                  marginBottom: '24px',
+                }}
+              >
+                <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#38bdf8', letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: '12px' }}>
+                  Interactive Disruption Sandbox
+                </div>
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={() => triggerAutopilotDisruption('flight_delay')}
+                    className="btn btn-secondary"
+                    style={{
+                      fontSize: '0.84rem',
+                      padding: '8px 14px',
+                      background: autopilotDisruption === 'flight_delay' ? 'rgba(56, 189, 248, 0.25)' : undefined,
+                      borderColor: autopilotDisruption === 'flight_delay' ? '#38bdf8' : undefined,
+                    }}
+                  >
+                    ✈️ Simulate 90m Flight Delay (UL-504)
+                  </button>
+                  <button
+                    onClick={() => triggerAutopilotDisruption('driver_breakdown')}
+                    className="btn btn-secondary"
+                    style={{
+                      fontSize: '0.84rem',
+                      padding: '8px 14px',
+                      background: autopilotDisruption === 'driver_breakdown' ? 'rgba(239, 68, 68, 0.25)' : undefined,
+                      borderColor: autopilotDisruption === 'driver_breakdown' ? '#ef4444' : undefined,
+                    }}
+                  >
+                    🚗 Simulate Driver Breakdown
+                  </button>
+                  <button
+                    onClick={() => triggerAutopilotDisruption('mountain_weather')}
+                    className="btn btn-secondary"
+                    style={{
+                      fontSize: '0.84rem',
+                      padding: '8px 14px',
+                      background: autopilotDisruption === 'mountain_weather' ? 'rgba(245, 158, 11, 0.25)' : undefined,
+                      borderColor: autopilotDisruption === 'mountain_weather' ? '#f59e0b' : undefined,
+                    }}
+                  >
+                    🌧️ Highland Roadwork Advisory (+45m)
+                  </button>
+                  {autopilotDisruption !== 'none' && (
+                    <button
+                      onClick={resetAutopilot}
+                      className="btn"
+                      style={{
+                        fontSize: '0.84rem',
+                        padding: '8px 14px',
+                        background: 'rgba(255, 255, 255, 0.1)',
+                        color: 'var(--text-muted)',
+                      }}
+                    >
+                      ↺ Reset
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Autopilot 6-Step Loop Live Tracker */}
+              {autopilotDisruption === 'none' ? (
+                <div
+                  style={{
+                    padding: '36px',
+                    textAlign: 'center',
+                    background: 'rgba(255, 255, 255, 0.02)',
+                    borderRadius: 'var(--radius-sm)',
+                    border: '1px dashed var(--border-glass)',
+                  }}
+                >
+                  <div style={{ fontSize: '2.4rem', marginBottom: '12px' }}>🛡️</div>
+                  <h3 style={{ fontSize: '1.15rem', color: '#f8fafc' }}>Active Journey Autopilot Monitoring</h3>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', maxWidth: '520px', margin: '8px auto 0' }}>
+                    Flight radar feeds, Sri Lanka Disaster Management Centre advisories, and chauffeur dispatch channels are connected. Click a disruption scenario above to see the 6-step recovery loop in action.
+                  </p>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {/* Step 1: OBSERVE */}
+                  <div
+                    style={{
+                      padding: '18px',
+                      borderRadius: 'var(--radius-sm)',
+                      background: 'rgba(56, 189, 248, 0.08)',
+                      border: '1px solid rgba(56, 189, 248, 0.3)',
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                      <div style={{ fontWeight: 700, color: '#38bdf8', fontSize: '0.9rem' }}>
+                        1. OBSERVE — Verified Event Ingested
+                      </div>
+                      <span className="badge badge-sapphire" style={{ fontSize: '0.72rem' }}>
+                        Freshness: 0s ago (Verified)
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '0.88rem', color: '#f1f5f9' }}>
+                      {autopilotDisruption === 'flight_delay' && (
+                        <>
+                          <strong>Flight UL-504 (London Heathrow → Colombo)</strong> delayed by 90 minutes.
+                          <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                            Source: SriLankan Airlines Live Radar Feed • Observed at: 2026-10-24 07:15 UTC • Original ETA: 10:00 → Revised ETA: 11:30.
+                          </div>
+                        </>
+                      )}
+                      {autopilotDisruption === 'driver_breakdown' && (
+                        <>
+                          <strong>Chauffeur Fleet #LK-102 (Toyota Prado)</strong> reported mechanical issue near Kadawatha interchange.
+                          <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                            Source: Ceylon Chauffeurs Guild Hotline • Severity: CRITICAL • 3h 15m prior to CMB pickup.
+                          </div>
+                        </>
+                      )}
+                      {autopilotDisruption === 'mountain_weather' && (
+                        <>
+                          <strong>DMC Weather & Roadwork Advisory</strong> active on A5 mountain route near Ramboda Pass.
+                          <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                            Source: Disaster Management Centre (DMC) • Heavy rainfall and resurfacing delay (+45m).
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Step 2: ASSESS */}
+                  <div
+                    style={{
+                      padding: '18px',
+                      borderRadius: 'var(--radius-sm)',
+                      background: 'rgba(245, 158, 11, 0.08)',
+                      border: '1px solid rgba(245, 158, 11, 0.3)',
+                    }}
+                  >
+                    <div style={{ fontWeight: 700, color: '#fbbf24', fontSize: '0.9rem', marginBottom: '8px' }}>
+                      2. ASSESS — Downstream Impact Analysis
+                    </div>
+                    <div style={{ fontSize: '0.88rem', color: '#f1f5f9' }}>
+                      {autopilotDisruption === 'flight_delay' && (
+                        <>
+                          Downstream clash detected: Airport Chauffeur Transfer (Fleet #LK-402) scheduled pickup at 10:30 is <strong>impossible</strong> with 11:30 landing.
+                          <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                            Buffer deficit: -60 minutes. Subsequent Sigiriya Eco Villa 18:30 check-in remains feasible if pickup shifts to 12:00.
+                          </div>
+                        </>
+                      )}
+                      {autopilotDisruption === 'driver_breakdown' && (
+                        <>
+                          Critical connection severed: Day 1 CMB Airport to Sigiriya transit cannot proceed without replacement vehicle.
+                          <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                            Depot check: Negombo fleet backup depot has certified Toyota Prado #LK-902 on standby (18m from terminal).
+                          </div>
+                        </>
+                      )}
+                      {autopilotDisruption === 'mountain_weather' && (
+                        <>
+                          Highland transit buffer deficit: Current schedule has only 20-min buffer between Kandy and Nuwara Eliya.
+                          <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                            TripGraph constraint: 32 km/h highland road speed requires +45m additional buffer to prevent dusk driving.
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Step 3: PROPOSE */}
+                  <div
+                    style={{
+                      padding: '18px',
+                      borderRadius: 'var(--radius-sm)',
+                      background: 'rgba(99, 102, 241, 0.08)',
+                      border: '1px solid rgba(99, 102, 241, 0.3)',
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                      <div style={{ fontWeight: 700, color: '#818cf8', fontSize: '0.9rem' }}>
+                        3. PROPOSE — Candidate Resolution with Deltas
+                      </div>
+                      <span className="badge badge-sapphire" style={{ fontSize: '0.72rem' }}>
+                        Confidence: 98%
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '0.88rem', color: '#f1f5f9' }}>
+                      {autopilotDisruption === 'flight_delay' && (
+                        <div>
+                          <strong>Proposed Action:</strong> Shift Chauffeur Pickup from 10:30 to 12:00 (preserving 30m customs clearance buffer).
+                          <div style={{ display: 'flex', gap: '16px', marginTop: '8px', fontSize: '0.85rem' }}>
+                            <div>Timing Delta: <strong style={{ color: '#fbbf24' }}>+90 mins</strong></div>
+                            <div>Cost Delta: <strong style={{ color: '#34d399' }}>LKR 0 (Contracted)</strong></div>
+                            <div>Downstream Safety: <strong style={{ color: '#34d399' }}>Feasible</strong></div>
+                          </div>
+                        </div>
+                      )}
+                      {autopilotDisruption === 'driver_breakdown' && (
+                        <div>
+                          <strong>Proposed Action:</strong> Dispatch Negombo Depot backup chauffeur (Fleet #LK-902). Arrival at CMB in 35 mins.
+                          <div style={{ display: 'flex', gap: '16px', marginTop: '8px', fontSize: '0.85rem' }}>
+                            <div>Timing Delta: <strong style={{ color: '#34d399' }}>0 mins delay</strong></div>
+                            <div>Cost Delta: <strong style={{ color: '#34d399' }}>LKR 0 (Fleet Guarantee)</strong></div>
+                            <div>Provider Lic: <strong>SLTDA/CG/2026/102</strong></div>
+                          </div>
+                        </div>
+                      )}
+                      {autopilotDisruption === 'mountain_weather' && (
+                        <div>
+                          <strong>Proposed Action:</strong> Depart Kandy 30m earlier and inject 45-minute mountain transit buffer before tea factory.
+                          <div style={{ display: 'flex', gap: '16px', marginTop: '8px', fontSize: '0.85rem' }}>
+                            <div>Buffer Added: <strong style={{ color: '#38bdf8' }}>+45 mins</strong></div>
+                            <div>Cost Delta: <strong style={{ color: '#34d399' }}>LKR 0</strong></div>
+                            <div>Pacing: <strong>Balanced</strong></div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Step 4: AUTHORIZE */}
+                  <div
+                    style={{
+                      padding: '18px',
+                      borderRadius: 'var(--radius-sm)',
+                      background: autopilotAuthorized ? 'rgba(16, 185, 129, 0.08)' : 'rgba(239, 68, 68, 0.08)',
+                      border: autopilotAuthorized ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(239, 68, 68, 0.3)',
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                      <div style={{ fontWeight: 700, color: autopilotAuthorized ? '#34d399' : '#f87171', fontSize: '0.9rem' }}>
+                        4. AUTHORIZE — Non-Negotiable Human Gate
+                      </div>
+                      <span className={`badge ${autopilotAuthorized ? 'badge-emerald' : 'badge-amber'}`} style={{ fontSize: '0.72rem' }}>
+                        {autopilotAuthorized ? 'Authorized by Traveller' : 'Pending Authorization'}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '0.84rem', color: 'var(--text-secondary)', marginBottom: '14px' }}>
+                      Safety Rule: AI may suggest and explain. Consequential itinerary modifications require explicit traveller or operator confirmation.
+                    </div>
+                    {!autopilotAuthorized ? (
+                      <div style={{ display: 'flex', gap: '12px' }}>
+                        <button
+                          onClick={() => handleAuthorizeAutopilot('APPROVE')}
+                          className="btn btn-primary"
+                          style={{ flex: 1, padding: '10px 16px', fontSize: '0.88rem' }}
+                        >
+                          ✓ Approve Adaptation & Update Timeline
+                        </button>
+                        <button
+                          onClick={() => handleAuthorizeAutopilot('REJECT')}
+                          className="btn btn-secondary"
+                          style={{ flex: 1, padding: '10px 16px', fontSize: '0.88rem' }}
+                        >
+                          ✕ Reject (Keep Original)
+                        </button>
+                      </div>
+                    ) : (
+                      <div style={{ fontSize: '0.86rem', color: '#34d399', fontWeight: 600 }}>
+                        ✓ Authorization confirmed. Proposal unlocked for execution.
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Step 5 & 6: EXECUTE & VERIFY (When Authorized) */}
+                  {autopilotAuthorized && (
+                    <div
+                      className="animate-fade-in"
+                      style={{
+                        padding: '18px',
+                        borderRadius: 'var(--radius-sm)',
+                        background: 'rgba(16, 185, 129, 0.12)',
+                        border: '1px solid rgba(16, 185, 129, 0.4)',
+                      }}
+                    >
+                      <div style={{ fontWeight: 700, color: '#34d399', fontSize: '0.9rem', marginBottom: '8px' }}>
+                        5. EXECUTE & 6. VERIFY — Idempotent Mutation & TripGraph Check
+                      </div>
+                      <div style={{ fontSize: '0.86rem', color: '#f1f5f9', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <div>✓ Itinerary items updated: Airport Chauffeur transfer rescheduled to 12:00 - 15:30.</div>
+                        <div>✓ Provider notification dispatched: Ceylon Chauffeurs Guild received automated dispatch token.</div>
+                        <div>✓ TripGraph validation result: <strong>0 hard errors</strong>. Temporal sequence & buffer verified.</div>
+                        <div>✓ Append-only audit record saved: Actor ID #traveller-9041 logged with IP and reason.</div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </div>
+
 
         {/* Right Column: Trip Readiness & Booking Summary */}
         <div>

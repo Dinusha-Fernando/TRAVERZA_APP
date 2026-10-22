@@ -49,6 +49,7 @@ void main() {
     expect(find.text('Search destinations, stays and experiences'), findsOneWidget);
 
     // 4. Verify Style A Hero Feature Card
+    expect(find.text('YOUR NEXT ADVENTURE'), findsOneWidget);
     expect(find.text('One island. One connected trip.'), findsOneWidget);
     expect(find.text('Plan my trip'), findsOneWidget);
 
@@ -131,8 +132,8 @@ void main() {
     await tester.pumpWidget(const TraverzaApp(showSplash: false));
     await tester.pumpAndSettle();
 
-    // Drag vertical scroll view so that Travel safety shortcut is in view
-    await tester.drag(find.byType(SingleChildScrollView), const Offset(0, -1400));
+    // Ensure Travel safety shortcut is scrolled into view
+    await tester.drag(find.byType(SingleChildScrollView), const Offset(0, -2000));
     await tester.pumpAndSettle();
 
     // Tap Travel safety

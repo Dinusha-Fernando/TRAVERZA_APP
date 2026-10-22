@@ -6,6 +6,7 @@ enum NotificationCategory {
   safety,
   booking,
   trip,
+  autopilot,
   offers,
 }
 
@@ -20,6 +21,8 @@ extension NotificationCategoryExtension on NotificationCategory {
         return 'Bookings';
       case NotificationCategory.trip:
         return 'Trip & Route';
+      case NotificationCategory.autopilot:
+        return 'Autopilot & Disruptions';
       case NotificationCategory.offers:
         return 'Perks & Offers';
     }
@@ -35,6 +38,8 @@ extension NotificationCategoryExtension on NotificationCategory {
         return Icons.confirmation_number_rounded;
       case NotificationCategory.trip:
         return Icons.alt_route_rounded;
+      case NotificationCategory.autopilot:
+        return Icons.bolt_rounded;
       case NotificationCategory.offers:
         return Icons.local_offer_rounded;
     }
@@ -50,6 +55,8 @@ extension NotificationCategoryExtension on NotificationCategory {
         return TraverzaColors.secondary;
       case NotificationCategory.trip:
         return const Color(0xFF0F4C75);
+      case NotificationCategory.autopilot:
+        return const Color(0xFF0284C7);
       case NotificationCategory.offers:
         return TraverzaColors.amberWarning;
     }

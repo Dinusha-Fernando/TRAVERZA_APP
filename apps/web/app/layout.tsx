@@ -89,6 +89,34 @@ export default function RootLayout({
                   Explore Corridor
                 </Link>
                 <Link
+                  href="/atlas"
+                  style={{
+                    color: 'var(--color-secondary)',
+                    fontWeight: 700,
+                    fontSize: '0.92rem',
+                    transition: 'color var(--transition-fast)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                  }}
+                >
+                  <span style={{ fontSize: '1.05rem' }}>🧭</span> Island Atlas
+                </Link>
+                <Link
+                  href="/community"
+                  style={{
+                    color: 'var(--color-primary)',
+                    fontWeight: 700,
+                    fontSize: '0.92rem',
+                    transition: 'color var(--transition-fast)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                  }}
+                >
+                  <span style={{ fontSize: '1.05rem' }}>📸</span> Community
+                </Link>
+                <Link
                   href="/provider"
                   style={{
                     color: 'var(--text-secondary)',

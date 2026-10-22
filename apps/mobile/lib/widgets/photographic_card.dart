@@ -75,7 +75,7 @@ class StyleAHeroCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      height: 230,
+      constraints: const BoxConstraints(minHeight: 230),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(22),
         border: Border.all(color: Colors.white.withOpacity(0.12), width: 1),
@@ -90,119 +90,157 @@ class StyleAHeroCard extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(22),
         child: Stack(
-          fit: StackFit.expand,
           children: [
-            const SafeImageBackground(
-              imageUrl: 'https://images.unsplash.com/photo-1586861635167-e5223aadc9fe?auto=format&fit=crop&w=1200&q=80',
-              gradientStart: Color(0xFF0F3B57),
-              gradientEnd: Color(0xFF071424),
-              fallbackIcon: Icons.landscape_rounded,
+            const Positioned.fill(
+              child: SafeImageBackground(
+                imageUrl: 'https://images.unsplash.com/photo-1586861635167-e5223aadc9fe?auto=format&fit=crop&w=1200&q=80',
+                gradientStart: Color(0xFF0F3B57),
+                gradientEnd: Color(0xFF071424),
+                fallbackIcon: Icons.landscape_rounded,
+              ),
             ),
             // Multi-stop gradient for maximum text legibility
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.black.withOpacity(0.1),
-                    Colors.black.withOpacity(0.45),
-                    const Color(0xFF0B1728).withOpacity(0.92),
-                  ],
-                  stops: const [0.0, 0.45, 1.0],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.black.withOpacity(0.1),
+                      Colors.black.withOpacity(0.45),
+                      const Color(0xFF0B1728).withOpacity(0.92),
+                    ],
+                    stops: const [0.0, 0.45, 1.0],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
                 ),
               ),
             ),
             // Content
             Padding(
               padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: TraverzaColors.lagoonTeal.withOpacity(0.25),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: TraverzaColors.lagoonTeal.withOpacity(0.5),
-                        width: 1,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 190),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0284C7).withOpacity(0.35),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: const Color(0xFF38BDF8).withOpacity(0.7),
+                          width: 1.2,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF0284C7).withOpacity(0.25),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF38BDF8),
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color(0xFF38BDF8),
+                                  blurRadius: 4,
+                                  spreadRadius: 1,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          const Text(
+                            'YOUR NEXT ADVENTURE',
+                            style: TextStyle(
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 1.2,
+                              color: Color(0xFFE0F2FE),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    child: const Text(
-                      'YOUR NEXT ADVENTURE',
+                    const SizedBox(height: 8),
+                    const Text(
+                      'One island. One connected trip.',
                       style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 1.2,
-                        color: TraverzaColors.lagoonTeal,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.white,
+                        letterSpacing: -0.3,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'One island. One connected trip.',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
-                      letterSpacing: -0.3,
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Create a trip that connects every destination, stay and experience.',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: TraverzaColors.warmSand,
+                        height: 1.3,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    'Create a trip that connects every destination, stay and experience.',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: TraverzaColors.warmSand,
-                      height: 1.3,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 14),
-                  Row(
-                    children: [
-                      ElevatedButton.icon(
-                        onPressed: onPlanPressed,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: TraverzaColors.oceanBlue,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                    const SizedBox(height: 14),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        ElevatedButton.icon(
+                          onPressed: onPlanPressed,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: TraverzaColors.oceanBlue,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          icon: const Text(
+                            'Plan my trip',
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                          ),
+                          label: const Icon(Icons.arrow_forward_rounded, size: 16),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.35),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.white12),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
+                              Icon(Icons.verified_rounded, size: 14, color: TraverzaColors.emeraldSuccess),
+                              SizedBox(width: 5),
+                              Text(
+                                'SLTDA Corridor Pilot',
+                                style: TextStyle(fontSize: 11, color: Colors.white70),
+                              ),
+                            ],
                           ),
                         ),
-                        icon: const Text(
-                          'Plan my trip',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                        ),
-                        label: const Icon(Icons.arrow_forward_rounded, size: 16),
-                      ),
-                      const SizedBox(width: 12),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.35),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.white12),
-                        ),
-                        child: Row(
-                          children: const [
-                            Icon(Icons.verified_rounded, size: 14, color: TraverzaColors.emeraldSuccess),
-                            SizedBox(width: 5),
-                            Text(
-                              'SLTDA Corridor Pilot',
-                              style: TextStyle(fontSize: 11, color: Colors.white70),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

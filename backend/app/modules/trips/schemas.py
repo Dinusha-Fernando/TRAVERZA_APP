@@ -84,3 +84,21 @@ class TripReadinessResponse(BaseModel):
     confirmed_items_count: int
     pending_items_count: int
     total_items_count: int
+
+
+class JourneyCommandCenterResponse(BaseModel):
+    trip_id: uuid.UUID
+    trip_title: str
+    journey_status: str  # DRAFT, REQUEST_SUBMITTED, PARTIALLY_CONFIRMED, FULLY_CONFIRMED
+    corridor_name: str
+    start_date: date
+    end_date: date
+    party_size: int
+    current_day_number: int = 1
+    next_action: dict
+    trip_health: dict
+    budget_breakdown: dict
+    active_disruptions_count: int = 0
+    travel_wallet_ready: bool = True
+    autopilot_status: str = "ACTIVE_MONITORING"
+
