@@ -55,6 +55,10 @@ class ServiceBooking(Base, UUIDMixin, TimestampMixin):
     response_deadline_at: Mapped[datetime] = mapped_column(nullable=False)
     confirmed_at: Mapped[datetime | None] = mapped_column(nullable=True)
     cancellation_reason: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    voucher_code: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    signed_voucher_token: Mapped[str | None] = mapped_column(Text, nullable=True)
+    payment_reference: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    refund_amount_minor: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
 
 
 class BookingEvent(Base, UUIDMixin, TimestampMixin):

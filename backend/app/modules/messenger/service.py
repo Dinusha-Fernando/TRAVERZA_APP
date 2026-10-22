@@ -379,9 +379,10 @@ class MessengerService:
         if not conv:
             raise ValueError(f"Conversation {conv_id} not found")
 
-        # Idempotency check: if client_message_id was already processed, return existing message
-        if payload.client_message_id in self._idempotency_map:
-            existing_msg_id = self._idempotency_map[payload.client_message_id]
+        # Server-enforced composite idempotency check: (sender_id, client_message_id)
+        idempotency_key = f"{sender_id}:{payload.client_message_id}"
+        if idempotency_key in self._idempotency_map:
+            existing_msg_id = self._idempotency_map[idempotency_key]
             for m in self._messages.get(conv_id_str, []):
                 if m["id"] == existing_msg_id:
                     return m
@@ -394,13 +395,14 @@ class MessengerService:
             "sender_name": sender_name,
             "client_message_id": payload.client_message_id,
             "message_type": payload.message_type.value,
+            "delivery_status": "DELIVERED",
             "text_content": payload.text_content,
             "payload_data": payload.payload_data,
             "created_at": datetime.now(timezone.utc),
         }
 
         self._messages.setdefault(conv_id_str, []).append(new_msg)
-        self._idempotency_map[payload.client_message_id] = msg_id
+        self._idempotency_map[idempotency_key] = msg_id
 
         # Update conversation meta
         conv["last_message_text"] = payload.text_content
