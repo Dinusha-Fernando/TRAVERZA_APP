@@ -1,7 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
+import { useState, useMemo } from 'react';
 
 interface Province {
   id: string;
@@ -746,26 +745,39 @@ export default function IslandAtlasPage() {
   // TripGraph Day Itinerary calculation
   const districtPlaces = PLACES.filter((p) => p.districtId === selectedDistrictId);
   const candidateStops = districtPlaces.length > 0 ? districtPlaces : PLACES.slice(0, 3);
-  let totalMinutes = 0;
-  const scheduleStops = candidateStops.map((place, idx) => {
-    const transitBuffer = idx === 0 ? 20 : dayPlanPace === 'relaxed' ? 35 : 25;
-    totalMinutes += transitBuffer;
-    const arrivalH = Math.floor((9 * 60 + totalMinutes) / 60);
-    const arrivalM = (9 * 60 + totalMinutes) % 60;
-    const dwell = dayPlanPace === 'relaxed' ? Math.round(place.dwellDurationMins * 1.25) : place.dwellDurationMins;
-    totalMinutes += dwell;
-    const departureH = Math.floor((9 * 60 + totalMinutes) / 60);
-    const departureM = (9 * 60 + totalMinutes) % 60;
+  const { scheduleStops, totalMinutes } = useMemo(() => {
+    let runningMinutes = 0;
+    const stops: Array<{
+      order: number;
+      place: (typeof candidateStops)[number];
+      arrival: string;
+      departure: string;
+      transitBuffer: number;
+      dwell: number;
+    }> = [];
 
-    return {
-      order: idx + 1,
-      place,
-      arrival: `${arrivalH.toString().padStart(2, '0')}:${arrivalM.toString().padStart(2, '0')}`,
-      departure: `${departureH.toString().padStart(2, '0')}:${departureM.toString().padStart(2, '0')}`,
-      transitBuffer,
-      dwell,
-    };
-  });
+    for (let idx = 0; idx < candidateStops.length; idx++) {
+      const place = candidateStops[idx];
+      const transitBuffer = idx === 0 ? 20 : dayPlanPace === 'relaxed' ? 35 : 25;
+      runningMinutes += transitBuffer;
+      const arrivalH = Math.floor((9 * 60 + runningMinutes) / 60);
+      const arrivalM = (9 * 60 + runningMinutes) % 60;
+      const dwell = dayPlanPace === 'relaxed' ? Math.round(place.dwellDurationMins * 1.25) : place.dwellDurationMins;
+      runningMinutes += dwell;
+      const departureH = Math.floor((9 * 60 + runningMinutes) / 60);
+      const departureM = (9 * 60 + runningMinutes) % 60;
+
+      stops.push({
+        order: idx + 1,
+        place,
+        arrival: `${arrivalH.toString().padStart(2, '0')}:${arrivalM.toString().padStart(2, '0')}`,
+        departure: `${departureH.toString().padStart(2, '0')}:${departureM.toString().padStart(2, '0')}`,
+        transitBuffer,
+        dwell,
+      });
+    }
+    return { scheduleStops: stops, totalMinutes: runningMinutes };
+  }, [candidateStops, dayPlanPace]);
 
   const isDayPlanFeasible = totalMinutes <= dayPlanHours * 60;
 
@@ -1417,7 +1429,7 @@ export default function IslandAtlasPage() {
                 </label>
                 <select
                   value={dayPlanPace}
-                  onChange={(e) => setDayPlanPace(e.target.value as any)}
+                  onChange={(e) => setDayPlanPace(e.target.value as 'relaxed' | 'balanced' | 'fast')}
                   style={{ width: '100%', padding: '6px 10px', marginTop: '6px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)' }}
                 >
                   <option value="relaxed">Relaxed (+25% Dwell)</option>

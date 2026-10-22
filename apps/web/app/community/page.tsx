@@ -1304,7 +1304,7 @@ export default function CommunityPage() {
                     <button
                       type="button"
                       key={t.id}
-                      onClick={() => setNewType(t.id as any)}
+                      onClick={() => setNewType(t.id as 'PHOTO' | 'FIELD_REPORT' | 'QUESTION' | 'LOCAL_NOTE')}
                       style={{
                         padding: '10px',
                         borderRadius: 'var(--radius-sm)',

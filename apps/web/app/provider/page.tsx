@@ -686,7 +686,7 @@ export default function ProviderPortalPage() {
                 </label>
                 <select
                   value={pkgType}
-                  onChange={(e) => setPkgType(e.target.value as any)}
+                  onChange={(e) => setPkgType(e.target.value as 'OPERATOR_PACKAGE' | 'ITINERARY_TEMPLATE')}
                   style={{
                     width: '100%',
                     padding: '10px',

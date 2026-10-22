@@ -519,7 +519,7 @@ export default function HomePage() {
                   }}
                 >
                   <span style={{ fontSize: '0.86rem', color: 'var(--color-primary)' }}>
-                    Filtering stops by <strong>"{searchQuery}"</strong> ({filteredStops.length} result{filteredStops.length === 1 ? '' : 's'})
+                    Filtering stops by <strong>&ldquo;{searchQuery}&rdquo;</strong> ({filteredStops.length} result{filteredStops.length === 1 ? '' : 's'})
                   </span>
                   <button
                     onClick={() => setSearchQuery('')}
@@ -539,7 +539,7 @@ export default function HomePage() {
 
               {filteredStops.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '36px 16px', color: 'var(--color-text-muted)' }}>
-                  <p style={{ fontSize: '1.05rem', marginBottom: '8px' }}>No itinerary stops match "{searchQuery}"</p>
+                  <p style={{ fontSize: '1.05rem', marginBottom: '8px' }}>No itinerary stops match &ldquo;{searchQuery}&rdquo;</p>
                   <button
                     onClick={() => setSearchQuery('')}
                     className="btn btn-secondary"
@@ -1247,7 +1247,7 @@ export default function HomePage() {
                       TRAVERZA 2.0 Flagship Innovation
                     </span>
                     <span className="badge badge-emerald" style={{ fontSize: '0.75rem' }}>
-                      Active Autopilot Engine
+                      Active Autopilot Engine {autopilotStep > 0 ? `• Stage ${autopilotStep}/6` : '• Standby'}
                     </span>
                   </div>
                   <h2 style={{ fontSize: '1.5rem', background: 'linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
