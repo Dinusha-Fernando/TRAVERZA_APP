@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from app.modules.admin.router import router as admin_router
 from app.modules.atlas.router import router as atlas_router
 from app.modules.audit.router import router as audit_router
 from app.modules.autopilot.router import router as autopilot_router
@@ -16,6 +17,7 @@ from app.modules.trips.router import router as trips_router
 
 api_v1_router = APIRouter()
 
+api_v1_router.include_router(admin_router)
 api_v1_router.include_router(identity_router)
 api_v1_router.include_router(catalogue_router)
 api_v1_router.include_router(packages_router)
