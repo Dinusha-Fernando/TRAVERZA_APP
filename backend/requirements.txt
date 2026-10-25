@@ -8,6 +8,7 @@ email-validator>=2.2.0
 # Database & ORM
 SQLAlchemy[asyncio]>=2.0.35
 greenlet>=3.0.0
+aiosqlite>=0.20.0
 alembic>=1.13.3
 asyncpg>=0.29.0
 psycopg2-binary>=2.9.9
