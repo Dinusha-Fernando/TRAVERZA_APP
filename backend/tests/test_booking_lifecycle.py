@@ -94,7 +94,6 @@ async def test_complete_booking_lifecycle_and_voucher_generation(test_db):
     await test_db.commit()
 
     # 3. Create Quote Snapshot
-    headers_traveler = {"Authorization": f"Bearer mock-token-traveler"}
     app.dependency_overrides[
         lambda: None
     ] = None  # Dependency override helper handled via token payload injection

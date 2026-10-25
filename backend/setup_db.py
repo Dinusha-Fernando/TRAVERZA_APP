@@ -1,9 +1,11 @@
 import asyncio
+
 import asyncpg
+
 
 async def main():
     conn = await asyncpg.connect("postgresql://postgres:zara07@localhost:5432/postgres")
-    
+
     # 1. Create or update user traverza_user
     user_exists = await conn.fetchval("SELECT 1 FROM pg_roles WHERE rolname = 'traverza_user'")
     if not user_exists:
@@ -26,7 +28,7 @@ async def main():
     # 3. Test connecting directly to traverza_db and list tables
     tconn = await asyncpg.connect("postgresql://traverza_user:zara07@localhost:5432/traverza_db")
     print("Connected successfully to traverza_db as traverza_user!")
-    
+
     rows = await tconn.fetch(
         "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name"
     )

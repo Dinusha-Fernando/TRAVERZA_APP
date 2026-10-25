@@ -1,7 +1,7 @@
 import json
 import logging
 import uuid
-from datetime import UTC, datetime, time, timedelta
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -11,14 +11,12 @@ from app.core.errors import NotFoundException, TraverzaException
 from app.modules.audit.models import AuditEvent
 from app.modules.autopilot.models import AutopilotProposal, DisruptionEvent
 from app.modules.autopilot.schemas import DisruptionEventCreate
-from app.modules.bookings.models import BookingEvent, ServiceBooking
 from app.modules.tripgraph.schemas import (
-    DependencyEdgeValidationInput,
     ItineraryItemValidationInput,
     ValidationResult,
 )
 from app.modules.tripgraph.validator import TripGraphValidator
-from app.modules.trips.models import ItineraryDay, ItineraryItem, Trip
+from app.modules.trips.models import ItineraryDay, Trip
 
 logger = logging.getLogger("traverza.autopilot")
 

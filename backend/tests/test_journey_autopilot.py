@@ -8,8 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.security import create_access_token, hash_password
 from app.main import app
 from app.modules.bookings.models import ServiceBooking
-from app.modules.catalogue.models import Destination, Listing
-from app.modules.identity.models import Organization, User
+from app.modules.identity.models import User
 from app.modules.trips.models import ItineraryDay, ItineraryItem, Trip
 
 

@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from typing import Any, Optional
+
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
@@ -26,26 +26,26 @@ class AdminUserCreateRequest(BaseModel):
     email: EmailStr
     password: str = Field(..., min_length=8)
     full_name: str
-    phone_number: Optional[str] = None
+    phone_number: str | None = None
     role: str = Field("TRAVELER", description="'SUPER_ADMIN', 'OPERATOR', 'GUIDE', 'TRAVELER'")
     is_active: bool = True
     is_verified: bool = False
 
 
 class AdminUserUpdateRequest(BaseModel):
-    full_name: Optional[str] = None
-    phone_number: Optional[str] = None
-    role: Optional[str] = None
-    is_active: Optional[bool] = None
-    is_verified: Optional[bool] = None
-    password: Optional[str] = None
+    full_name: str | None = None
+    phone_number: str | None = None
+    role: str | None = None
+    is_active: bool | None = None
+    is_verified: bool | None = None
+    password: str | None = None
 
 
 class AdminUserResponse(BaseModel):
     id: uuid.UUID
     email: str
     full_name: str
-    phone_number: Optional[str] = None
+    phone_number: str | None = None
     role: str
     is_active: bool
     is_verified: bool
@@ -60,8 +60,8 @@ class AdminUserResponse(BaseModel):
 class AdminOrgCreateRequest(BaseModel):
     name: str
     legal_name: str
-    business_reg_no: Optional[str] = None
-    sltda_license_no: Optional[str] = None
+    business_reg_no: str | None = None
+    sltda_license_no: str | None = None
     category: str = Field("TRANSPORT", description="'STAYS', 'TRANSPORT', 'GUIDE', 'ACTIVITY'")
     contact_email: EmailStr
     contact_phone: str
@@ -69,22 +69,22 @@ class AdminOrgCreateRequest(BaseModel):
 
 
 class AdminOrgUpdateRequest(BaseModel):
-    name: Optional[str] = None
-    legal_name: Optional[str] = None
-    business_reg_no: Optional[str] = None
-    sltda_license_no: Optional[str] = None
-    category: Optional[str] = None
-    contact_email: Optional[EmailStr] = None
-    contact_phone: Optional[str] = None
-    is_verified: Optional[bool] = None
+    name: str | None = None
+    legal_name: str | None = None
+    business_reg_no: str | None = None
+    sltda_license_no: str | None = None
+    category: str | None = None
+    contact_email: EmailStr | None = None
+    contact_phone: str | None = None
+    is_verified: bool | None = None
 
 
 class AdminOrgResponse(BaseModel):
     id: uuid.UUID
     name: str
     legal_name: str
-    business_reg_no: Optional[str] = None
-    sltda_license_no: Optional[str] = None
+    business_reg_no: str | None = None
+    sltda_license_no: str | None = None
     category: str
     is_verified: bool
     contact_email: str
@@ -108,12 +108,12 @@ class AdminDestinationCreateRequest(BaseModel):
 
 
 class AdminDestinationUpdateRequest(BaseModel):
-    name: Optional[str] = None
-    province: Optional[str] = None
-    corridor_name: Optional[str] = None
-    description: Optional[str] = None
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
+    name: str | None = None
+    province: str | None = None
+    corridor_name: str | None = None
+    description: str | None = None
+    latitude: float | None = None
+    longitude: float | None = None
 
 
 class AdminDestinationResponse(BaseModel):
@@ -144,14 +144,14 @@ class AdminPlaceCreateRequest(BaseModel):
 
 
 class AdminPlaceUpdateRequest(BaseModel):
-    name: Optional[str] = None
-    category: Optional[str] = None
-    description: Optional[str] = None
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
-    recommended_duration_minutes: Optional[int] = None
-    opening_time_str: Optional[str] = None
-    closing_time_str: Optional[str] = None
+    name: str | None = None
+    category: str | None = None
+    description: str | None = None
+    latitude: float | None = None
+    longitude: float | None = None
+    recommended_duration_minutes: int | None = None
+    opening_time_str: str | None = None
+    closing_time_str: str | None = None
 
 
 class AdminPlaceResponse(BaseModel):
@@ -164,8 +164,8 @@ class AdminPlaceResponse(BaseModel):
     latitude: float
     longitude: float
     recommended_duration_minutes: int
-    opening_time_str: Optional[str] = "08:00"
-    closing_time_str: Optional[str] = "18:00"
+    opening_time_str: str | None = "08:00"
+    closing_time_str: str | None = "18:00"
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
@@ -176,7 +176,7 @@ class AdminPlaceResponse(BaseModel):
 # ==========================================
 class AdminListingCreateRequest(BaseModel):
     organization_id: uuid.UUID
-    destination_id: Optional[uuid.UUID] = None
+    destination_id: uuid.UUID | None = None
     title: str
     category: str = Field(..., description="'STAY', 'TRANSFER', 'GUIDE', 'ACTIVITY'")
     description: str
@@ -187,19 +187,19 @@ class AdminListingCreateRequest(BaseModel):
 
 
 class AdminListingUpdateRequest(BaseModel):
-    title: Optional[str] = None
-    category: Optional[str] = None
-    description: Optional[str] = None
-    base_price_minor: Optional[int] = None
-    currency: Optional[str] = None
-    is_published: Optional[bool] = None
-    cancellation_policy: Optional[str] = None
+    title: str | None = None
+    category: str | None = None
+    description: str | None = None
+    base_price_minor: int | None = None
+    currency: str | None = None
+    is_published: bool | None = None
+    cancellation_policy: str | None = None
 
 
 class AdminListingResponse(BaseModel):
     id: uuid.UUID
     organization_id: uuid.UUID
-    destination_id: Optional[uuid.UUID] = None
+    destination_id: uuid.UUID | None = None
     title: str
     category: str
     description: str
@@ -216,7 +216,7 @@ class AdminListingResponse(BaseModel):
 # 6. Packages & Tours Schemas
 # ==========================================
 class AdminPackageCreateRequest(BaseModel):
-    organization_id: Optional[uuid.UUID] = None
+    organization_id: uuid.UUID | None = None
     provider_name: str = "Verified Ceylon Operator"
     title: str
     slug: str
@@ -235,27 +235,27 @@ class AdminPackageCreateRequest(BaseModel):
     exclusions: str
     cancellation_policy: str
     is_verified: bool = True
-    sltda_license_no: Optional[str] = None
+    sltda_license_no: str | None = None
 
 
 class AdminPackageUpdateRequest(BaseModel):
-    title: Optional[str] = None
-    summary: Optional[str] = None
-    description: Optional[str] = None
-    package_type: Optional[str] = None
-    status: Optional[str] = None
-    duration_days: Optional[int] = None
-    duration_nights: Optional[int] = None
-    price_basis: Optional[str] = None
-    base_price_lkr: Optional[float] = None
-    corridor_name: Optional[str] = None
-    destinations: Optional[str] = None
-    cover_image_url: Optional[str] = None
-    inclusions: Optional[str] = None
-    exclusions: Optional[str] = None
-    cancellation_policy: Optional[str] = None
-    is_verified: Optional[bool] = None
-    sltda_license_no: Optional[str] = None
+    title: str | None = None
+    summary: str | None = None
+    description: str | None = None
+    package_type: str | None = None
+    status: str | None = None
+    duration_days: int | None = None
+    duration_nights: int | None = None
+    price_basis: str | None = None
+    base_price_lkr: float | None = None
+    corridor_name: str | None = None
+    destinations: str | None = None
+    cover_image_url: str | None = None
+    inclusions: str | None = None
+    exclusions: str | None = None
+    cancellation_policy: str | None = None
+    is_verified: bool | None = None
+    sltda_license_no: str | None = None
 
 
 # ==========================================
@@ -264,7 +264,7 @@ class AdminPackageUpdateRequest(BaseModel):
 class AdminBookingOverrideRequest(BaseModel):
     new_status: str = Field(..., description="'CONFIRMED', 'CANCELLED', 'PROVIDER_ACCEPTED', 'COMPLETED', 'EXCEPTION'")
     reason: str = Field(..., min_length=5, description="Mandatory reason logged to immutable audit trail")
-    refund_amount_minor: Optional[int] = None
+    refund_amount_minor: int | None = None
 
 
 class AdminBookingResponse(BaseModel):
@@ -275,9 +275,9 @@ class AdminBookingResponse(BaseModel):
     status: str
     amount_minor: int
     currency: str
-    voucher_code: Optional[str] = None
-    payment_reference: Optional[str] = None
-    cancellation_reason: Optional[str] = None
+    voucher_code: str | None = None
+    payment_reference: str | None = None
+    cancellation_reason: str | None = None
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
@@ -291,6 +291,6 @@ class AdminBroadcastRequest(BaseModel):
     body: str
     category: str = Field("SAFETY", description="'SAFETY', 'BOOKING', 'TRIP', 'OFFERS'")
     priority: str = Field("high", description="'high', 'medium', 'low'")
-    corridor_name: Optional[str] = None
-    action_route: Optional[str] = "plan"
-    action_label: Optional[str] = "View Alert"
+    corridor_name: str | None = None
+    action_route: str | None = "plan"
+    action_label: str | None = "View Alert"

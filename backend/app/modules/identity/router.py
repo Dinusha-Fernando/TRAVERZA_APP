@@ -1,6 +1,7 @@
 import uuid
 from typing import Any
 
+import httpx
 from fastapi import APIRouter, Depends, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -29,7 +30,6 @@ from app.modules.identity.schemas import (
     UserResponse,
     UserUpdateRequest,
 )
-import httpx
 
 router = APIRouter(prefix="/auth", tags=["Authentication & Identity"])
 
@@ -130,7 +130,7 @@ async def google_social_login(req: SocialAuthRequest, db: AsyncSession = Depends
             email = req.email or "google.pilot@traverza.lk"
             full_name = req.full_name or "Google Verified Pilot"
         else:
-            raise UnauthorizedException(f"Invalid Google ID token: {str(e)}")
+            raise UnauthorizedException(f"Invalid Google ID token: {str(e)}") from e
 
     if not email:
         raise UnauthorizedException("Could not extract verified email from Google ID token")

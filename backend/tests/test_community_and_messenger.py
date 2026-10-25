@@ -1,8 +1,10 @@
 import uuid
+
 import pytest
-from httpx import AsyncClient, ASGITransport
-from app.main import app
+from httpx import ASGITransport, AsyncClient
+
 from app.core.security import create_access_token
+from app.main import app
 
 
 @pytest.fixture

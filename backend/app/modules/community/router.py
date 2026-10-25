@@ -1,9 +1,10 @@
 import uuid
-from typing import Any, List, Optional
+from typing import Any
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from app.core.security import get_current_user_token
-from app.modules.community.models import AuthorBadge, PostType, ReactionType
+from app.modules.community.models import PostType
 from app.modules.community.schemas import (
     CommunityPostCreate,
     CommunityPostResponse,
@@ -22,12 +23,12 @@ from app.modules.community.service import community_service
 router = APIRouter(prefix="/community", tags=["Community Moments & Travel Pulse"])
 
 
-@router.get("/feed", response_model=List[CommunityPostResponse])
+@router.get("/feed", response_model=list[CommunityPostResponse])
 async def get_community_feed(
-    post_type: Optional[PostType] = None,
-    district_id: Optional[str] = None,
-    destination_slug: Optional[str] = None,
-    search: Optional[str] = None,
+    post_type: PostType | None = None,
+    district_id: str | None = None,
+    destination_slug: str | None = None,
+    search: str | None = None,
     limit: int = Query(20, ge=1, le=100),
     offset: int = Query(0, ge=0),
 ):

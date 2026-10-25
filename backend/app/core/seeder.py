@@ -1,8 +1,6 @@
 import asyncio
 import json
 import logging
-import uuid
-from datetime import UTC, datetime
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -23,7 +21,7 @@ from app.modules.atlas.seed_data import (
     DISTRICTS_SEED,
     PROVINCES_SEED,
 )
-from app.modules.catalogue.models import Destination, Listing, Place
+from app.modules.catalogue.models import Destination
 from app.modules.identity.models import Organization, OrganizationMembership, User
 from app.modules.packages.models import Package
 from app.modules.packages.router import INITIAL_PACKAGES_DATA

@@ -1,6 +1,6 @@
 """
 TRAVERZA Island Atlas - Canonical Seed Data
-Authoritative 9-Province / 25-District administrative structure based on 
+Authoritative 9-Province / 25-District administrative structure based on
 the Department of Census and Statistics Sri Lanka (Census 2024) and SLTDA guidelines.
 """
 

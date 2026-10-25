@@ -1,19 +1,15 @@
 import enum
 import uuid
 from datetime import datetime
-from typing import Optional
 
 from sqlalchemy import (
     Boolean,
     Column,
     DateTime,
     Enum,
-    Float,
     ForeignKey,
-    Index,
     Integer,
     String,
-    Table,
     Text,
 )
 from sqlalchemy.dialects.postgresql import UUID
@@ -22,7 +18,7 @@ from sqlalchemy.orm import relationship
 from app.core.database import Base
 
 
-class PostType(str, enum.Enum):
+class PostType(enum.StrEnum):
     PHOTO = "PHOTO"
     CAROUSEL = "CAROUSEL"
     QUESTION = "QUESTION"
@@ -30,7 +26,7 @@ class PostType(str, enum.Enum):
     LOCAL_NOTE = "LOCAL_NOTE"
 
 
-class ModerationStatus(str, enum.Enum):
+class ModerationStatus(enum.StrEnum):
     DRAFT = "DRAFT"
     PROCESSING = "PROCESSING"
     APPROVED = "APPROVED"
@@ -39,7 +35,7 @@ class ModerationStatus(str, enum.Enum):
     REMOVED = "REMOVED"
 
 
-class AuthorBadge(str, enum.Enum):
+class AuthorBadge(enum.StrEnum):
     VERIFIED_VISITOR = "VERIFIED_VISITOR"
     LICENSED_GUIDE = "LICENSED_GUIDE"
     VERIFIED_PROVIDER = "VERIFIED_PROVIDER"
@@ -47,14 +43,14 @@ class AuthorBadge(str, enum.Enum):
     TRAVELLER = "TRAVELLER"
 
 
-class ReactionType(str, enum.Enum):
+class ReactionType(enum.StrEnum):
     HELPFUL = "HELPFUL"
     LIKE = "LIKE"
     LOVE = "LOVE"
     SAVED = "SAVED"
 
 
-class ReportReason(str, enum.Enum):
+class ReportReason(enum.StrEnum):
     SPAM_OR_SCAM = "SPAM_OR_SCAM"
     HARASSMENT = "HARASSMENT"
     DANGEROUS_ADVICE = "DANGEROUS_ADVICE"
@@ -64,7 +60,7 @@ class ReportReason(str, enum.Enum):
     OTHER = "OTHER"
 
 
-class ReportStatus(str, enum.Enum):
+class ReportStatus(enum.StrEnum):
     PENDING = "PENDING"
     INVESTIGATING = "INVESTIGATING"
     ACTION_TAKEN = "ACTION_TAKEN"

@@ -1,6 +1,7 @@
 import json
 import uuid
-from typing import Any, List
+from typing import Any
+
 from fastapi import APIRouter, Depends, HTTPException, Query, WebSocket, WebSocketDisconnect, status
 
 from app.core.security import get_current_user_token
@@ -16,7 +17,7 @@ from app.modules.messenger.service import messenger_service
 router = APIRouter(prefix="/messenger", tags=["Travel Messenger"])
 
 
-@router.get("/conversations", response_model=List[ChatConversationSummaryResponse])
+@router.get("/conversations", response_model=list[ChatConversationSummaryResponse])
 async def list_conversations(
     token_payload: dict[str, Any] = Depends(get_current_user_token),
 ):
@@ -36,7 +37,7 @@ async def create_conversation(
     return conv
 
 
-@router.get("/conversations/{conv_id}/messages", response_model=List[ChatMessageResponse])
+@router.get("/conversations/{conv_id}/messages", response_model=list[ChatMessageResponse])
 async def get_messages(
     conv_id: str,
     limit: int = Query(50, ge=1, le=100),
@@ -62,7 +63,7 @@ async def send_message(
         msg = messenger_service.send_message(str(conv_id), sender_id, sender_name, payload)
         return msg
     except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=404, detail=str(e)) from e
 
 
 @router.post("/conversations/{conv_id}/read-cursor")

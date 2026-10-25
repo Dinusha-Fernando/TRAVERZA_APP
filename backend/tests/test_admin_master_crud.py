@@ -11,7 +11,6 @@ from app.modules.audit.models import AuditEvent
 from app.modules.bookings.models import QuoteSnapshot, ServiceBooking
 from app.modules.catalogue.models import Destination, Listing
 from app.modules.identity.models import Organization, User
-from app.modules.notifications.models import UserNotification
 from app.modules.trips.models import ItineraryDay, ItineraryItem, Trip
 
 

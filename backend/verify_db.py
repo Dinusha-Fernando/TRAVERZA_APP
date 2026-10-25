@@ -1,12 +1,14 @@
 import asyncio
+
 import asyncpg
+
 
 async def main():
     conn = await asyncpg.connect("postgresql://traverza_user:zara07@localhost:5432/traverza_db")
     tables = await conn.fetch("""
-        SELECT table_name 
-        FROM information_schema.tables 
-        WHERE table_schema = 'public' 
+        SELECT table_name
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
         ORDER BY table_name
     """)
     print(f"Total tables: {len(tables)}")

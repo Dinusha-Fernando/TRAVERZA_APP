@@ -2,7 +2,7 @@ import json
 import logging
 import uuid
 from datetime import UTC, datetime
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy import func, select
@@ -24,11 +24,6 @@ from app.modules.admin.schemas import (
     AdminOrgCreateRequest,
     AdminOrgResponse,
     AdminOrgUpdateRequest,
-    AdminPackageCreateRequest,
-    AdminPackageUpdateRequest,
-    AdminPlaceCreateRequest,
-    AdminPlaceResponse,
-    AdminPlaceUpdateRequest,
     AdminPlatformTelemetryResponse,
     AdminUserCreateRequest,
     AdminUserResponse,
@@ -37,12 +32,9 @@ from app.modules.admin.schemas import (
 from app.modules.audit.models import AuditEvent
 from app.modules.autopilot.models import DisruptionEvent
 from app.modules.bookings.models import BookingEvent, ServiceBooking
-from app.modules.catalogue.models import Destination, Listing, Place
-from app.modules.identity.models import Organization, OrganizationMembership, User
+from app.modules.catalogue.models import Destination, Listing
+from app.modules.identity.models import Organization, User
 from app.modules.notifications.models import UserNotification
-from app.modules.packages.models import Package
-from app.modules.packages.schemas import PackageResponse
-from app.modules.payments.models import LedgerAccount, LedgerEntry
 from app.modules.support.models import SupportCase
 from app.modules.trips.models import Trip
 
@@ -132,9 +124,9 @@ async def get_platform_telemetry(
 # ==========================================
 @router.get("/users", response_model=list[AdminUserResponse])
 async def list_admin_users(
-    search: Optional[str] = None,
-    role: Optional[str] = None,
-    is_active: Optional[bool] = None,
+    search: str | None = None,
+    role: str | None = None,
+    is_active: bool | None = None,
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     admin: dict[str, Any] = Depends(require_super_admin),
@@ -284,8 +276,8 @@ async def delete_admin_user(
 # ==========================================
 @router.get("/organizations", response_model=list[AdminOrgResponse])
 async def list_admin_organizations(
-    category: Optional[str] = None,
-    is_verified: Optional[bool] = None,
+    category: str | None = None,
+    is_verified: bool | None = None,
     admin: dict[str, Any] = Depends(require_super_admin),
     db: AsyncSession = Depends(get_db),
 ):
@@ -400,7 +392,7 @@ async def delete_admin_organization(
 # ==========================================
 @router.get("/destinations", response_model=list[AdminDestinationResponse])
 async def list_admin_destinations(
-    corridor: Optional[str] = None,
+    corridor: str | None = None,
     admin: dict[str, Any] = Depends(require_super_admin),
     db: AsyncSession = Depends(get_db),
 ):
@@ -507,8 +499,8 @@ async def delete_admin_destination(
 # ==========================================
 @router.get("/listings", response_model=list[AdminListingResponse])
 async def list_admin_listings(
-    category: Optional[str] = None,
-    org_id: Optional[uuid.UUID] = None,
+    category: str | None = None,
+    org_id: uuid.UUID | None = None,
     admin: dict[str, Any] = Depends(require_super_admin),
     db: AsyncSession = Depends(get_db),
 ):
@@ -622,8 +614,8 @@ async def delete_admin_listing(
 # ==========================================
 @router.get("/bookings", response_model=list[AdminBookingResponse])
 async def list_admin_bookings(
-    trip_id: Optional[uuid.UUID] = None,
-    status_filter: Optional[str] = None,
+    trip_id: uuid.UUID | None = None,
+    status_filter: str | None = None,
     limit: int = Query(50, ge=1, le=200),
     admin: dict[str, Any] = Depends(require_super_admin),
     db: AsyncSession = Depends(get_db),
@@ -700,7 +692,7 @@ async def dispatch_system_broadcast(
     Dispatches a high-priority system broadcast push notification to all users or
     filtered corridor travellers.
     """
-    users_stmt = select(User.id).where(User.is_active == True)
+    users_stmt = select(User.id).where(User.is_active)
     user_ids = (await db.execute(users_stmt)).scalars().all()
 
     created_cnt = 0

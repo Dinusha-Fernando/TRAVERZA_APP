@@ -10,7 +10,7 @@ from app.main import app
 from app.modules.bookings.models import QuoteSnapshot, ServiceBooking
 from app.modules.catalogue.models import Destination, Listing
 from app.modules.identity.models import Organization, User
-from app.modules.payments.models import LedgerAccount, LedgerEntry
+from app.modules.payments.models import LedgerEntry
 from app.modules.trips.models import ItineraryDay, ItineraryItem, Trip
 
 

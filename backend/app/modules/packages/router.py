@@ -1,23 +1,20 @@
 import uuid
-from datetime import date, datetime, timedelta
-from typing import Any, Optional
+from datetime import date, timedelta
+from typing import Any
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.core.errors import ForbiddenException, NotFoundException
+from app.core.errors import NotFoundException
 from app.core.security import get_current_user_token
-from app.modules.packages.models import Package, PackageReviewCase
 from app.modules.packages.schemas import (
     PackageBookingRequest,
-    PackageCreateRequest,
     PackageCustomizeRequest,
     PackageResponse,
-    PackageReviewDecisionRequest,
 )
-from app.modules.trips.models import ItineraryDay, ItineraryItem, Trip
+from app.modules.trips.models import ItineraryDay, Trip
 from app.modules.trips.schemas import TripResponse
 
 router = APIRouter(prefix="/packages", tags=["Packages & Tours"])
@@ -98,11 +95,11 @@ INITIAL_PACKAGES_DATA = [
 
 @router.get("", response_model=list[PackageResponse])
 async def list_packages(
-    corridor: Optional[str] = None,
-    package_type: Optional[str] = None,
-    max_budget: Optional[float] = None,
-    duration_days: Optional[int] = None,
-    search: Optional[str] = None,
+    corridor: str | None = None,
+    package_type: str | None = None,
+    max_budget: float | None = None,
+    duration_days: int | None = None,
+    search: str | None = None,
     db: AsyncSession = Depends(get_db),
 ):
     """

@@ -1,7 +1,6 @@
 import enum
 import uuid
 from datetime import datetime
-from typing import Optional
 
 from sqlalchemy import (
     Boolean,
@@ -11,7 +10,6 @@ from sqlalchemy import (
     ForeignKey,
     Integer,
     String,
-    Table,
     Text,
 )
 from sqlalchemy.dialects.postgresql import JSONB, UUID
@@ -20,7 +18,7 @@ from sqlalchemy.orm import relationship
 from app.core.database import Base
 
 
-class ConversationType(str, enum.Enum):
+class ConversationType(enum.StrEnum):
     DIRECT = "DIRECT"
     PROVIDER_INQUIRY = "PROVIDER_INQUIRY"
     TRIP_GROUP = "TRIP_GROUP"
@@ -28,7 +26,7 @@ class ConversationType(str, enum.Enum):
     COMMUNITY_TOPIC = "COMMUNITY_TOPIC"
 
 
-class MessageType(str, enum.Enum):
+class MessageType(enum.StrEnum):
     TEXT = "TEXT"
     PHOTO = "PHOTO"
     VIDEO = "VIDEO"
@@ -37,7 +35,7 @@ class MessageType(str, enum.Enum):
     PROVIDER_QUOTE_REQUEST = "PROVIDER_QUOTE_REQUEST"
 
 
-class DeliveryStatus(str, enum.Enum):
+class DeliveryStatus(enum.StrEnum):
     SENDING = "SENDING"
     SENT = "SENT"
     DELIVERED = "DELIVERED"

@@ -268,7 +268,7 @@ async def seed_database(db: AsyncSession):
         closing_time_str="18:00",
     )
 
-    place_tooth_relic = await get_or_create_place(
+    await get_or_create_place(
         slug="temple-of-the-tooth",
         destination_id=dest_kandy.id,
         name="Temple of the Sacred Tooth Relic (Sri Dalada Maligawa)",
@@ -282,7 +282,7 @@ async def seed_database(db: AsyncSession):
         closing_time_str="20:00",
     )
 
-    place_tea_estate = await get_or_create_place(
+    await get_or_create_place(
         slug="pedro-tea-estate",
         destination_id=dest_nuwara_eliya.id,
         name="Pedro Tea Estate & Lover's Leap",
@@ -336,7 +336,7 @@ async def seed_database(db: AsyncSession):
         cancellation_policy="FREE_CANCELLATION_24H",
     )
 
-    listing_guide_kandy = await get_or_create_listing(
+    await get_or_create_listing(
         org_guide.id,
         "Temple of the Sacred Tooth Relic Guided Walking Tour",
         destination_id=dest_kandy.id,

@@ -1,5 +1,5 @@
 import uuid
-from typing import Optional
+
 from pydantic import BaseModel
 
 
@@ -22,9 +22,9 @@ class PackageBase(BaseModel):
 
 class PackageCreateRequest(PackageBase):
     slug: str
-    organization_id: Optional[uuid.UUID] = None
+    organization_id: uuid.UUID | None = None
     provider_name: str = "Verified Ceylon Operator"
-    sltda_license_no: Optional[str] = "SLTDA/SQA/2026/044"
+    sltda_license_no: str | None = "SLTDA/SQA/2026/044"
 
 
 class PackageResponse(PackageBase):
@@ -33,14 +33,14 @@ class PackageResponse(PackageBase):
     provider_name: str
     status: str
     is_verified: bool
-    sltda_license_no: Optional[str] = None
+    sltda_license_no: str | None = None
     version: int
 
     model_config = {"from_attributes": True}
 
 
 class PackageCustomizeRequest(BaseModel):
-    trip_title: Optional[str] = None
+    trip_title: str | None = None
     start_date: str = "2026-10-24"
     party_size: int = 2
 
@@ -50,10 +50,10 @@ class PackageBookingRequest(BaseModel):
     preferred_start_date: str
     party_size: int = 2
     contact_phone: str
-    special_requests: Optional[str] = None
+    special_requests: str | None = None
 
 
 class PackageReviewDecisionRequest(BaseModel):
     decision: str  # 'APPROVED', 'CHANGES_REQUESTED', 'REJECTED', 'SUSPENDED'
     reason: str
-    reviewer_notes: Optional[str] = None
+    reviewer_notes: str | None = None

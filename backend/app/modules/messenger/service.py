@@ -1,14 +1,13 @@
-import copy
 import uuid
-from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, List, Optional, Set
+from datetime import UTC, datetime, timedelta
+from typing import Any
+
 from fastapi import WebSocket
 
 from app.modules.messenger.models import ConversationType, MessageType
 from app.modules.messenger.schemas import (
     ChatConversationCreate,
     ChatMessageCreate,
-    ChatMessageResponse,
 )
 
 
@@ -17,9 +16,9 @@ class MessengerService:
 
     def __init__(self):
         self._conversations: dict[str, dict[str, Any]] = {}
-        self._messages: dict[str, List[dict[str, Any]]] = {}  # conv_id -> list of messages
+        self._messages: dict[str, list[dict[str, Any]]] = {}  # conv_id -> list of messages
         self._idempotency_map: dict[str, str] = {}  # client_message_id -> message_id
-        self._active_connections: dict[str, Set[WebSocket]] = {}  # conv_id -> active WebSockets
+        self._active_connections: dict[str, set[WebSocket]] = {}  # conv_id -> active WebSockets
         self._seed_initial_conversations()
 
     def _seed_initial_conversations(self):
@@ -36,7 +35,7 @@ class MessengerService:
             "related_trip_id": "t1000000-0000-0000-0000-000000000001",
             "created_by": "u1000000-0000-0000-0000-000000000001",
             "last_message_text": "We have prepared the garden cottage for your 18:30 check-in.",
-            "last_message_at": datetime.now(timezone.utc) - timedelta(minutes=25),
+            "last_message_at": datetime.now(UTC) - timedelta(minutes=25),
             "unread_count": 1,
             "participants": [
                 {
@@ -72,7 +71,7 @@ class MessengerService:
                     "estimated_lkr": 38000,
                     "booking_status": "PROVIDER_CONFIRMED",
                 },
-                "created_at": datetime.now(timezone.utc) - timedelta(hours=2),
+                "created_at": datetime.now(UTC) - timedelta(hours=2),
             },
             {
                 "id": "msg10000-0000-0000-0000-000000000002",
@@ -83,7 +82,7 @@ class MessengerService:
                 "message_type": "TEXT",
                 "text_content": "Ayubowan! We have prepared the garden cottage for your 18:30 check-in. Dinner can be served on your private terrace.",
                 "payload_data": None,
-                "created_at": datetime.now(timezone.utc) - timedelta(minutes=25),
+                "created_at": datetime.now(UTC) - timedelta(minutes=25),
             },
         ]
 
@@ -96,7 +95,7 @@ class MessengerService:
             "related_trip_id": None,
             "created_by": "u1000000-0000-0000-0000-000000000001",
             "last_message_text": "Meeting at Sigiriya south entrance at 06:15 AM sharp.",
-            "last_message_at": datetime.now(timezone.utc) - timedelta(hours=1),
+            "last_message_at": datetime.now(UTC) - timedelta(hours=1),
             "unread_count": 0,
             "participants": [
                 {
@@ -131,7 +130,7 @@ class MessengerService:
                     "photo_url": "https://images.unsplash.com/photo-1586861635167-e5223aadc9fe?auto=format&fit=crop&w=600&q=80",
                     "summary": "UNESCO 5th-century sky fortress built by King Kasyapa.",
                 },
-                "created_at": datetime.now(timezone.utc) - timedelta(hours=3),
+                "created_at": datetime.now(UTC) - timedelta(hours=3),
             },
             {
                 "id": "msg10000-0000-0000-0000-000000000004",
@@ -142,7 +141,7 @@ class MessengerService:
                 "message_type": "TEXT",
                 "text_content": "Meeting at Sigiriya south entrance at 06:15 AM sharp. I will carry the official archaeological badges.",
                 "payload_data": None,
-                "created_at": datetime.now(timezone.utc) - timedelta(hours=1),
+                "created_at": datetime.now(UTC) - timedelta(hours=1),
             },
         ]
 
@@ -155,7 +154,7 @@ class MessengerService:
             "related_trip_id": "t1000000-0000-0000-0000-000000000001",
             "created_by": "u1000000-0000-0000-0000-000000000001",
             "last_message_text": "Added Dambulla Cave Temples to Day 2 afternoon itinerary.",
-            "last_message_at": datetime.now(timezone.utc) - timedelta(hours=4),
+            "last_message_at": datetime.now(UTC) - timedelta(hours=4),
             "unread_count": 0,
             "participants": [
                 {
@@ -185,7 +184,7 @@ class MessengerService:
                 "message_type": "TEXT",
                 "text_content": "Added Dambulla Cave Temples to Day 2 afternoon itinerary. TripGraph confirmed 25m transit buffer from Sigiriya.",
                 "payload_data": None,
-                "created_at": datetime.now(timezone.utc) - timedelta(hours=4),
+                "created_at": datetime.now(UTC) - timedelta(hours=4),
             }
         ]
 
@@ -201,7 +200,7 @@ class MessengerService:
             "member_count": 342,
             "created_by": "u1000000-0000-0000-0000-000000000001",
             "last_message_text": "Watch the blue train crossing through the tea valley!",
-            "last_message_at": datetime.now(timezone.utc) - timedelta(minutes=15),
+            "last_message_at": datetime.now(UTC) - timedelta(minutes=15),
             "unread_count": 2,
             "participants": [
                 {
@@ -242,7 +241,7 @@ class MessengerService:
                     "media_type": "image",
                     "caption": "Nine Arch Bridge at sunrise",
                 },
-                "created_at": datetime.now(timezone.utc) - timedelta(hours=1),
+                "created_at": datetime.now(UTC) - timedelta(hours=1),
             },
             {
                 "id": "msg10000-0000-0000-0000-000000000007",
@@ -259,7 +258,7 @@ class MessengerService:
                     "thumbnail_url": "https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=800&q=80",
                     "caption": "Blue express train clearing Nine Arch viaduct",
                 },
-                "created_at": datetime.now(timezone.utc) - timedelta(minutes=15),
+                "created_at": datetime.now(UTC) - timedelta(minutes=15),
             },
         ]
 
@@ -275,7 +274,7 @@ class MessengerService:
             "member_count": 516,
             "created_by": "u1000000-0000-0000-0000-000000000001",
             "last_message_text": "Pidurangala sunrise climb: recommend starting at 05:15 AM from north temple.",
-            "last_message_at": datetime.now(timezone.utc) - timedelta(minutes=40),
+            "last_message_at": datetime.now(UTC) - timedelta(minutes=40),
             "unread_count": 1,
             "participants": [
                 {
@@ -303,7 +302,7 @@ class MessengerService:
                     "photo_url": "https://images.unsplash.com/photo-1586861635167-e5223aadc9fe?auto=format&fit=crop&w=600&q=80",
                     "summary": "Panoramic granite peak directly facing Sigiriya Lion Rock fortress.",
                 },
-                "created_at": datetime.now(timezone.utc) - timedelta(minutes=40),
+                "created_at": datetime.now(UTC) - timedelta(minutes=40),
             },
         ]
 
@@ -319,7 +318,7 @@ class MessengerService:
             "member_count": 2,
             "created_by": "u1000000-0000-0000-0000-000000000001",
             "last_message_text": "Here is the photo of the sunset ramparts from Pedlar Street!",
-            "last_message_at": datetime.now(timezone.utc) - timedelta(hours=2),
+            "last_message_at": datetime.now(UTC) - timedelta(hours=2),
             "unread_count": 0,
             "participants": [
                 {
@@ -353,17 +352,17 @@ class MessengerService:
                     "media_type": "image",
                     "caption": "Galle Fort Lighthouse & Ramparts",
                 },
-                "created_at": datetime.now(timezone.utc) - timedelta(hours=2),
+                "created_at": datetime.now(UTC) - timedelta(hours=2),
             },
         ]
 
-    def get_user_conversations(self, user_id: str) -> List[dict[str, Any]]:
+    def get_user_conversations(self, user_id: str) -> list[dict[str, Any]]:
         return list(self._conversations.values())
 
-    def get_conversation(self, conv_id: str) -> Optional[dict[str, Any]]:
+    def get_conversation(self, conv_id: str) -> dict[str, Any] | None:
         return self._conversations.get(str(conv_id))
 
-    def get_messages(self, conv_id: str, limit: int = 50, offset: int = 0) -> List[dict[str, Any]]:
+    def get_messages(self, conv_id: str, limit: int = 50, offset: int = 0) -> list[dict[str, Any]]:
         msgs = self._messages.get(str(conv_id), [])
         return msgs[offset : offset + limit]
 
@@ -398,7 +397,7 @@ class MessengerService:
             "delivery_status": "DELIVERED",
             "text_content": payload.text_content,
             "payload_data": payload.payload_data,
-            "created_at": datetime.now(timezone.utc),
+            "created_at": datetime.now(UTC),
         }
 
         self._messages.setdefault(conv_id_str, []).append(new_msg)
@@ -417,7 +416,7 @@ class MessengerService:
         payload: ChatConversationCreate,
     ) -> dict[str, Any]:
         conv_id = str(uuid.uuid4())
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
 
         participants = [
             {

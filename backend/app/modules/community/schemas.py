@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, List, Optional
+
 from pydantic import BaseModel, Field
 
 from app.modules.community.models import (
@@ -15,12 +15,12 @@ from app.modules.community.models import (
 class PostMediaResponse(BaseModel):
     id: str
     media_url: str
-    thumbnail_url: Optional[str] = None
+    thumbnail_url: str | None = None
     media_type: str = "IMAGE"
-    alt_text: Optional[str] = None
+    alt_text: str | None = None
     sort_order: int = 0
-    width: Optional[int] = None
-    height: Optional[int] = None
+    width: int | None = None
+    height: int | None = None
 
 
 class PostCommentResponse(BaseModel):
@@ -28,7 +28,7 @@ class PostCommentResponse(BaseModel):
     post_id: str
     author_id: str
     author_name: str
-    author_avatar_url: Optional[str] = None
+    author_avatar_url: str | None = None
     author_badge: AuthorBadge
     comment_text: str
     is_accepted_answer: bool = False
@@ -44,9 +44,9 @@ class CommunityPostResponse(BaseModel):
     id: str
     author_id: str
     author_name: str
-    author_avatar_url: Optional[str] = None
+    author_avatar_url: str | None = None
     author_badge: AuthorBadge
-    author_badge_detail: Optional[str] = None
+    author_badge_detail: str | None = None
 
     post_type: PostType
     caption: str
@@ -54,13 +54,13 @@ class CommunityPostResponse(BaseModel):
     district_id: str
     district_name: str
     province_id: str
-    destination_id: Optional[str] = None
-    destination_slug: Optional[str] = None
-    destination_name: Optional[str] = None
+    destination_id: str | None = None
+    destination_slug: str | None = None
+    destination_name: str | None = None
 
     trust_label: str
-    observed_at: Optional[datetime] = None
-    expires_at: Optional[datetime] = None
+    observed_at: datetime | None = None
+    expires_at: datetime | None = None
     is_stale: bool = False
     freshness_label: str = "Active"
 
@@ -73,19 +73,19 @@ class CommunityPostResponse(BaseModel):
     is_question_resolved: bool = False
 
     created_at: datetime
-    media: List[PostMediaResponse] = []
-    comments: List[PostCommentResponse] = []
+    media: list[PostMediaResponse] = []
+    comments: list[PostCommentResponse] = []
 
 
 class CommunityPostCreate(BaseModel):
     post_type: PostType = PostType.PHOTO
     caption: str = Field(..., min_length=5, max_length=2000)
     district_id: str
-    destination_id: Optional[str] = None
-    destination_name: Optional[str] = None
-    media_urls: List[str] = []
-    observed_at: Optional[datetime] = None
-    expiry_hours: Optional[int] = Field(None, ge=1, le=72)
+    destination_id: str | None = None
+    destination_name: str | None = None
+    media_urls: list[str] = []
+    observed_at: datetime | None = None
+    expiry_hours: int | None = Field(None, ge=1, le=72)
 
 
 class PostReactionRequest(BaseModel):
@@ -100,15 +100,15 @@ class PostReactionResponse(BaseModel):
 
 
 class ContentReportRequest(BaseModel):
-    post_id: Optional[str] = None
-    comment_id: Optional[str] = None
+    post_id: str | None = None
+    comment_id: str | None = None
     reason: ReportReason
-    description: Optional[str] = None
+    description: str | None = None
 
 
 class ContentReportResponse(BaseModel):
     id: str
-    post_id: Optional[str] = None
+    post_id: str | None = None
     reporter_name: str
     reason: ReportReason
     status: ReportStatus
@@ -116,14 +116,14 @@ class ContentReportResponse(BaseModel):
 
 
 class PlaceSignalResponse(BaseModel):
-    destination_id: Optional[str] = None
+    destination_id: str | None = None
     destination_name: str
     district_name: str
     recent_notes_count: int
     unanswered_questions_count: int
     active_field_reports_count: int
-    latest_observation: Optional[str] = None
-    latest_observed_at: Optional[datetime] = None
+    latest_observation: str | None = None
+    latest_observed_at: datetime | None = None
     trail_or_road_status: str = "NORMAL"
     crowd_level: str = "MODERATE"
     freshness_status: str = "FRESH"
@@ -132,10 +132,10 @@ class PlaceSignalResponse(BaseModel):
 class ItineraryAdditionValidationRequest(BaseModel):
     post_id: str
     destination_id: str
-    trip_id: Optional[str] = None
+    trip_id: str | None = None
     target_day_number: int = 1
     requested_start_hour: int = 10  # 10:00 AM default
-    dwell_duration_mins: Optional[int] = None
+    dwell_duration_mins: int | None = None
 
 
 class ItineraryAdditionValidationResponse(BaseModel):
@@ -146,5 +146,5 @@ class ItineraryAdditionValidationResponse(BaseModel):
     proposed_end_time: str
     road_buffer_mins: int
     transit_duration_mins: int
-    conflicts: List[str] = []
+    conflicts: list[str] = []
     recommendation: str

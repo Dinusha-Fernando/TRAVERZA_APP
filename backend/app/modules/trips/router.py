@@ -28,7 +28,6 @@ from app.modules.trips.schemas import (
     TripResponse,
 )
 
-
 router = APIRouter(prefix="/trips", tags=["Trips & Itinerary"])
 
 

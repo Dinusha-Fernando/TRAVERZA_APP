@@ -1,6 +1,6 @@
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
 
-now = datetime.now(timezone.utc)
+now = datetime.now(UTC)
 
 COMMUNITY_POSTS_SEED = [
     {

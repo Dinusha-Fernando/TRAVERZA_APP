@@ -1,41 +1,33 @@
 import copy
 import uuid
-from datetime import datetime, timezone, timedelta
-from typing import Any, List, Optional
+from datetime import UTC, datetime, timedelta
+from typing import Any
 
 from app.modules.community.models import (
-    AuthorBadge,
-    ModerationStatus,
     PostType,
     ReactionType,
     ReportReason,
-    ReportStatus,
 )
 from app.modules.community.schemas import (
     CommunityPostCreate,
-    CommunityPostResponse,
     ContentReportRequest,
-    ContentReportResponse,
     ItineraryAdditionValidationRequest,
     ItineraryAdditionValidationResponse,
     PlaceSignalResponse,
     PostCommentCreate,
-    PostCommentResponse,
-    PostMediaResponse,
-    PostReactionResponse,
 )
 from app.modules.community.seed_data import COMMUNITY_POSTS_SEED
 
 
 def _now() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
-def _ensure_utc(dt: Optional[datetime]) -> Optional[datetime]:
+def _ensure_utc(dt: datetime | None) -> datetime | None:
     if dt is None:
         return None
     if dt.tzinfo is None:
-        return dt.replace(tzinfo=timezone.utc)
+        return dt.replace(tzinfo=UTC)
     return dt
 
 
@@ -82,14 +74,14 @@ class CommunityService:
 
     def get_feed(
         self,
-        post_type: Optional[str] = None,
-        district_id: Optional[str] = None,
-        destination_slug: Optional[str] = None,
-        search_query: Optional[str] = None,
-        current_user_id: Optional[str] = None,
+        post_type: str | None = None,
+        district_id: str | None = None,
+        destination_slug: str | None = None,
+        search_query: str | None = None,
+        current_user_id: str | None = None,
         limit: int = 20,
         offset: int = 0,
-    ) -> List[dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         results = []
 
         for p in self._posts.values():
@@ -130,7 +122,7 @@ class CommunityService:
 
             results.append(post_data)
 
-        epoch_utc = datetime(2000, 1, 1, tzinfo=timezone.utc)
+        epoch_utc = datetime(2000, 1, 1, tzinfo=UTC)
         results.sort(
             key=lambda x: (
                 not x.get("is_stale", False),
@@ -140,7 +132,7 @@ class CommunityService:
         )
         return results[offset : offset + limit]
 
-    def get_post(self, post_id: str) -> Optional[dict[str, Any]]:
+    def get_post(self, post_id: str) -> dict[str, Any] | None:
         raw = self._posts.get(str(post_id))
         if not raw:
             return None
@@ -155,7 +147,7 @@ class CommunityService:
         author_id: str,
         author_name: str,
         author_badge: str,
-        author_badge_detail: Optional[str],
+        author_badge_detail: str | None,
         payload: CommunityPostCreate,
     ) -> dict[str, Any]:
         post_id = str(uuid.uuid4())
@@ -219,7 +211,7 @@ class CommunityService:
         author_name: str,
         author_badge: str,
         payload: PostCommentCreate,
-    ) -> Optional[dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         post = self._posts.get(str(post_id))
         if not post:
             return None
@@ -264,7 +256,7 @@ class CommunityService:
             post["is_question_resolved"] = True
         return found
 
-    def toggle_reaction(self, post_id: str, user_id: str, reaction_type: ReactionType) -> Optional[dict[str, Any]]:
+    def toggle_reaction(self, post_id: str, user_id: str, reaction_type: ReactionType) -> dict[str, Any] | None:
         post = self._posts.get(str(post_id))
         if not post:
             return None
@@ -304,7 +296,7 @@ class CommunityService:
         notes = [p for p in matching_posts if p.get("post_type") == "LOCAL_NOTE"]
 
         latest_post = None
-        epoch_utc = datetime(2000, 1, 1, tzinfo=timezone.utc)
+        epoch_utc = datetime(2000, 1, 1, tzinfo=UTC)
         if matching_posts:
             latest_post = max(
                 matching_posts,
@@ -392,7 +384,7 @@ class CommunityService:
     def unblock_user(self, blocker_id: str, target_user_id: str):
         self._blocks.discard((str(blocker_id), str(target_user_id)))
 
-    def get_moderation_queue(self) -> List[dict[str, Any]]:
+    def get_moderation_queue(self) -> list[dict[str, Any]]:
         return list(self._reports.values())
 
 
