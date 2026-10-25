@@ -6,7 +6,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/theme/app_theme.dart';
 import 'package:mobile/widgets/creative_experience_tab_switcher.dart';
 import 'package:mobile/features/messenger/presentation/widgets/creative_experience_share_sheet.dart';
-import 'package:mobile/features/messenger/models/messenger_models.dart';
 import 'package:mobile/features/messenger/services/messenger_service.dart';
 import 'package:mobile/features/messenger/presentation/conversation_screen.dart';
 import 'package:mobile/features/community/presentation/widgets/media_gallery_picker_modal.dart';

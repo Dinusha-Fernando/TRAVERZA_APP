@@ -117,6 +117,7 @@ class CommunityPostCard extends StatelessWidget {
                       );
                       if (!granted) return;
                     }
+                    if (!context.mounted) return;
 
                     final convId = MessengerService.instance.startDirectChat(
                       userName: post.authorName,
@@ -419,6 +420,7 @@ class CommunityPostCard extends StatelessWidget {
                       );
                       if (!granted) return;
                     }
+                    if (!context.mounted) return;
                     ItineraryFeasibilityModal.show(context, post);
                   },
                   icon: const Icon(Icons.add_location_alt_rounded, size: 13, color: Colors.white),

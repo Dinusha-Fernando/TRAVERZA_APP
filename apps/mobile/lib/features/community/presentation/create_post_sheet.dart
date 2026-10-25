@@ -32,6 +32,7 @@ class CreatePostSheet extends StatefulWidget {
       );
       if (!granted) return;
     }
+    if (!context.mounted) return;
 
     return showModalBottomSheet(
       context: context,

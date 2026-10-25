@@ -4,7 +4,6 @@ import '../../../../widgets/animated_traverza_logo.dart';
 import '../../../../widgets/creative_google_button.dart';
 import '../../../../widgets/creative_auth_tab_switcher.dart';
 import '../services/auth_service.dart';
-import 'auth_sheet.dart';
 import 'sign_in_screen.dart';
 import 'register_screen.dart';
 

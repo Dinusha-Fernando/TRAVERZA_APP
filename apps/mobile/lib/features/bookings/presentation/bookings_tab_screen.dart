@@ -558,6 +558,7 @@ class _BookingsTabScreenState extends State<BookingsTabScreen> {
           );
           if (!granted) return;
         }
+        if (!mounted) return;
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -579,6 +580,7 @@ class _BookingsTabScreenState extends State<BookingsTabScreen> {
           );
           if (!granted) return;
         }
+        if (!mounted) return;
 
         final profile = TraverzaAuthService.instance.currentProfile;
         // Create booking request and switch to My Bookings
