@@ -9,6 +9,7 @@ enum MessageTypeEnum {
   text,
   photo,
   video,
+  file,
   placeSnippet,
   itinerarySnippet,
   providerQuoteRequest,
@@ -46,10 +47,13 @@ class PlaceSnippetModel {
 
 class MediaAttachmentModel {
   final String mediaUrl;
-  final String mediaType; // 'image' or 'video'
+  final String mediaType; // 'image', 'video', or 'file'
   final String? caption;
   final int? durationSeconds;
   final String? thumbnailUrl;
+  final String? fileName;
+  final String? fileSize;
+  final String? fileExtension;
 
   const MediaAttachmentModel({
     required this.mediaUrl,
@@ -57,6 +61,9 @@ class MediaAttachmentModel {
     this.caption,
     this.durationSeconds,
     this.thumbnailUrl,
+    this.fileName,
+    this.fileSize,
+    this.fileExtension,
   });
 
   factory MediaAttachmentModel.fromJson(Map<String, dynamic> json) {
@@ -66,6 +73,9 @@ class MediaAttachmentModel {
       caption: json['caption'] as String?,
       durationSeconds: json['duration_seconds'] as int?,
       thumbnailUrl: json['thumbnail_url'] as String?,
+      fileName: json['file_name'] as String?,
+      fileSize: json['file_size'] as String?,
+      fileExtension: json['file_extension'] as String?,
     );
   }
 
@@ -75,6 +85,9 @@ class MediaAttachmentModel {
     'caption': caption,
     'duration_seconds': durationSeconds,
     'thumbnail_url': thumbnailUrl,
+    'file_name': fileName,
+    'file_size': fileSize,
+    'file_extension': fileExtension,
   };
 }
 

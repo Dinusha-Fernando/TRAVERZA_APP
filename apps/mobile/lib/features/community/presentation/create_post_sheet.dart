@@ -3,6 +3,8 @@ import '../../../theme/app_theme.dart';
 import '../models/community_models.dart';
 import '../services/community_service.dart';
 import 'widgets/media_gallery_picker_modal.dart';
+import '../../auth/services/auth_service.dart';
+import '../../../widgets/creative_auth_gate_dialog.dart';
 
 class CreatePostSheet extends StatefulWidget {
   final PostType? initialPostType;
@@ -18,7 +20,19 @@ class CreatePostSheet extends StatefulWidget {
     BuildContext context, {
     PostType? initialPostType,
     int? initialMediaTab,
-  }) {
+  }) async {
+    if (!TraverzaAuthService.instance.isAccountComplete) {
+      final granted = await CreativeAuthGateSheet.show(
+        context,
+        featureTitle: 'Community Pulse',
+        actionMessage: 'Publish Live Moment & Field Reports',
+        clearanceReason:
+            'Sri Lanka Tourism (SLTDA) verified credentials required to publish live trail dispatches, road alerts, and local guides.',
+        featureIcon: Icons.podcasts_rounded,
+      );
+      if (!granted) return;
+    }
+
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -546,14 +560,49 @@ class _CreatePostSheetState extends State<CreatePostSheet> {
     final isSelected = _selectedType == type;
     return Padding(
       padding: const EdgeInsets.only(right: 8),
-      child: ChoiceChip(
-        label: Text(label, style: TextStyle(fontSize: 11.5, fontWeight: isSelected ? FontWeight.bold : FontWeight.w500)),
-        selected: isSelected,
-        selectedColor: TraverzaColors.secondary.withValues(alpha: 0.15),
-        backgroundColor: TraverzaColors.background,
-        onSelected: (val) {
-          if (val) setState(() => _selectedType = type);
+      child: GestureDetector(
+        onTap: () {
+          setState(() => _selectedType = type);
         },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 240),
+          curve: Curves.easeOutCubic,
+          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 7.5),
+          decoration: BoxDecoration(
+            gradient: isSelected
+                ? const LinearGradient(
+                    colors: [TraverzaColors.secondary, Color(0xFF0E7490)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  )
+                : null,
+            color: isSelected ? null : TraverzaColors.background,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: isSelected
+                  ? TraverzaColors.secondary
+                  : TraverzaColors.border,
+              width: isSelected ? 1.4 : 1.0,
+            ),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: TraverzaColors.secondary.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 11.5,
+              fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+              color: isSelected ? Colors.white : TraverzaColors.text,
+            ),
+          ),
+        ),
       ),
     );
   }

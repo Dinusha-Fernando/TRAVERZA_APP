@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "396524897339",
+    "project_id": "traverza-fac2b",
+    "storage_bucket": "traverza-fac2b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:396524897339:android:204ddffeeca082c3f1881e",
+        "android_client_info": {
+          "package_name": "lk.traverza.mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "396524897339-urohcl7gt104297sffold3e171uhqh8e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "lk.traverza.mobile",
+            "certificate_hash": "e7e220418ffeca4ad672fd423cf15d6a058fa38c"
+          }
+        },
+        {
+          "client_id": "396524897339-e4gscl1i0r3oud7gpc88vbljbi6oaaet.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAy3PuOwxDCfDH51iUr1UEDX2DlMzgCcoc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "396524897339-e4gscl1i0r3oud7gpc88vbljbi6oaaet.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import '../../../../theme/app_theme.dart';
 import '../../data/notification_model.dart';
+import 'notification_detail_sheet.dart';
 
 class NotificationTile extends StatelessWidget {
   final TraverzaNotification notification;
   final ValueChanged<TraverzaNotification> onTap;
   final ValueChanged<TraverzaNotification> onDismissed;
+  final ValueChanged<String>? onNavigate;
 
   const NotificationTile({
     super.key,
     required this.notification,
     required this.onTap,
     required this.onDismissed,
+    this.onNavigate,
   });
 
   @override
@@ -55,6 +58,15 @@ class NotificationTile extends StatelessWidget {
         ),
         child: InkWell(
           onTap: () => onTap(notification),
+          onLongPress: onNavigate != null
+              ? () {
+                  NotificationDetailSheet.show(
+                    context,
+                    notification: notification,
+                    onNavigate: onNavigate!,
+                  );
+                }
+              : null,
           borderRadius: BorderRadius.circular(16),
           child: Padding(
             padding: const EdgeInsets.all(14),
@@ -68,6 +80,10 @@ class NotificationTile extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: cat.color.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: cat.color.withValues(alpha: 0.25),
+                      width: 1,
+                    ),
                   ),
                   child: Icon(cat.icon, color: cat.color, size: 20),
                 ),
@@ -123,6 +139,19 @@ class NotificationTile extends StatelessWidget {
                           ),
                         ],
                       ),
+                      if (notification.subtitle != null) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          notification.subtitle!,
+                          style: const TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: TraverzaColors.secondary,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                       const SizedBox(height: 4),
                       Text(
                         notification.body,

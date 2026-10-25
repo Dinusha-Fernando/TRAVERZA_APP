@@ -1,21 +1,15 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import Image from 'next/image';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'TRAVERZA | Connected Travel Operating Platform for Sri Lanka',
+  title: 'TRAVERZA Operations Console | Master Admin Desk',
   description:
-    'Experience Sri Lanka with coordinated multi-stop journeys. Discover, validate, and book verified boutique stays, licensed chauffeur transfers, and certified cultural guides.',
-  keywords: [
-    'Sri Lanka Travel',
-    'Curated Itinerary',
-    'SLTDA Verified Providers',
-    'Chauffeur Guide Sri Lanka',
-    'Cultural Triangle',
-    'Kandy',
-    'Sigiriya',
-    'TripGraph',
-  ],
+    'Internal Master Operations Command Center for TRAVERZA Sri Lanka. Centralized management across 12 operational domains.',
+  icons: {
+    icon: '/traverza-logo.jpg',
+  },
 };
 
 export default function RootLayout({
@@ -26,129 +20,169 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <header className="glass-nav">
+        {/* Executive Admin Operations Navigation Header */}
+        <header
+          style={{
+            position: 'sticky',
+            top: 0,
+            zIndex: 100,
+            background: 'rgba(7, 59, 92, 0.96)',
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+            borderBottom: '1px solid rgba(34, 184, 207, 0.3)',
+            boxShadow: '0 4px 20px rgba(7, 59, 92, 0.25)',
+          }}
+        >
           <div
             style={{
-              maxWidth: '1280px',
+              maxWidth: '1440px',
               margin: '0 auto',
-              padding: '16px 24px',
+              padding: '12px 24px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
+              gap: '16px',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
-              <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <img
+            {/* Left: Brand & Admin Console Badge */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <Link href="/admin" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <Image
                   src="/traverza-logo.jpg"
-                  alt="TRAVERZA Logo"
+                  alt="TRAVERZA"
+                  width={38}
+                  height={38}
                   style={{
-                    width: '38px',
-                    height: '38px',
                     borderRadius: '10px',
                     objectFit: 'cover',
-                    boxShadow: '0 4px 14px rgba(7, 59, 92, 0.15)',
-                    border: '1.5px solid var(--color-border)',
+                    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
+                    border: '1.5px solid rgba(255, 255, 255, 0.4)',
                   }}
                 />
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span
+                      style={{
+                        fontFamily: 'var(--font-heading)',
+                        fontWeight: 800,
+                        fontSize: '1.25rem',
+                        letterSpacing: '0.04em',
+                        color: '#ffffff',
+                      }}
+                    >
+                      TRAVERZA
+                    </span>
+                    <span
+                      style={{
+                        background: 'rgba(34, 184, 207, 0.25)',
+                        border: '1px solid #22b8cf',
+                        color: '#22b8cf',
+                        padding: '2px 8px',
+                        borderRadius: '6px',
+                        fontSize: '0.68rem',
+                        fontWeight: 700,
+                        letterSpacing: '0.06em',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      Admin Console
+                    </span>
+                  </div>
                   <span
                     style={{
-                      fontFamily: 'var(--font-heading)',
-                      fontWeight: 800,
-                      fontSize: '1.3rem',
-                      letterSpacing: '0.04em',
-                      color: 'var(--color-primary)',
+                      fontSize: '0.68rem',
+                      color: 'rgba(255, 255, 255, 0.7)',
+                      letterSpacing: '0.08em',
+                      fontWeight: 500,
                     }}
                   >
-                    TRAVERZA
-                  </span>
-                  <span
-                    style={{
-                      fontSize: '0.65rem',
-                      color: 'var(--color-secondary)',
-                      letterSpacing: '0.12em',
-                      fontWeight: 700,
-                    }}
-                  >
-                    SRI LANKA
+                    MASTER OPERATIONS DESK • SRI LANKA
                   </span>
                 </div>
               </Link>
-
-              <nav style={{ display: 'flex', gap: '20px' }}>
-                <Link
-                  href="/"
-                  style={{
-                    color: 'var(--text-primary)',
-                    fontWeight: 600,
-                    fontSize: '0.92rem',
-                    transition: 'color var(--transition-fast)',
-                  }}
-                >
-                  Explore Corridor
-                </Link>
-                <Link
-                  href="/atlas"
-                  style={{
-                    color: 'var(--color-secondary)',
-                    fontWeight: 700,
-                    fontSize: '0.92rem',
-                    transition: 'color var(--transition-fast)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                  }}
-                >
-                  <span style={{ fontSize: '1.05rem' }}>🧭</span> Island Atlas
-                </Link>
-                <Link
-                  href="/community"
-                  style={{
-                    color: 'var(--color-primary)',
-                    fontWeight: 700,
-                    fontSize: '0.92rem',
-                    transition: 'color var(--transition-fast)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                  }}
-                >
-                  <span style={{ fontSize: '1.05rem' }}>📸</span> Community
-                </Link>
-                <Link
-                  href="/provider"
-                  style={{
-                    color: 'var(--text-secondary)',
-                    fontWeight: 500,
-                    fontSize: '0.92rem',
-                    transition: 'color var(--transition-fast)',
-                  }}
-                >
-                  Provider OS
-                </Link>
-                <Link
-                  href="/admin"
-                  style={{
-                    color: 'var(--text-secondary)',
-                    fontWeight: 500,
-                    fontSize: '0.92rem',
-                    transition: 'color var(--transition-fast)',
-                  }}
-                >
-                  Trip Ops
-                </Link>
-              </nav>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-              <span className="badge badge-emerald">Pilot: Cultural Triangle</span>
-              <Link href="/provider" className="btn btn-secondary" style={{ fontSize: '0.85rem', padding: '8px 16px' }}>
-                Provider Portal
-              </Link>
-              <Link href="/" className="btn btn-primary" style={{ fontSize: '0.85rem', padding: '8px 18px' }}>
-                Plan My Journey
-              </Link>
+            {/* Right: Operational Status Badges & Admin User Badge */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: 'rgba(52, 211, 153, 0.15)',
+                  border: '1px solid rgba(52, 211, 153, 0.4)',
+                  padding: '5px 12px',
+                  borderRadius: '999px',
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  color: '#34d399',
+                }}
+              >
+                <span
+                  style={{
+                    width: '7px',
+                    height: '7px',
+                    borderRadius: '50%',
+                    background: '#34d399',
+                    boxShadow: '0 0 8px #34d399',
+                  }}
+                />
+                System Operational
+              </div>
+
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  padding: '5px 12px',
+                  borderRadius: '999px',
+                  fontSize: '0.75rem',
+                  fontWeight: 500,
+                  color: '#ffffff',
+                }}
+              >
+                <span>🛡️</span> PDPA / ISO 27001
+              </div>
+
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  background: 'rgba(255, 255, 255, 0.12)',
+                  border: '1px solid rgba(255, 255, 255, 0.25)',
+                  padding: '4px 12px 4px 6px',
+                  borderRadius: '999px',
+                }}
+              >
+                <span
+                  style={{
+                    width: '24px',
+                    height: '24px',
+                    borderRadius: '50%',
+                    background: 'var(--color-secondary)',
+                    color: '#ffffff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '0.75rem',
+                    fontWeight: 700,
+                  }}
+                >
+                  SA
+                </span>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#ffffff', lineHeight: 1.2 }}>
+                    Super Admin
+                  </span>
+                  <span style={{ fontSize: '0.65rem', color: 'rgba(255, 255, 255, 0.65)', lineHeight: 1 }}>
+                    admin@traverza.lk
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </header>
@@ -157,68 +191,36 @@ export default function RootLayout({
 
         <footer
           style={{
-            borderTop: '1px solid var(--border-glass)',
+            borderTop: '1px solid var(--color-border)',
             background: 'var(--bg-surface)',
-            padding: '48px 24px',
-            marginTop: '80px',
+            padding: '24px',
+            marginTop: '60px',
+            textAlign: 'center',
+            fontSize: '0.8rem',
+            color: 'var(--text-muted)',
           }}
         >
           <div
             style={{
-              maxWidth: '1280px',
+              maxWidth: '1440px',
               margin: '0 auto',
               display: 'flex',
-              flexWrap: 'wrap',
               justifyContent: 'space-between',
-              gap: '32px',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '16px',
             }}
           >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontWeight: 700, color: 'var(--color-primary)' }}>TRAVERZA</span>
+              <span>• Internal Operations Desk (v1.0.0-PROD)</span>
+            </div>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                <img
-                  src="/traverza-logo.jpg"
-                  alt="TRAVERZA"
-                  style={{ width: '28px', height: '28px', borderRadius: '8px', objectFit: 'cover' }}
-                />
-                <h3 style={{ fontSize: '1.2rem', margin: 0 }}>TRAVERZA</h3>
-              </div>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', maxWidth: '340px' }}>
-                Connected travel operating platform for Sri Lanka. Curating verified stays, licensed chauffeur guides, and authentic excursions.
-              </p>
+              Restricted Access • Authorized Personnel Only • Governed by Sri Lanka Personal Data Protection Act (PDPA 2027)
             </div>
-            <div style={{ display: 'flex', gap: '48px' }}>
-              <div>
-                <h4 style={{ fontSize: '0.95rem', marginBottom: '12px', color: 'var(--accent-gold)' }}>Regulatory & Trust</h4>
-                <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                  <li>SLTDA App Registered Merchant Standard</li>
-                  <li>PDPA (Sri Lanka 2027) Privacy Architecture</li>
-                  <li>ISO/IEC 27001 Readiness</li>
-                  <li>Truthful Partial Confirmation Guarantee</li>
-                </ul>
-              </div>
-              <div>
-                <h4 style={{ fontSize: '0.95rem', marginBottom: '12px', color: 'var(--accent-emerald)' }}>Corridor Focus</h4>
-                <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                  <li>Bandaranaike Intl Airport (CMB)</li>
-                  <li>Sigiriya & Dambulla Heritage</li>
-                  <li>Kandy Sacred City & Highlands</li>
-                  <li>Nuwara Eliya Tea Estates</li>
-                </ul>
-              </div>
+            <div>
+              &copy; 2026 TRAVERZA Sri Lanka. All administrative rights reserved.
             </div>
-          </div>
-          <div
-            style={{
-              maxWidth: '1280px',
-              margin: '32px auto 0',
-              paddingTop: '20px',
-              borderTop: '1px solid var(--color-border)',
-              textAlign: 'center',
-              fontSize: '0.8rem',
-              color: 'var(--text-muted)',
-            }}
-          >
-            &copy; 2026 TRAVERZA. Built with FastAPI + PostgreSQL/PostGIS + Next.js + Flutter. All rights reserved.
           </div>
         </footer>
       </body>

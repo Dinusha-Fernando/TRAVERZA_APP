@@ -9,7 +9,11 @@ import 'features/profile/presentation/profile_tab_screen.dart';
 import 'features/notifications/data/notification_model.dart';
 import 'features/notifications/services/notification_service.dart';
 import 'features/notifications/presentation/notification_center_sheet.dart';
+import 'features/notifications/presentation/widgets/in_app_notification_banner.dart';
+import 'features/command_center/presentation/journey_command_center_screen.dart';
 import 'features/auth/services/auth_service.dart';
+import 'features/auth/presentation/auth_sheet.dart';
+import 'features/auth/presentation/account_quick_sheet.dart';
 import 'features/messenger/presentation/widgets/creative_messenger_button.dart';
 
 void main() {
@@ -67,6 +71,14 @@ class _MainTripScreenState extends State<MainTripScreen> {
   }
 
   void _handleNotificationNavigation(String route) {
+    if (route == 'command_center') {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => const JourneyCommandCenterScreen(initialTab: CommandCenterTab.autopilot),
+        ),
+      );
+      return;
+    }
     setState(() {
       switch (route) {
         case 'plan':
@@ -139,7 +151,12 @@ class _MainTripScreenState extends State<MainTripScreen> {
 
     return Scaffold(
       appBar: _buildAppBar(),
-      body: screens[_currentIndex],
+      body: Stack(
+        children: [
+          screens[_currentIndex],
+          InAppNotificationBanner(onNavigate: _handleNotificationNavigation),
+        ],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
@@ -226,7 +243,6 @@ class _MainTripScreenState extends State<MainTripScreen> {
                   overflow: TextOverflow.ellipsis,
                 ),
                 Row(
-                  mainAxisSize: MainAxisSize.min,
                   children: const [
                     Icon(Icons.location_on, size: 10, color: TraverzaColors.secondary),
                     SizedBox(width: 2),
@@ -303,32 +319,54 @@ class _MainTripScreenState extends State<MainTripScreen> {
             final profile = auth.currentProfile;
             final initial = profile.fullName.isNotEmpty ? profile.fullName.substring(0, 1).toUpperCase() : 'U';
 
-            return IconButton(
-              tooltip: isAuth ? '${profile.fullName} (Profile)' : 'Guest Explorer (Profile & Sign In)',
-              icon: isAuth
-                  ? CircleAvatar(
-                      radius: 13,
-                      backgroundColor: TraverzaColors.primary,
-                      backgroundImage: (profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty)
-                          ? NetworkImage(profile.avatarUrl!)
-                          : null,
-                      onBackgroundImageError: (profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty)
-                          ? (e, s) {}
-                          : null,
-                      child: (profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty)
-                          ? null
-                          : Text(
-                              initial,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                    )
-                  : const Icon(Icons.account_circle_outlined, color: TraverzaColors.primary),
-              onPressed: () => setState(() => _currentIndex = 4),
-            );
+            if (isAuth) {
+              return IconButton(
+                tooltip: '${profile.fullName} (Account Menu)',
+                icon: CircleAvatar(
+                  radius: 13,
+                  backgroundColor: TraverzaColors.primary,
+                  backgroundImage: (profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty)
+                      ? NetworkImage(profile.avatarUrl!)
+                      : null,
+                  onBackgroundImageError: (profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty)
+                      ? (e, s) {}
+                      : null,
+                  child: (profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty)
+                      ? null
+                      : Text(
+                          initial,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                ),
+                onPressed: () {
+                  AccountQuickSheet.show(
+                    context,
+                    onNavigateToProfile: () => setState(() => _currentIndex = 4),
+                  );
+                },
+              );
+            } else {
+              return Padding(
+                padding: const EdgeInsets.only(right: 6, top: 10, bottom: 10),
+                child: ElevatedButton.icon(
+                  onPressed: () => AuthSheet.show(context),
+                  icon: const Icon(Icons.login_rounded, size: 13),
+                  label: const Text('Sign In', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: TraverzaColors.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                    minimumSize: Size.zero,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    elevation: 0,
+                  ),
+                ),
+              );
+            }
           },
         ),
       ],

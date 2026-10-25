@@ -49,6 +49,9 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
+    # Google OAuth
+    GOOGLE_CLIENT_ID: str = "396524897339-e4gscl1i0r3oud7gpc88vbljbi6oaaet.apps.googleusercontent.com"
+
     # Pilot Constraints
     PILOT_CORRIDOR_NAME: str = "Colombo - Sigiriya - Kandy - Nuwara Eliya"
     DEFAULT_CURRENCY: str = "LKR"

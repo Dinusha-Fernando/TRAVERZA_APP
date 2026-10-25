@@ -5,6 +5,8 @@ import '../services/community_service.dart';
 import 'widgets/community_post_card.dart';
 import 'create_post_sheet.dart';
 import '../../messenger/presentation/widgets/creative_messenger_button.dart';
+import '../../auth/services/auth_service.dart';
+import '../../../widgets/creative_auth_gate_dialog.dart';
 
 class CommunityPulseScreen extends StatefulWidget {
   final String? initialDistrictId;
@@ -189,6 +191,10 @@ class _CommunityPulseScreenState extends State<CommunityPulseScreen> {
                 ),
               ),
 
+              // Unauthenticated Guest Clearance Banner
+              if (!TraverzaAuthService.instance.isAccountComplete)
+                _buildGuestClearanceBanner(),
+
               // Post Feed Stream
               Expanded(
                 child: posts.isEmpty
@@ -283,6 +289,86 @@ class _CommunityPulseScreenState extends State<CommunityPulseScreen> {
             _selectedPostType = val ? type : null;
           });
         },
+      ),
+    );
+  }
+
+  Widget _buildGuestClearanceBanner() {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF041826),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: TraverzaColors.secondary.withValues(alpha: 0.35)),
+        boxShadow: [
+          BoxShadow(
+            color: TraverzaColors.secondary.withValues(alpha: 0.12),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: TraverzaColors.secondary.withValues(alpha: 0.2),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.shield_outlined, size: 20, color: TraverzaColors.sand),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Text(
+                  'Guest Explorer Mode',
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 2),
+                Text(
+                  'Account required to publish moments, question guides, and post field reports.',
+                  style: TextStyle(
+                    fontSize: 10.5,
+                    color: Colors.white70,
+                    height: 1.3,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          ElevatedButton(
+            onPressed: () {
+              CreativeAuthGateSheet.show(
+                context,
+                featureTitle: 'Community Pulse',
+                actionMessage: 'Access Full Verified Community Features',
+                clearanceReason:
+                    'Create your free SLTDA digital passport to interact with certified guides, share live moments, and submit road reports.',
+                featureIcon: Icons.podcasts_rounded,
+              ).then((_) {
+                if (mounted) setState(() {});
+              });
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: TraverzaColors.secondary,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            child: const Text('Unlock', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+          ),
+        ],
       ),
     );
   }

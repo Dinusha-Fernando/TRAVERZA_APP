@@ -123,6 +123,8 @@ async def seed_atlas_geography(session: AsyncSession) -> None:
         stmt = select(CuratedCollection).where(CuratedCollection.slug == coll_data["slug"])
         res = await session.execute(stmt)
         if not res.scalar_one_or_none():
+            raw_slugs = coll_data.get("place_slugs_json") or coll_data.get("place_slugs") or []
+            place_slugs_str = raw_slugs if isinstance(raw_slugs, str) else json.dumps(raw_slugs)
             coll = CuratedCollection(
                 slug=coll_data["slug"],
                 title=coll_data["title"],
@@ -130,7 +132,7 @@ async def seed_atlas_geography(session: AsyncSession) -> None:
                 theme=coll_data["theme"],
                 cover_image=coll_data["cover_image"],
                 editorial_note=coll_data["editorial_note"],
-                place_slugs_json=json.dumps(coll_data["place_slugs"]),
+                place_slugs_json=place_slugs_str,
             )
             session.add(coll)
             logger.info(f"Seeded Collection: {coll_data['title']}")
@@ -191,8 +193,8 @@ async def seed_pilot_marketplace(session: AsyncSession) -> None:
             hashed_password=hash_password("TraverzaAdmin2026!"),
             full_name="TRAVERZA Platform Governance",
             staff_role="SUPER_ADMIN",
+            is_staff=True,
             is_active=True,
-            is_verified=True,
         )
         session.add(admin_user)
         logger.info("Seeded Super Admin: admin@traverza.lk")
@@ -205,7 +207,6 @@ async def seed_pilot_marketplace(session: AsyncSession) -> None:
             full_name="Dinesh Jayawardene",
             phone_number="+94771234567",
             is_active=True,
-            is_verified=True,
         )
         session.add(provider_user)
         await session.flush()

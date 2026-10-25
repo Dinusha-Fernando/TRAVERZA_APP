@@ -1,7 +1,11 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../theme/app_theme.dart';
 import '../models/messenger_models.dart';
 import '../services/messenger_service.dart';
+import 'widgets/creative_experience_share_sheet.dart';
 
 class ConversationScreen extends StatefulWidget {
   final String conversationId;
@@ -22,7 +26,11 @@ class _ConversationScreenState extends State<ConversationScreen> {
   @override
   void initState() {
     super.initState();
-    MessengerService.instance.markAsRead(widget.conversationId);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        MessengerService.instance.markAsRead(widget.conversationId);
+      }
+    });
   }
 
   @override
@@ -564,6 +572,10 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 ),
               ),
 
+            // 5. Rich Card: Document / File Attachment
+            if ((msg.messageType == MessageTypeEnum.file || msg.mediaAttachment?.mediaType == 'file') && msg.mediaAttachment != null)
+              _buildFileAttachmentCard(msg, isMe),
+
             // Message text
             Text(
               msg.textContent,
@@ -592,79 +604,235 @@ class _ConversationScreenState extends State<ConversationScreen> {
     );
   }
 
-  void _showMediaAttachmentSheet(BuildContext context) {
+  Widget _buildFileAttachmentCard(ChatMessageModel msg, bool isMe) {
+    final attachment = msg.mediaAttachment!;
+    final fileName = attachment.fileName ?? 'Travel_Document.pdf';
+    final ext = (attachment.fileExtension ?? (fileName.contains('.') ? fileName.split('.').last : 'DOC')).toUpperCase();
+    final fileSize = attachment.fileSize ?? '1.2 MB';
+
+    IconData fileIcon;
+    Color iconColor;
+    Color iconBg;
+
+    if (ext == 'PDF') {
+      fileIcon = Icons.picture_as_pdf_rounded;
+      iconColor = const Color(0xFFEF4444);
+      iconBg = const Color(0xFFEF4444).withValues(alpha: 0.15);
+    } else if (ext == 'GPX' || ext == 'KML') {
+      fileIcon = Icons.route_rounded;
+      iconColor = const Color(0xFF10B981);
+      iconBg = const Color(0xFF10B981).withValues(alpha: 0.15);
+    } else if (ext == 'DOC' || ext == 'DOCX') {
+      fileIcon = Icons.description_rounded;
+      iconColor = const Color(0xFF3B82F6);
+      iconBg = const Color(0xFF3B82F6).withValues(alpha: 0.15);
+    } else {
+      fileIcon = Icons.insert_drive_file_rounded;
+      iconColor = const Color(0xFFF59E0B);
+      iconBg = const Color(0xFFF59E0B).withValues(alpha: 0.15);
+    }
+
+    return InkWell(
+      onTap: () => _openRealFile(attachment.mediaUrl, fileName),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: isMe ? Colors.white.withValues(alpha: 0.12) : TraverzaColors.background,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: isMe ? Colors.white24 : TraverzaColors.border),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(9),
+              decoration: BoxDecoration(
+                color: iconBg,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(fileIcon, color: iconColor, size: 22),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    fileName,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: isMe ? Colors.white : TraverzaColors.text,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                        decoration: BoxDecoration(
+                          color: iconColor.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          ext,
+                          style: TextStyle(
+                            fontSize: 8.5,
+                            fontWeight: FontWeight.w900,
+                            color: iconColor,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        fileSize,
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: isMe ? Colors.white70 : TraverzaColors.textMuted,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: isMe ? Colors.white24 : TraverzaColors.secondary.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.open_in_new_rounded,
+                size: 16,
+                color: isMe ? Colors.white : TraverzaColors.secondary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openRealFile(String fileUrl, String fileName) async {
+    _showFileDetailDialog(fileName, fileUrl);
+  }
+
+  void _showFileDetailDialog(String fileName, String fileUrl) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (_) => Container(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.all(20),
         decoration: const BoxDecoration(
-          color: TraverzaColors.surface,
+          color: Color(0xFF0F172A),
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(color: TraverzaColors.border, borderRadius: BorderRadius.circular(2)),
+            Row(
+              children: [
+                const Icon(Icons.folder_shared_rounded, color: TraverzaColors.secondary, size: 24),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    fileName,
+                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close_rounded, color: Colors.white70),
+                  onPressed: () => Navigator.pop(ctx),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('FILE STORAGE PATH', style: TextStyle(fontSize: 9.5, color: Colors.white54, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 4),
+                  Text(fileUrl, style: const TextStyle(fontSize: 11.5, color: TraverzaColors.secondary, fontFamily: 'monospace')),
+                ],
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Share Travel Experience',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: TraverzaColors.primary),
-            ),
-            const Text(
-              'Attach scenic photos, experiential video clips, or Island Atlas spots to discuss with travellers.',
-              style: TextStyle(fontSize: 11.5, color: TraverzaColors.textMuted),
-            ),
-            const SizedBox(height: 16),
-
-            // 1. Photo Option
-            _buildAttachmentOptionTile(
-              icon: Icons.photo_camera_back_rounded,
-              color: TraverzaColors.oceanBlue,
-              title: 'Share Travel Photo',
-              subtitle: 'Share scenic sunrise, wildlife, or landscape captures',
-              onTap: () {
-                Navigator.pop(context);
-                _showPhotoPickerOptions(context);
-              },
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      side: const BorderSide(color: Colors.white24),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    icon: const Icon(Icons.copy_rounded, size: 16),
+                    label: const Text('Copy Path'),
+                    onPressed: () {
+                      Clipboard.setData(ClipboardData(text: fileUrl));
+                      Navigator.pop(ctx);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Path copied to clipboard')),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: TraverzaColors.secondary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    icon: const Icon(Icons.open_in_new_rounded, size: 16),
+                    label: const Text('Open System App'),
+                    onPressed: () async {
+                      Navigator.pop(ctx);
+                      try {
+                        final uri = fileUrl.startsWith('http') ? Uri.parse(fileUrl) : Uri.file(fileUrl);
+                        await launchUrl(uri, mode: LaunchMode.externalApplication);
+                      } catch (e) {
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Could not open file: $e')),
+                          );
+                        }
+                      }
+                    },
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 10),
-
-            // 2. Video Option
-            _buildAttachmentOptionTile(
-              icon: Icons.videocam_rounded,
-              color: TraverzaColors.secondary,
-              title: 'Share Video Clip',
-              subtitle: 'Post high-definition video of trains, surf, or safari',
-              onTap: () {
-                Navigator.pop(context);
-                _showVideoPickerOptions(context);
-              },
-            ),
-            const SizedBox(height: 10),
-
-            // 3. Landmark Snippet Option
-            _buildAttachmentOptionTile(
-              icon: Icons.map_rounded,
-              color: TraverzaColors.emeraldSuccess,
-              title: 'Share Island Atlas Landmark',
-              subtitle: 'Attach official destination info, coordinates, and trails',
-              onTap: () {
-                Navigator.pop(context);
-                _showPlaceSnippetPicker(context);
-              },
-            ),
           ],
         ),
       ),
+    );
+  }
+
+  void _showMediaAttachmentSheet(BuildContext context) {
+    CreativeExperienceShareSheet.show(
+      context,
+      conversationId: widget.conversationId,
+      onMessageSent: _scrollToBottom,
     );
   }
 

@@ -6,6 +6,8 @@ import '../post_detail_screen.dart';
 import 'itinerary_feasibility_modal.dart';
 import '../../../messenger/presentation/conversation_screen.dart';
 import '../../../messenger/services/messenger_service.dart';
+import '../../../auth/services/auth_service.dart';
+import '../../../../widgets/creative_auth_gate_dialog.dart';
 
 class CommunityPostCard extends StatelessWidget {
   final CommunityPostModel post;
@@ -103,7 +105,19 @@ class CommunityPostCard extends StatelessWidget {
                   visualDensity: VisualDensity.compact,
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
-                  onPressed: () {
+                  onPressed: () async {
+                    if (!TraverzaAuthService.instance.isAccountComplete) {
+                      final granted = await CreativeAuthGateSheet.show(
+                        context,
+                        featureTitle: 'Travel Messenger',
+                        actionMessage: 'Direct Chat with ${post.authorName}',
+                        clearanceReason:
+                            'Direct communication with verified guides and travellers requires a registered SLTDA traveller profile.',
+                        featureIcon: Icons.chat_bubble_outline_rounded,
+                      );
+                      if (!granted) return;
+                    }
+
                     final convId = MessengerService.instance.startDirectChat(
                       userName: post.authorName,
                       userRole: post.trustLabel,
@@ -343,7 +357,20 @@ class CommunityPostCard extends StatelessWidget {
               children: [
                 // Helpful Button
                 TextButton.icon(
-                  onPressed: () => service.toggleHelpful(post.id),
+                  onPressed: () async {
+                    if (!TraverzaAuthService.instance.isAccountComplete) {
+                      final granted = await CreativeAuthGateSheet.show(
+                        context,
+                        featureTitle: 'Community Pulse',
+                        actionMessage: 'Endorse Helpful Intelligence',
+                        clearanceReason:
+                            'To keep community voting credible and prevent bot manipulation, helpful votes require an active traveller account.',
+                        featureIcon: Icons.thumb_up_alt_outlined,
+                      );
+                      if (!granted) return;
+                    }
+                    service.toggleHelpful(post.id);
+                  },
                   icon: Icon(
                     isHelpful ? Icons.thumb_up_rounded : Icons.thumb_up_alt_outlined,
                     size: 15,
@@ -380,7 +407,20 @@ class CommunityPostCard extends StatelessWidget {
 
                 // Add to Trip (TripGraph Feasibility)
                 ElevatedButton.icon(
-                  onPressed: () => ItineraryFeasibilityModal.show(context, post),
+                  onPressed: () async {
+                    if (!TraverzaAuthService.instance.isAccountComplete) {
+                      final granted = await CreativeAuthGateSheet.show(
+                        context,
+                        featureTitle: 'Trip Planner Sync',
+                        actionMessage: 'Add to Trip: ${post.destinationName ?? post.districtName}',
+                        clearanceReason:
+                            'Saving live community waypoints and corridor routing requires a verified TRAVERZA account.',
+                        featureIcon: Icons.add_location_alt_rounded,
+                      );
+                      if (!granted) return;
+                    }
+                    ItineraryFeasibilityModal.show(context, post);
+                  },
                   icon: const Icon(Icons.add_location_alt_rounded, size: 13, color: Colors.white),
                   label: const Text('Add to Trip', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white)),
                   style: ElevatedButton.styleFrom(
@@ -394,7 +434,20 @@ class CommunityPostCard extends StatelessWidget {
                 // Save toggle
                 IconButton(
                   tooltip: isSaved ? 'Saved in Wishlist' : 'Save to Wishlist',
-                  onPressed: () => service.toggleSave(post.id),
+                  onPressed: () async {
+                    if (!TraverzaAuthService.instance.isAccountComplete) {
+                      final granted = await CreativeAuthGateSheet.show(
+                        context,
+                        featureTitle: 'Wishlist & Vault',
+                        actionMessage: 'Save to Wishlist: ${post.destinationName ?? post.districtName}',
+                        clearanceReason:
+                            'Syncing bookmarks across your devices and offline travel vault requires an authenticated account.',
+                        featureIcon: Icons.bookmark_border_rounded,
+                      );
+                      if (!granted) return;
+                    }
+                    service.toggleSave(post.id);
+                  },
                   icon: Icon(
                     isSaved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
                     size: 19,

@@ -8,6 +8,7 @@ enum NotificationCategory {
   trip,
   autopilot,
   offers,
+  messenger,
 }
 
 extension NotificationCategoryExtension on NotificationCategory {
@@ -25,6 +26,8 @@ extension NotificationCategoryExtension on NotificationCategory {
         return 'Autopilot & Disruptions';
       case NotificationCategory.offers:
         return 'Perks & Offers';
+      case NotificationCategory.messenger:
+        return 'Messages & Community';
     }
   }
 
@@ -42,6 +45,8 @@ extension NotificationCategoryExtension on NotificationCategory {
         return Icons.bolt_rounded;
       case NotificationCategory.offers:
         return Icons.local_offer_rounded;
+      case NotificationCategory.messenger:
+        return Icons.forum_rounded;
     }
   }
 
@@ -59,6 +64,8 @@ extension NotificationCategoryExtension on NotificationCategory {
         return const Color(0xFF0284C7);
       case NotificationCategory.offers:
         return TraverzaColors.amberWarning;
+      case NotificationCategory.messenger:
+        return const Color(0xFF8B5CF6);
     }
   }
 }
@@ -70,9 +77,11 @@ class TraverzaNotification {
   final NotificationCategory category;
   final DateTime timestamp;
   bool isRead;
-  final String? actionRoute; // 'plan', 'bookings', 'safety', 'saved'
+  final String? actionRoute; // 'plan', 'bookings', 'safety', 'saved', 'command_center', 'messenger'
   final String? actionLabel;
-  final String priority; // 'high', 'medium', 'low'
+  final String priority; // 'emergency', 'high', 'medium', 'low'
+  final String? subtitle;
+  final Map<String, dynamic>? payload;
 
   TraverzaNotification({
     required this.id,
@@ -84,6 +93,8 @@ class TraverzaNotification {
     this.actionRoute,
     this.actionLabel,
     this.priority = 'medium',
+    this.subtitle,
+    this.payload,
   });
 
   String get timeAgo {
@@ -101,6 +112,21 @@ class TraverzaNotification {
     }
   }
 
+  Color get priorityColor {
+    switch (priority.toLowerCase()) {
+      case 'emergency':
+      case 'critical':
+        return TraverzaColors.roseEmergency;
+      case 'high':
+        return const Color(0xFFEA580C);
+      case 'medium':
+        return TraverzaColors.secondary;
+      case 'low':
+      default:
+        return TraverzaColors.textMuted;
+    }
+  }
+
   TraverzaNotification copyWith({
     String? id,
     String? title,
@@ -111,6 +137,8 @@ class TraverzaNotification {
     String? actionRoute,
     String? actionLabel,
     String? priority,
+    String? subtitle,
+    Map<String, dynamic>? payload,
   }) {
     return TraverzaNotification(
       id: id ?? this.id,
@@ -122,7 +150,73 @@ class TraverzaNotification {
       actionRoute: actionRoute ?? this.actionRoute,
       actionLabel: actionLabel ?? this.actionLabel,
       priority: priority ?? this.priority,
+      subtitle: subtitle ?? this.subtitle,
+      payload: payload ?? this.payload,
     );
+  }
+
+  factory TraverzaNotification.fromJson(Map<String, dynamic> json) {
+    NotificationCategory parsedCategory;
+    final catRaw = (json['category'] as String? ?? '').toUpperCase();
+    switch (catRaw) {
+      case 'SAFETY':
+        parsedCategory = NotificationCategory.safety;
+        break;
+      case 'BOOKING':
+        parsedCategory = NotificationCategory.booking;
+        break;
+      case 'TRIP':
+        parsedCategory = NotificationCategory.trip;
+        break;
+      case 'AUTOPILOT':
+        parsedCategory = NotificationCategory.autopilot;
+        break;
+      case 'OFFERS':
+        parsedCategory = NotificationCategory.offers;
+        break;
+      case 'MESSENGER':
+        parsedCategory = NotificationCategory.messenger;
+        break;
+      default:
+        parsedCategory = NotificationCategory.trip;
+    }
+
+    DateTime parsedDate;
+    try {
+      parsedDate = DateTime.parse(json['timestamp'] as String);
+    } catch (_) {
+      parsedDate = DateTime.now();
+    }
+
+    return TraverzaNotification(
+      id: json['id'] as String? ?? 'NOTIF-${DateTime.now().millisecondsSinceEpoch}',
+      title: json['title'] as String? ?? 'Notification',
+      body: json['body'] as String? ?? '',
+      category: parsedCategory,
+      timestamp: parsedDate,
+      isRead: json['is_read'] as bool? ?? false,
+      actionRoute: json['action_route'] as String?,
+      actionLabel: json['action_label'] as String?,
+      priority: json['priority'] as String? ?? 'medium',
+      subtitle: json['subtitle'] as String?,
+      payload: json['payload'] as Map<String, dynamic>?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'body': body,
+      'category': category.name.toUpperCase(),
+      'timestamp': timestamp.toIso8601String(),
+      'is_read': isRead,
+      'action_route': actionRoute,
+      'action_label': actionLabel,
+      'priority': priority,
+      'subtitle': subtitle,
+      'payload': payload,
+    };
   }
 
   /// Default baseline corridor notifications for TRAVERZA Sri Lanka
@@ -137,6 +231,12 @@ class TraverzaNotification {
           actionRoute: 'plan',
           actionLabel: 'Review Buffers',
           priority: 'high',
+          subtitle: 'A5 Hill Highway · Ramboda Pass',
+          payload: {
+            'corridor': 'Kandy - Nuwara Eliya (A5)',
+            'delayMinutes': 30,
+            'source': 'SL-RDA Highway Operations Centre',
+          },
         ),
         TraverzaNotification(
           id: 'NOTIF-LK-002',
@@ -148,6 +248,12 @@ class TraverzaNotification {
           actionRoute: 'bookings',
           actionLabel: 'Track SLA',
           priority: 'medium',
+          subtitle: 'Cultural Triangle · Sigiriya Basin',
+          payload: {
+            'bookingId': 'BK-LK-8041',
+            'slaHours': 12,
+            'provider': 'Sigiriya Eco Villas Pvt Ltd',
+          },
         ),
         TraverzaNotification(
           id: 'NOTIF-LK-003',
@@ -159,6 +265,11 @@ class TraverzaNotification {
           actionRoute: 'safety',
           actionLabel: 'View Pass',
           priority: 'medium',
+          subtitle: 'Sri Lanka Tourism Development Authority',
+          payload: {
+            'passCode': 'TRV-LK-9041-INTL',
+            'validUntil': '2026-11-15',
+          },
         ),
         TraverzaNotification(
           id: 'NOTIF-LK-004',
@@ -170,6 +281,82 @@ class TraverzaNotification {
           actionRoute: 'plan',
           actionLabel: 'Explore',
           priority: 'low',
+          subtitle: 'Exclusive Member Perk · Sigiriya',
+          payload: {
+            'entryTime': '06:30 AM',
+            'gate': 'Western Water Garden Gate',
+          },
         ),
       ];
+}
+
+/// Notification Delivery & Channel Preferences
+class NotificationPreferences {
+  bool pushEnabled;
+  bool inAppBannersEnabled;
+  bool safetyEnabled;
+  bool bookingEnabled;
+  bool autopilotEnabled;
+  bool messengerEnabled;
+  bool offersEnabled;
+  bool quietHoursEnabled;
+  TimeOfDay quietHoursStart;
+  TimeOfDay quietHoursEnd;
+
+  NotificationPreferences({
+    this.pushEnabled = true,
+    this.inAppBannersEnabled = true,
+    this.safetyEnabled = true,
+    this.bookingEnabled = true,
+    this.autopilotEnabled = true,
+    this.messengerEnabled = true,
+    this.offersEnabled = true,
+    this.quietHoursEnabled = false,
+    this.quietHoursStart = const TimeOfDay(hour: 22, minute: 0),
+    this.quietHoursEnd = const TimeOfDay(hour: 6, minute: 0),
+  });
+
+  bool isCategoryEnabled(NotificationCategory category) {
+    if (!pushEnabled && !inAppBannersEnabled) return false;
+    switch (category) {
+      case NotificationCategory.safety:
+        return true; // Safety alerts are critical and never suppressed
+      case NotificationCategory.booking:
+        return bookingEnabled;
+      case NotificationCategory.autopilot:
+        return autopilotEnabled;
+      case NotificationCategory.messenger:
+        return messengerEnabled;
+      case NotificationCategory.offers:
+        return offersEnabled;
+      default:
+        return true;
+    }
+  }
+
+  NotificationPreferences copyWith({
+    bool? pushEnabled,
+    bool? inAppBannersEnabled,
+    bool? safetyEnabled,
+    bool? bookingEnabled,
+    bool? autopilotEnabled,
+    bool? messengerEnabled,
+    bool? offersEnabled,
+    bool? quietHoursEnabled,
+    TimeOfDay? quietHoursStart,
+    TimeOfDay? quietHoursEnd,
+  }) {
+    return NotificationPreferences(
+      pushEnabled: pushEnabled ?? this.pushEnabled,
+      inAppBannersEnabled: inAppBannersEnabled ?? this.inAppBannersEnabled,
+      safetyEnabled: safetyEnabled ?? this.safetyEnabled,
+      bookingEnabled: bookingEnabled ?? this.bookingEnabled,
+      autopilotEnabled: autopilotEnabled ?? this.autopilotEnabled,
+      messengerEnabled: messengerEnabled ?? this.messengerEnabled,
+      offersEnabled: offersEnabled ?? this.offersEnabled,
+      quietHoursEnabled: quietHoursEnabled ?? this.quietHoursEnabled,
+      quietHoursStart: quietHoursStart ?? this.quietHoursStart,
+      quietHoursEnd: quietHoursEnd ?? this.quietHoursEnd,
+    );
+  }
 }

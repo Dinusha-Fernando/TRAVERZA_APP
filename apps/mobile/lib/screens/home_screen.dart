@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../models/service_category.dart';
 import '../theme/app_theme.dart';
 import '../utils/maps_launcher.dart';
@@ -10,6 +11,8 @@ import '../features/community/models/community_models.dart';
 import '../features/community/services/community_service.dart';
 import '../features/community/presentation/create_post_sheet.dart';
 import '../features/community/presentation/post_detail_screen.dart';
+import '../features/auth/services/auth_service.dart';
+import '../features/auth/presentation/auth_sheet.dart';
 
 class SearchableTravelItem {
   final String title;
@@ -215,7 +218,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close_rounded, color: TraverzaColors.textMuted),
+                    icon: const Icon(
+                      Icons.close_rounded,
+                      color: TraverzaColors.textMuted,
+                    ),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
@@ -310,7 +316,9 @@ class _HomeScreenState extends State<HomeScreen> {
         style: TextStyle(
           fontSize: 12,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-          color: isSelected ? TraverzaColors.secondary : TraverzaColors.textMuted,
+          color: isSelected
+              ? TraverzaColors.secondary
+              : TraverzaColors.textMuted,
         ),
       ),
     );
@@ -340,7 +348,11 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.place_rounded, size: 12, color: TraverzaColors.accent),
+            const Icon(
+              Icons.place_rounded,
+              size: 12,
+              color: TraverzaColors.accent,
+            ),
             const SizedBox(width: 4),
             Flexible(
               child: Text(
@@ -418,7 +430,103 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
 
-          const SizedBox(height: 12),
+          // Guest Mode Sign-In / Digital Passport Activation Banner
+          ListenableBuilder(
+            listenable: TraverzaAuthService.instance,
+            builder: (context, _) {
+              if (TraverzaAuthService.instance.isAuthenticated) {
+                return const SizedBox.shrink();
+              }
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, 10),
+                child: InkWell(
+                  onTap: () => AuthSheet.show(context),
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          TraverzaColors.primary.withValues(alpha: 0.08),
+                          TraverzaColors.secondary.withValues(alpha: 0.12),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: TraverzaColors.secondary.withValues(alpha: 0.25),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: TraverzaColors.secondary.withValues(
+                              alpha: 0.15,
+                            ),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.badge_outlined,
+                            color: TraverzaColors.secondary,
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: const [
+                              Text(
+                                'Sign In to Activate Digital Passport',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12.5,
+                                  color: TraverzaColors.primary,
+                                ),
+                              ),
+                              SizedBox(height: 2),
+                              Text(
+                                'Sign in or register to sync bookings, unlock SOS vault & manage vouchers.',
+                                style: TextStyle(
+                                  fontSize: 10.5,
+                                  color: TraverzaColors.textMuted,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: TraverzaColors.primary,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Text(
+                            'Sign In',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+
+          const SizedBox(height: 8),
 
           // 2. Interactive Search & Filter Bar
           Padding(
@@ -483,7 +591,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           decoration: const InputDecoration(
                             isDense: true,
                             contentPadding: EdgeInsets.symmetric(vertical: 4),
-                            hintText: 'Search destinations, stays and experiences',
+                            hintText:
+                                'Search destinations, stays and experiences',
                             hintStyle: TextStyle(
                               fontSize: 13,
                               color: TraverzaColors.textMuted,
@@ -497,10 +606,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   if (_activeQuery.isNotEmpty)
                     IconButton(
-                      icon: const Icon(Icons.close_rounded, size: 18, color: TraverzaColors.textMuted),
+                      icon: const Icon(
+                        Icons.close_rounded,
+                        size: 18,
+                        color: TraverzaColors.textMuted,
+                      ),
                       onPressed: _clearSearch,
                       padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+                      constraints: const BoxConstraints(
+                        minWidth: 28,
+                        minHeight: 28,
+                      ),
                     ),
                   const SizedBox(width: 4),
                   InkWell(
@@ -532,7 +648,8 @@ class _HomeScreenState extends State<HomeScreen> {
               spacing: 8,
               runSpacing: 6,
               children: _quickDestinations.map((dest) {
-                final isSelected = _activeQuery.toLowerCase() == dest.toLowerCase();
+                final isSelected =
+                    _activeQuery.toLowerCase() == dest.toLowerCase();
                 return InkWell(
                   onTap: () {
                     _searchController.text = dest;
@@ -540,14 +657,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                   borderRadius: BorderRadius.circular(14),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: isSelected
                           ? TraverzaColors.secondary.withValues(alpha: 0.15)
                           : TraverzaColors.surface,
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(
-                        color: isSelected ? TraverzaColors.secondary : TraverzaColors.border,
+                        color: isSelected
+                            ? TraverzaColors.secondary
+                            : TraverzaColors.border,
                         width: 0.8,
                       ),
                     ),
@@ -555,8 +677,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       dest,
                       style: TextStyle(
                         fontSize: 11,
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                        color: isSelected ? TraverzaColors.secondary : TraverzaColors.textMuted,
+                        fontWeight: isSelected
+                            ? FontWeight.bold
+                            : FontWeight.w600,
+                        color: isSelected
+                            ? TraverzaColors.secondary
+                            : TraverzaColors.textMuted,
                       ),
                     ),
                   ),
@@ -598,16 +724,26 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Center(
                   child: Column(
                     children: const [
-                      Icon(Icons.search_off_rounded, size: 40, color: TraverzaColors.textMuted),
+                      Icon(
+                        Icons.search_off_rounded,
+                        size: 40,
+                        color: TraverzaColors.textMuted,
+                      ),
                       SizedBox(height: 8),
                       Text(
                         'No direct matches found.',
-                        style: TextStyle(fontWeight: FontWeight.bold, color: TraverzaColors.text),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: TraverzaColors.text,
+                        ),
                       ),
                       SizedBox(height: 4),
                       Text(
                         'Try searching "Sigiriya", "Kandy", "Villa" or "Transfer".',
-                        style: TextStyle(fontSize: 12, color: TraverzaColors.textMuted),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: TraverzaColors.textMuted,
+                        ),
                       ),
                     ],
                   ),
@@ -617,7 +753,10 @@ class _HomeScreenState extends State<HomeScreen> {
               ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 itemCount: _searchResults.length,
                 itemBuilder: (context, index) {
                   final item = _searchResults[index];
@@ -629,15 +768,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         width: 44,
                         height: 44,
                         decoration: BoxDecoration(
-                          color: TraverzaColors.secondary.withValues(alpha: 0.12),
+                          color: TraverzaColors.secondary.withValues(
+                            alpha: 0.12,
+                          ),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Icon(
                           item.category == 'STAY'
                               ? Icons.hotel_rounded
                               : item.category == 'TRANSFER'
-                                  ? Icons.directions_car_rounded
-                                  : Icons.explore_rounded,
+                              ? Icons.directions_car_rounded
+                              : Icons.explore_rounded,
                           color: TraverzaColors.secondary,
                         ),
                       ),
@@ -655,7 +796,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           const SizedBox(height: 2),
                           Text(
                             '${item.location} • ${item.provider}',
-                            style: const TextStyle(fontSize: 11, color: TraverzaColors.textMuted),
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: TraverzaColors.textMuted,
+                            ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -674,7 +818,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         onPressed: () => _submitSearch(item.title),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: TraverzaColors.primary,
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
                           minimumSize: const Size(60, 32),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
@@ -682,7 +829,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         child: const Text(
                           'View',
-                          style: TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
@@ -694,9 +845,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 10),
 
           // 3. Cinematic Hero Photograph (Style A)
-          StyleAHeroCard(
-            onPlanPressed: widget.onNavigateToPlan,
-          ),
+          StyleAHeroCard(onPlanPressed: widget.onNavigateToPlan),
 
           // 4. Conditional "Continue your journey" Card
           if (widget.hasActiveTrip)
@@ -724,7 +873,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         Container(
                           padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: TraverzaColors.secondary.withValues(alpha: 0.12),
+                            color: TraverzaColors.secondary.withValues(
+                              alpha: 0.12,
+                            ),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Icon(
@@ -765,9 +916,14 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
-                            color: TraverzaColors.secondary.withValues(alpha: 0.12),
+                            color: TraverzaColors.secondary.withValues(
+                              alpha: 0.12,
+                            ),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: const Text(
@@ -781,7 +937,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
                           decoration: BoxDecoration(
                             color: widget.isHotelConfirmed
                                 ? const Color(0x2610B981)
@@ -822,7 +981,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     // Next Action Module
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         color: TraverzaColors.background,
                         borderRadius: BorderRadius.circular(10),
@@ -831,9 +993,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Row(
                         children: [
                           Icon(
-                            widget.isHotelConfirmed ? Icons.check_circle_rounded : Icons.pending_actions_rounded,
+                            widget.isHotelConfirmed
+                                ? Icons.check_circle_rounded
+                                : Icons.pending_actions_rounded,
                             size: 16,
-                            color: widget.isHotelConfirmed ? TraverzaColors.emeraldSuccess : TraverzaColors.amberWarning,
+                            color: widget.isHotelConfirmed
+                                ? TraverzaColors.emeraldSuccess
+                                : TraverzaColors.amberWarning,
                           ),
                           const SizedBox(width: 8),
                           Expanded(
@@ -841,7 +1007,11 @@ class _HomeScreenState extends State<HomeScreen> {
                               widget.isHotelConfirmed
                                   ? 'Next: Day 1 · 18:30 Check-in at Sigiriya Eco Villa'
                                   : 'Next Action: Sigiriya Eco Villa pending provider response (12h SLA)',
-                              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: TraverzaColors.text),
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: TraverzaColors.text,
+                              ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -857,7 +1027,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       runSpacing: 6,
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: const Color(0x1A0284C7),
                             borderRadius: BorderRadius.circular(8),
@@ -866,17 +1039,28 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: const [
-                              Icon(Icons.bolt_rounded, size: 12, color: Color(0xFF0284C7)),
+                              Icon(
+                                Icons.bolt_rounded,
+                                size: 12,
+                                color: Color(0xFF0284C7),
+                              ),
                               SizedBox(width: 4),
                               Text(
                                 'Autopilot: +30m Active',
-                                style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF0284C7)),
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF0284C7),
+                                ),
                               ),
                             ],
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: const Color(0x1A10B981),
                             borderRadius: BorderRadius.circular(8),
@@ -884,7 +1068,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           child: const Text(
                             'Health: 94%',
-                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF059669)),
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF059669),
+                            ),
                           ),
                         ),
                       ],
@@ -901,11 +1089,20 @@ class _HomeScreenState extends State<HomeScreen> {
                             children: [
                               const Text(
                                 'Committed Spend',
-                                style: TextStyle(fontSize: 10, color: TraverzaColors.textMuted),
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: TraverzaColors.textMuted,
+                                ),
                               ),
                               Text(
-                                widget.isHotelConfirmed ? 'LKR 68,500' : 'LKR 30,500 (+ LKR 38k req)',
-                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: TraverzaColors.primary),
+                                widget.isHotelConfirmed
+                                    ? 'LKR 68,500'
+                                    : 'LKR 30,500 (+ LKR 38k req)',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: TraverzaColors.primary,
+                                ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -918,12 +1115,16 @@ class _HomeScreenState extends State<HomeScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const JourneyCommandCenterScreen(),
+                                builder: (context) =>
+                                    const JourneyCommandCenterScreen(),
                               ),
                             );
                           },
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
                             decoration: BoxDecoration(
                               color: TraverzaColors.primary,
                               borderRadius: BorderRadius.circular(10),
@@ -940,7 +1141,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ),
                                 SizedBox(width: 4),
-                                Icon(Icons.arrow_forward_rounded, size: 12, color: Colors.white),
+                                Icon(
+                                  Icons.arrow_forward_rounded,
+                                  size: 12,
+                                  color: Colors.white,
+                                ),
                               ],
                             ),
                           ),
@@ -951,7 +1156,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-
 
           const SizedBox(height: 14),
 
@@ -999,16 +1203,29 @@ class _HomeScreenState extends State<HomeScreen> {
                         crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
-                              color: TraverzaColors.secondary.withValues(alpha: 0.2),
+                              color: TraverzaColors.secondary.withValues(
+                                alpha: 0.2,
+                              ),
                               borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: TraverzaColors.secondary.withValues(alpha: 0.4)),
+                              border: Border.all(
+                                color: TraverzaColors.secondary.withValues(
+                                  alpha: 0.4,
+                                ),
+                              ),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: const [
-                                Icon(Icons.explore_rounded, size: 13, color: TraverzaColors.secondary),
+                                Icon(
+                                  Icons.explore_rounded,
+                                  size: 13,
+                                  color: TraverzaColors.secondary,
+                                ),
                                 SizedBox(width: 5),
                                 Text(
                                   'ISLAND ATLAS',
@@ -1023,9 +1240,13 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                              color: const Color(0xFF10B981)
+                                  .withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: const Text(
@@ -1068,7 +1289,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: const [
-                              Icon(Icons.military_tech_rounded, size: 16, color: Color(0xFFFBBF24)),
+                              Icon(
+                                Icons.military_tech_rounded,
+                                size: 16,
+                                color: Color(0xFFFBBF24),
+                              ),
                               SizedBox(width: 6),
                               Text(
                                 'Passport Active',
@@ -1092,7 +1317,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: TraverzaColors.secondary,
                               foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 8,
+                              ),
                               minimumSize: Size.zero,
                               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               shape: RoundedRectangleBorder(
@@ -1105,7 +1333,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               children: const [
                                 Text(
                                   'Explore Atlas',
-                                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                                 SizedBox(width: 4),
                                 Icon(Icons.arrow_forward_rounded, size: 13),
@@ -1137,7 +1368,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 end: Alignment.bottomCenter,
               ),
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: TraverzaColors.secondary.withValues(alpha: 0.12)),
+              border: Border.all(
+                color: TraverzaColors.secondary.withValues(alpha: 0.12),
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1165,7 +1398,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: TraverzaColors.emeraldSuccess.withValues(alpha: 0.6),
+                                      color: TraverzaColors.emeraldSuccess
+                                          .withValues(alpha: 0.6),
                                       blurRadius: 6,
                                       spreadRadius: 2,
                                     ),
@@ -1185,9 +1419,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             ],
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 1.5,
+                            ),
                             decoration: BoxDecoration(
-                              color: TraverzaColors.secondary.withValues(alpha: 0.12),
+                              color: TraverzaColors.secondary.withValues(
+                                alpha: 0.12,
+                              ),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: const Text(
@@ -1211,7 +1450,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: TraverzaColors.secondary,
                               foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 6,
+                              ),
                               minimumSize: Size.zero,
                               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               shape: RoundedRectangleBorder(
@@ -1224,7 +1466,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               children: const [
                                 Text(
                                   'Full Pulse',
-                                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                                 SizedBox(width: 3),
                                 Icon(Icons.arrow_forward_rounded, size: 12),
@@ -1331,7 +1576,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         physics: const BouncingScrollPhysics(),
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         itemCount: posts.length,
-                        separatorBuilder: (ctx, idx) => const SizedBox(width: 10),
+                        separatorBuilder: (ctx, idx) =>
+                            const SizedBox(width: 10),
                         itemBuilder: (context, index) {
                           final post = posts[index];
                           return _buildHomePulseMomentCard(context, post);
@@ -1374,7 +1620,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       Text(
                         'All curated providers across the island',
-                        style: TextStyle(fontSize: 11, color: TraverzaColors.textMuted),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: TraverzaColors.textMuted,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -1393,7 +1642,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: const [
                       Text(
                         'See all (8)',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       SizedBox(width: 4),
                       Icon(Icons.arrow_forward_ios_rounded, size: 11),
@@ -1448,7 +1700,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 Text(
                   'Expertly paced multi-day corridors with verified drivers',
-                  style: TextStyle(fontSize: 11, color: TraverzaColors.textMuted),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: TraverzaColors.textMuted,
+                  ),
                 ),
               ],
             ),
@@ -1505,7 +1760,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       Expanded(
                         child: Row(
                           children: const [
-                            Icon(Icons.map_rounded, color: TraverzaColors.accent, size: 20),
+                            Icon(
+                              Icons.map_rounded,
+                              color: TraverzaColors.accent,
+                              size: 20,
+                            ),
                             SizedBox(width: 8),
                             Expanded(
                               child: Text(
@@ -1524,7 +1783,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
                         decoration: BoxDecoration(
                           color: TraverzaColors.secondary,
                           borderRadius: BorderRadius.circular(10),
@@ -1543,7 +1805,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 6),
                   const Text(
                     'Explore Sri Lanka’s curated corridors with verified routes, terrain warnings, and 1-tap Google Maps navigation.',
-                    style: TextStyle(color: Colors.white70, fontSize: 11.5, height: 1.3),
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 11.5,
+                      height: 1.3,
+                    ),
                   ),
                   const SizedBox(height: 12),
                   Wrap(
@@ -1596,7 +1862,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const Text(
                   'Intelligent trip coordination & safety utilities',
-                  style: TextStyle(fontSize: 11, color: TraverzaColors.textMuted),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: TraverzaColors.textMuted,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 ManageJourneyShortcut(
@@ -1610,7 +1879,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 ManageJourneyShortcut(
                   icon: Icons.account_balance_wallet_outlined,
                   title: 'Trip budget',
-                  description: 'Estimate and track committed costs (LKR 68,500 total).',
+                  description:
+                      'Estimate and track committed costs (LKR 68,500 total).',
                   onTap: widget.onNavigateToPlan,
                   iconColor: TraverzaColors.emeraldSuccess,
                 ),
@@ -1618,7 +1888,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 ManageJourneyShortcut(
                   icon: Icons.explore_outlined,
                   title: 'Routes & nearby',
-                  description: 'Explore stops, highland transit buffers and services.',
+                  description:
+                      'Explore stops, highland transit buffers and services.',
                   onTap: widget.onNavigateToPlan,
                   iconColor: TraverzaColors.warmSand,
                 ),
@@ -1728,7 +1999,10 @@ class _HomeScreenState extends State<HomeScreen> {
               if (badgeText != null) ...[
                 const SizedBox(width: 5),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 1,
+                  ),
                   decoration: BoxDecoration(
                     color: color,
                     borderRadius: BorderRadius.circular(6),
@@ -1750,10 +2024,18 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildHomePulseMomentCard(BuildContext context, CommunityPostModel post) {
+  Widget _buildHomePulseMomentCard(
+    BuildContext context,
+    CommunityPostModel post,
+  ) {
     final media = post.media.isNotEmpty ? post.media.first : null;
-    final imageUrl = media?.thumbnailUrl ?? media?.mediaUrl ?? 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=800&q=80';
-    final isVideo = post.postType == PostType.video || (media != null && media.mediaType == 'video');
+    final imageUrl =
+        media?.thumbnailUrl ??
+        media?.mediaUrl ??
+        'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=800&q=80';
+    final isVideo =
+        post.postType == PostType.video ||
+        (media != null && media.mediaType == 'video');
 
     Color typeColor;
     String typeLabel;
@@ -1787,7 +2069,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final avatarUrl = post.authorAvatarUrl;
     final hasAvatar = avatarUrl != null && avatarUrl.isNotEmpty;
-    final dest = (post.destinationName != null && post.destinationName!.isNotEmpty)
+    final dest =
+        (post.destinationName != null && post.destinationName!.isNotEmpty)
         ? post.destinationName!
         : post.districtName;
     final placeName = dest.contains('·') ? dest.split('·').first.trim() : dest;
@@ -1828,7 +2111,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 errorBuilder: (context, error, stackTrace) => Container(
                   color: const Color(0xFF1E293B),
                   child: const Center(
-                    child: Icon(Icons.terrain_rounded, color: Colors.white30, size: 36),
+                    child: Icon(
+                      Icons.terrain_rounded,
+                      color: Colors.white30,
+                      size: 36,
+                    ),
                   ),
                 ),
               ),
@@ -1858,7 +2145,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2.5,
+                      ),
                       decoration: BoxDecoration(
                         color: typeColor.withValues(alpha: 0.92),
                         borderRadius: BorderRadius.circular(7),
@@ -1882,16 +2172,25 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     if (isVideo)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2.5),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 5,
+                          vertical: 2.5,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.black.withValues(alpha: 0.65),
                           borderRadius: BorderRadius.circular(7),
-                          border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.25),
+                          ),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.play_arrow_rounded, size: 10, color: Colors.white),
+                            const Icon(
+                              Icons.play_arrow_rounded,
+                              size: 10,
+                              color: Colors.white,
+                            ),
                             const SizedBox(width: 2),
                             Text(
                               '${media?.durationSeconds ?? 18}s',
@@ -1916,7 +2215,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     decoration: BoxDecoration(
                       color: Colors.black.withValues(alpha: 0.45),
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.7), width: 1.5),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.7),
+                        width: 1.5,
+                      ),
                     ),
                     child: const Icon(
                       Icons.play_arrow_rounded,
@@ -1940,12 +2242,21 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         CircleAvatar(
                           radius: 9,
-                          backgroundImage: hasAvatar ? NetworkImage(avatarUrl) : null,
-                          onBackgroundImageError: hasAvatar ? (obj, trace) {} : null,
+                          backgroundImage: hasAvatar
+                              ? NetworkImage(avatarUrl)
+                              : null,
+                          onBackgroundImageError: hasAvatar
+                              ? (obj, trace) {}
+                              : null,
                           child: !hasAvatar
                               ? Text(
-                                  post.authorName.isNotEmpty ? post.authorName[0] : 'T',
-                                  style: const TextStyle(fontSize: 7.5, color: Colors.white),
+                                  post.authorName.isNotEmpty
+                                      ? post.authorName[0]
+                                      : 'T',
+                                  style: const TextStyle(
+                                    fontSize: 7.5,
+                                    color: Colors.white,
+                                  ),
                                 )
                               : null,
                         ),
@@ -1963,9 +2274,18 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         if (post.authorBadge == AuthorBadge.licensedGuide)
-                          const Icon(Icons.verified_rounded, size: 11, color: Color(0xFF38BDF8))
-                        else if (post.authorBadge == AuthorBadge.verifiedVisitor)
-                          const Icon(Icons.check_circle_rounded, size: 11, color: Color(0xFF34D399)),
+                          const Icon(
+                            Icons.verified_rounded,
+                            size: 11,
+                            color: Color(0xFF38BDF8),
+                          )
+                        else if (post.authorBadge ==
+                            AuthorBadge.verifiedVisitor)
+                          const Icon(
+                            Icons.check_circle_rounded,
+                            size: 11,
+                            color: Color(0xFF34D399),
+                          ),
                       ],
                     ),
                     const SizedBox(height: 3),
@@ -1973,7 +2293,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     // Destination Tag
                     Row(
                       children: [
-                        const Icon(Icons.location_on_rounded, size: 10, color: Color(0xFFF59E0B)),
+                        const Icon(
+                          Icons.location_on_rounded,
+                          size: 10,
+                          color: Color(0xFFF59E0B),
+                        ),
                         const SizedBox(width: 2),
                         Expanded(
                           child: Text(
@@ -2007,18 +2331,34 @@ class _HomeScreenState extends State<HomeScreen> {
                     // Micro-stats
                     Row(
                       children: [
-                        const Icon(Icons.favorite_rounded, size: 10, color: Color(0xFFF43F5E)),
+                        const Icon(
+                          Icons.favorite_rounded,
+                          size: 10,
+                          color: Color(0xFFF43F5E),
+                        ),
                         const SizedBox(width: 3),
                         Text(
                           '${post.likeCount}',
-                          style: const TextStyle(fontSize: 9, color: Colors.white70, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                            fontSize: 9,
+                            color: Colors.white70,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         const SizedBox(width: 8),
-                        const Icon(Icons.chat_bubble_outline_rounded, size: 9.5, color: Colors.white70),
+                        const Icon(
+                          Icons.chat_bubble_outline_rounded,
+                          size: 9.5,
+                          color: Colors.white70,
+                        ),
                         const SizedBox(width: 3),
                         Text(
                           '${post.commentCount} replies',
-                          style: const TextStyle(fontSize: 9, color: Colors.white70, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                            fontSize: 9,
+                            color: Colors.white70,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
@@ -2038,9 +2378,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: InkWell(
         onTap: () {
           Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => const CommunityPulseScreen(),
-            ),
+            MaterialPageRoute(builder: (_) => const CommunityPulseScreen()),
           );
         },
         borderRadius: BorderRadius.circular(12),

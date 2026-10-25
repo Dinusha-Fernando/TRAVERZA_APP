@@ -31,7 +31,7 @@ class DeleteProfileDialog {
               ),
               SizedBox(height: 12),
               Text(
-                'You will be returned to guest mode. Emergency SOS and offline hospital routes will remain accessible.',
+                'You will be signed out. Emergency SOS and offline hospital routes will remain accessible.',
                 style: TextStyle(fontSize: 11.5, color: TraverzaColors.textMuted),
               ),
             ],
@@ -47,7 +47,7 @@ class DeleteProfileDialog {
                 Navigator.pop(ctx, true);
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Profile and local credentials deleted. Switched to guest mode.'),
+                    content: Text('Profile and local credentials deleted successfully.'),
                     backgroundColor: TraverzaColors.roseEmergency,
                     duration: Duration(seconds: 3),
                   ),

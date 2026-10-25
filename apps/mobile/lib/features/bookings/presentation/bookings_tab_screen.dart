@@ -4,6 +4,10 @@ import '../data/booking_models.dart';
 import 'widgets/booking_detail_sheet.dart';
 import 'widgets/booking_voucher_sheet.dart';
 import 'widgets/service_detail_modal.dart';
+import '../../auth/services/auth_service.dart';
+import '../../auth/presentation/welcome_auth_screen.dart';
+import '../../../widgets/creative_auth_gate_dialog.dart';
+import '../../../widgets/creative_google_button.dart';
 
 enum BookingTabMode {
   explore,
@@ -148,7 +152,9 @@ class _BookingsTabScreenState extends State<BookingsTabScreen> {
         Expanded(
           child: _currentMode == BookingTabMode.explore
               ? _buildExploreView()
-              : _buildMyBookingsView(),
+              : (!TraverzaAuthService.instance.isAccountComplete
+                  ? _buildLockedBookingsVaultView()
+                  : _buildMyBookingsView()),
         ),
       ],
     );
@@ -540,7 +546,19 @@ class _BookingsTabScreenState extends State<BookingsTabScreen> {
     ServiceDetailModal.show(
       context,
       service: item,
-      onAddToTrip: () {
+      onAddToTrip: () async {
+        if (!TraverzaAuthService.instance.isAccountComplete) {
+          final granted = await CreativeAuthGateSheet.show(
+            context,
+            featureTitle: 'Trip Planner Sync',
+            actionMessage: 'Add "${item.title}" to Trip Draft',
+            clearanceReason:
+                'Syncing multi-stop corridor itineraries and hotel bookings requires an authenticated TRAVERZA account.',
+            featureIcon: Icons.route_rounded,
+          );
+          if (!granted) return;
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Added "${item.title}" to your active trip draft.'),
@@ -549,7 +567,20 @@ class _BookingsTabScreenState extends State<BookingsTabScreen> {
           ),
         );
       },
-      onRequestBooking: () {
+      onRequestBooking: () async {
+        if (!TraverzaAuthService.instance.isAccountComplete) {
+          final granted = await CreativeAuthGateSheet.show(
+            context,
+            featureTitle: 'Verified Bookings',
+            actionMessage: 'Reserve ${item.title}',
+            clearanceReason:
+                'Sri Lanka Tourism Development Authority (SLTDA) escrow safety and licensed provider insurance require an active, verified traveller account.',
+            featureIcon: Icons.confirmation_number_rounded,
+          );
+          if (!granted) return;
+        }
+
+        final profile = TraverzaAuthService.instance.currentProfile;
         // Create booking request and switch to My Bookings
         final newBooking = TraverzaBooking(
           id: 'TRIP-LK-2026-9041-B0${_userBookings.length + 1}',
@@ -566,11 +597,11 @@ class _BookingsTabScreenState extends State<BookingsTabScreen> {
           status: BookingStatus.requestSubmitted,
           responseDeadline: DateTime.now().add(const Duration(hours: 12)),
           cancellationTerms: item.policy,
-          qrToken: 'TRV-VOUCHER-${item.id}-NEW-REQ',
+          qrToken: 'TRV-VOUCHER-${item.id}-${profile.id}',
           timeline: [
             TraverzaBookingEvent(
               title: 'Booking Request Submitted',
-              description: 'Request dispatched to provider reservation desk under 12-hour SLA.',
+              description: 'Request dispatched under SLTDA escrow protection for ${profile.fullName}.',
               timestamp: 'Just now',
               actorRole: 'TRAVELLER',
             ),
@@ -591,6 +622,126 @@ class _BookingsTabScreenState extends State<BookingsTabScreen> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildLockedBookingsVaultView() {
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+        physics: const BouncingScrollPhysics(),
+        child: Container(
+          padding: const EdgeInsets.all(22),
+          decoration: BoxDecoration(
+            color: const Color(0xFF031622),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.40),
+                blurRadius: 22,
+                offset: const Offset(0, 8),
+              ),
+              BoxShadow(
+                color: TraverzaColors.secondary.withValues(alpha: 0.15),
+                blurRadius: 16,
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: TraverzaColors.secondary.withValues(alpha: 0.20),
+                  border: Border.all(color: TraverzaColors.accent.withValues(alpha: 0.4)),
+                ),
+                child: const Icon(Icons.lock_person_rounded, size: 36, color: TraverzaColors.accent),
+              ),
+              const SizedBox(height: 14),
+              const Text(
+                'SLTDA Booking Vault Locked',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'serif',
+                  fontSize: 19,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Active multi-stop reservations, offline emergency vouchers, and licensed driver live sync require a verified TRAVERZA account.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 12, color: Colors.white70, height: 1.4),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildVaultPill(Icons.verified_outlined, 'SLTDA Escrow'),
+                    Container(width: 1, height: 18, color: Colors.white.withValues(alpha: 0.2)),
+                    _buildVaultPill(Icons.qr_code_2_rounded, 'Offline QR'),
+                    Container(width: 1, height: 18, color: Colors.white.withValues(alpha: 0.2)),
+                    _buildVaultPill(Icons.alt_route, 'Driver Sync'),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 18),
+              CreativeGoogleButton(
+                onPressed: () async {
+                  final success = await TraverzaAuthService.instance.signInWithGoogle();
+                  if (success && mounted) {
+                    setState(() {});
+                  }
+                },
+                text: 'Continue with Google',
+                subtitle: 'Instant 1-Tap Booking Access',
+                variant: CreativeGoogleVariant.pearl,
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    WelcomeAuthScreen.show(context).then((_) {
+                      if (mounted) setState(() {});
+                    });
+                  },
+                  icon: const Icon(Icons.person_add_alt_1_rounded, size: 16),
+                  label: const Text('Create Account or Sign In', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: TraverzaColors.secondary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 13),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildVaultPill(IconData icon, String text) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 13, color: TraverzaColors.accent),
+        const SizedBox(width: 4),
+        Text(text, style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: Colors.white70)),
+      ],
     );
   }
 

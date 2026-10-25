@@ -22,6 +22,12 @@ class UserLoginRequest(BaseModel):
     password: str
 
 
+class SocialAuthRequest(BaseModel):
+    id_token: str
+    full_name: str | None = None
+    email: str | None = None
+
+
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"

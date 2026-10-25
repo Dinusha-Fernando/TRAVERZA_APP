@@ -200,4 +200,36 @@ void main() {
 
     expect(find.text('SOS Beacon Dispatched to Rescue Desk (+94 11 289 0123) & 1990 Ambulance'), findsOneWidget);
   });
+
+  testWidgets('ProfileTabScreen: renders seamlessly on narrow mobile screens (340dp width) without RenderFlex overflow', (WidgetTester tester) async {
+    // Exact screen width constraints where overflow was observed (e.g. 339.4dp width)
+    tester.view.physicalSize = const Size(340, 750);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+
+    // 1. Tab 0: Safety & SOS
+    await tester.pumpWidget(buildTestableProfileTab(initialSegment: 0));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    expect(find.text('Nearest Emergency Facilities'), findsOneWidget);
+    expect(find.text('TRAVERZA PASSPORT'), findsOneWidget);
+
+    // 2. Tab 1: Preferences
+    await tester.tap(find.text('Preferences'));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    expect(find.text('Corridor Travel Preferences'), findsOneWidget);
+
+    // 3. Tab 2: Vault
+    await tester.tap(find.text('Vault'));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    expect(find.text('Digital Documents Vault'), findsOneWidget);
+
+    // 4. Tab 3: Settings
+    await tester.tap(find.text('Settings'));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    expect(find.text('Account & Device Security'), findsOneWidget);
+  });
 }

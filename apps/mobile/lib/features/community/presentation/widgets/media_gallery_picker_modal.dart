@@ -1,5 +1,8 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../../theme/app_theme.dart';
+import '../../../../widgets/creative_experience_tab_switcher.dart';
 
 class SelectedMediaItem {
   final String mediaUrl;
@@ -190,6 +193,9 @@ class _MediaGalleryPickerModalState extends State<MediaGalleryPickerModal> with 
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this, initialIndex: widget.initialTabIndex);
+    _tabController.addListener(() {
+      if (mounted) setState(() {});
+    });
     if (_galleryPhotos.isNotEmpty) {
       _selectedItem = _galleryPhotos.first;
     }
@@ -261,27 +267,36 @@ class _MediaGalleryPickerModalState extends State<MediaGalleryPickerModal> with 
           ),
           const SizedBox(height: 8),
 
-          // Tab Bar: Gallery Photos, Video Clips, File Storage
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 20),
-            decoration: BoxDecoration(
-              color: TraverzaColors.background,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: TraverzaColors.border),
-            ),
-            child: TabBar(
-              controller: _tabController,
-              indicator: BoxDecoration(
-                color: TraverzaColors.secondary,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              labelColor: Colors.white,
-              unselectedLabelColor: TraverzaColors.textMuted,
-              labelStyle: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold),
-              tabs: const [
-                Tab(icon: Icon(Icons.photo_library_rounded, size: 18), text: 'Gallery'),
-                Tab(icon: Icon(Icons.videocam_rounded, size: 18), text: 'Videos'),
-                Tab(icon: Icon(Icons.folder_open_rounded, size: 18), text: 'Open Files'),
+          // Creative Segmented Tab Switcher: Gallery Photos, Video Clips, File Storage
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: CreativeExperienceTabSwitcher(
+              selectedIndex: _tabController.index,
+              onTabChanged: (index) {
+                _tabController.animateTo(index);
+                setState(() {});
+              },
+              isDarkTheme: false,
+              height: 48,
+              items: const [
+                CreativeExperienceTabItem(
+                  label: 'Gallery',
+                  icon: Icons.photo_library_rounded,
+                  badge: 'HDR',
+                  gradientColors: [Color(0xFF0284C7), Color(0xFF0369A1), Color(0xFF075985)],
+                ),
+                CreativeExperienceTabItem(
+                  label: 'Videos',
+                  icon: Icons.videocam_rounded,
+                  badge: '4K',
+                  gradientColors: [Color(0xFFD97706), Color(0xFFB45309), Color(0xFF92400E)],
+                ),
+                CreativeExperienceTabItem(
+                  label: 'Open Files',
+                  icon: Icons.folder_open_rounded,
+                  badge: 'STORAGE',
+                  gradientColors: [Color(0xFF059669), Color(0xFF047857), Color(0xFF065F46)],
+                ),
               ],
             ),
           ),
@@ -601,6 +616,60 @@ class _MediaGalleryPickerModalState extends State<MediaGalleryPickerModal> with 
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
+        // Real Device Storage Browse Button
+        InkWell(
+          onTap: () async {
+            try {
+              final files = await FilePicker.pickFiles();
+              if (files.isNotEmpty) {
+                final f = files.first;
+                final path = f.path ?? f.uri.toString();
+                final len = f.lengthSync();
+                final isVid = ['mp4', 'mov', 'avi', 'mkv'].contains(f.extension?.toLowerCase());
+                final item = SelectedMediaItem(
+                  mediaUrl: path,
+                  mediaType: isVid ? 'video' : 'image',
+                  fileName: f.name,
+                  fileSize: len != null && len > 0 ? '${(len / 1024).toStringAsFixed(1)} KB' : 'File',
+                  locationTag: 'Device Storage',
+                );
+                setState(() {
+                  _selectedItem = item;
+                });
+              }
+            } catch (_) {}
+          },
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [TraverzaColors.secondary, Color(0xFF0E7490)],
+              ),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: TraverzaColors.secondary.withValues(alpha: 0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Icon(Icons.folder_open_rounded, color: Colors.white, size: 20),
+                SizedBox(width: 8),
+                Text(
+                  'Browse Device Storage / Files',
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                ),
+              ],
+            ),
+          ),
+        ),
+
         // Custom File Path or URL Input
         Container(
           padding: const EdgeInsets.all(12),
@@ -676,47 +745,51 @@ class _MediaGalleryPickerModalState extends State<MediaGalleryPickerModal> with 
                 width: isSelected ? 1.8 : 1,
               ),
             ),
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: isVid ? TraverzaColors.secondary.withValues(alpha: 0.15) : TraverzaColors.oceanBlue.withValues(alpha: 0.15),
-                  shape: BoxShape.circle,
+            child: Material(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(12),
+              child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: isVid ? TraverzaColors.secondary.withValues(alpha: 0.15) : TraverzaColors.oceanBlue.withValues(alpha: 0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    isVid ? Icons.videocam_rounded : Icons.image_rounded,
+                    color: isVid ? TraverzaColors.secondary : TraverzaColors.oceanBlue,
+                    size: 20,
+                  ),
                 ),
-                child: Icon(
-                  isVid ? Icons.videocam_rounded : Icons.image_rounded,
-                  color: isVid ? TraverzaColors.secondary : TraverzaColors.oceanBlue,
-                  size: 20,
+                title: Text(
+                  f['name']!,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12.5),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
+                subtitle: Text(
+                  '${f['path']} · ${f['size']}',
+                  style: const TextStyle(fontSize: 10, color: TraverzaColors.textMuted),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                trailing: isSelected
+                    ? const Icon(Icons.check_circle_rounded, color: TraverzaColors.secondary, size: 20)
+                    : const Icon(Icons.radio_button_unchecked_rounded, color: TraverzaColors.textMuted, size: 20),
+                onTap: () {
+                  setState(() {
+                    _selectedItem = SelectedMediaItem(
+                      mediaUrl: f['url']!,
+                      thumbnailUrl: f['url']!,
+                      mediaType: f['type']!,
+                      fileName: f['name']!,
+                      fileSize: f['size']!,
+                      durationSeconds: isVid ? 18 : null,
+                    );
+                  });
+                },
               ),
-              title: Text(
-                f['name']!,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12.5),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              subtitle: Text(
-                '${f['path']} · ${f['size']}',
-                style: const TextStyle(fontSize: 10, color: TraverzaColors.textMuted),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              trailing: isSelected
-                  ? const Icon(Icons.check_circle_rounded, color: TraverzaColors.secondary, size: 20)
-                  : const Icon(Icons.radio_button_unchecked_rounded, color: TraverzaColors.textMuted, size: 20),
-              onTap: () {
-                setState(() {
-                  _selectedItem = SelectedMediaItem(
-                    mediaUrl: f['url']!,
-                    thumbnailUrl: f['url']!,
-                    mediaType: f['type']!,
-                    fileName: f['name']!,
-                    fileSize: f['size']!,
-                    durationSeconds: isVid ? 18 : null,
-                  );
-                });
-              },
             ),
           );
         }),

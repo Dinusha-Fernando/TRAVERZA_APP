@@ -133,7 +133,7 @@ void main() {
   });
 
   group('TRAVERZA Authentication Flow (Sign In, Demo Switch, Sign Out)', () {
-    testWidgets('Signing out to Guest Mode displays guest banner and updates passport', (tester) async {
+    testWidgets('Signing out displays sign-in banner and updates passport', (tester) async {
       tester.view.physicalSize = const Size(1080, 2400);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -150,8 +150,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(auth.isAuthenticated, isFalse);
-      expect(find.text('Guest Explorer Mode · Sign in to save digital passport and sync bookings.'), findsOneWidget);
-      expect(find.text('Guest Traveller'), findsAtLeastNWidgets(1));
+      expect(find.text('Sign in to save digital passport and sync bookings.'), findsOneWidget);
+      expect(find.text('Traveller'), findsAtLeastNWidgets(1));
     });
 
     testWidgets('Switching to Demo Account updates profile immediately', (tester) async {
@@ -181,7 +181,7 @@ void main() {
       expect(find.text('Alexander Wright'), findsAtLeastNWidgets(1));
     });
 
-    testWidgets('AuthSheet renders Sign In and Register tabs with 1-tap demo logins', (tester) async {
+    testWidgets('AuthSheet renders Sign In and Register tabs with real authentication forms', (tester) async {
       tester.view.physicalSize = const Size(1080, 2400);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -197,19 +197,24 @@ void main() {
       expect(find.text('One island. One connected trip.'), findsOneWidget);
       expect(find.text('Sign In'), findsAtLeastNWidgets(1));
       expect(find.text('Register Account'), findsOneWidget);
-      expect(find.text('Quick Pilot Login:'), findsOneWidget);
-      expect(find.text('Sarah'), findsOneWidget);
-      expect(find.text('Alexander'), findsOneWidget);
+      expect(find.text('Quick Pilot Login:'), findsNothing);
+      expect(find.text('Continue with Google'), findsOneWidget);
 
-      // Tap Sarah demo button
-      await tester.tap(find.text('Sarah'));
+      // Enter real credentials and submit
+      final emailField = find.widgetWithText(TextFormField, 'Email Address');
+      await tester.enterText(emailField, 'maya.rathnayake@traverza.lk');
+
+      final passwordField = find.widgetWithText(TextFormField, 'Password');
+      await tester.enterText(passwordField, 'MayaSecurePass123!');
       await tester.pumpAndSettle();
 
-      expect(TraverzaAuthService.instance.currentProfile.fullName, 'Sarah Jenkins');
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Sign In to Account'));
+      await tester.pumpAndSettle();
+
       expect(TraverzaAuthService.instance.isAuthenticated, isTrue);
     });
 
-    testWidgets('Deleting profile prompts confirmation dialog and resets to guest state', (tester) async {
+    testWidgets('Deleting profile prompts confirmation dialog and resets session', (tester) async {
       final auth = TraverzaAuthService.instance;
       expect(auth.isAuthenticated, isTrue);
 
@@ -236,16 +241,16 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(auth.isAuthenticated, isFalse);
-      expect(auth.currentProfile.fullName, 'Guest Traveller');
+      expect(auth.currentProfile.fullName, 'Traveller');
     });
 
-    testWidgets('Safety SOS Vault remains 100% accessible even in Guest mode', (tester) async {
+    testWidgets('Safety SOS Vault remains 100% accessible even when unauthenticated', (tester) async {
       tester.view.physicalSize = const Size(1080, 2400);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
 
       final auth = TraverzaAuthService.instance;
-      auth.signOut(); // Ensure guest mode
+      auth.signOut(); // Ensure signed out
 
       await tester.pumpWidget(buildTestableWidget(const ProfileTabScreen(initialSegment: 0)));
       await tester.pumpAndSettle();

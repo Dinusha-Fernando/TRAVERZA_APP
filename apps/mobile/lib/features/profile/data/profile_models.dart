@@ -295,16 +295,16 @@ class TravellerProfile {
         ],
       );
 
-  /// Guest profile when signed out
-  static TravellerProfile get guestProfile => const TravellerProfile(
-        id: 'TRV-GUEST-001',
-        fullName: 'Guest Traveller',
-        email: 'guest@traverza.lk',
+  /// Profile when signed out (unauthenticated)
+  static TravellerProfile get unauthenticatedProfile => const TravellerProfile(
+        id: 'TRV-LOCAL-001',
+        fullName: 'Traveller',
+        email: '',
         phone: '+94 00 000 0000',
-        nationality: 'International Visitor',
-        membershipTier: 'Guest Explorer',
+        nationality: 'Visitor',
+        membershipTier: 'Standard',
         tierLevel: 1,
-        sltdaLicenseNo: 'GUEST_UNREGISTERED',
+        sltdaLicenseNo: 'PENDING_VERIFICATION',
         isSltdaRegistered: false,
         isKycVerified: false,
         memberSince: 'October 2026',
@@ -333,4 +333,6 @@ class TravellerProfile {
         ),
         documents: [],
       );
+
+  static TravellerProfile get guestProfile => unauthenticatedProfile;
 }

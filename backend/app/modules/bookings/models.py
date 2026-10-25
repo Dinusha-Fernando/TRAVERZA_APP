@@ -1,7 +1,7 @@
 import uuid
 from datetime import UTC, datetime
 
-from sqlalchemy import BigInteger, ForeignKey, String, Text
+from sqlalchemy import BigInteger, DateTime, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -26,8 +26,8 @@ class QuoteSnapshot(Base, UUIDMixin, TimestampMixin):
     currency: Mapped[str] = mapped_column(String(3), default="LKR", nullable=False)
     inclusions_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     cancellation_terms: Mapped[str] = mapped_column(String(100), nullable=False)
-    expires_at: Mapped[datetime] = mapped_column(nullable=False)
-    captured_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(UTC), nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    captured_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False)
 
 
 class ServiceBooking(Base, UUIDMixin, TimestampMixin):
@@ -52,8 +52,8 @@ class ServiceBooking(Base, UUIDMixin, TimestampMixin):
     status: Mapped[str] = mapped_column(String(50), default="REQUEST_SUBMITTED", nullable=False, index=True)
     amount_minor: Mapped[int] = mapped_column(BigInteger, nullable=False)
     currency: Mapped[str] = mapped_column(String(3), default="LKR", nullable=False)
-    response_deadline_at: Mapped[datetime] = mapped_column(nullable=False)
-    confirmed_at: Mapped[datetime | None] = mapped_column(nullable=True)
+    response_deadline_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    confirmed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     cancellation_reason: Mapped[str | None] = mapped_column(String(255), nullable=True)
     voucher_code: Mapped[str | None] = mapped_column(String(50), nullable=True)
     signed_voucher_token: Mapped[str | None] = mapped_column(Text, nullable=True)

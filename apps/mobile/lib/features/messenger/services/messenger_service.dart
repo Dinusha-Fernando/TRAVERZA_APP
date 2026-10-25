@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter/widgets.dart';
 import '../models/messenger_models.dart';
 
 class MessengerService extends ChangeNotifier {
@@ -272,7 +274,13 @@ class MessengerService extends ChangeNotifier {
     final idx = _conversations.indexWhere((c) => c.id == conversationId);
     if (idx != -1 && _conversations[idx].unreadCount > 0) {
       _conversations[idx] = _conversations[idx].copyWith(unreadCount: 0);
-      notifyListeners();
+      if (WidgetsBinding.instance.schedulerPhase == SchedulerPhase.persistentCallbacks) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          notifyListeners();
+        });
+      } else {
+        notifyListeners();
+      }
     }
   }
 
@@ -351,6 +359,30 @@ class MessengerService extends ChangeNotifier {
         mediaType: 'video',
         durationSeconds: durationSeconds,
         thumbnailUrl: thumbnailUrl ?? 'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=800&q=80',
+        caption: caption,
+      ),
+    );
+  }
+
+  void sendFileMessage({
+    required String conversationId,
+    required String fileUrl,
+    required String fileName,
+    required String fileSize,
+    String? fileExtension,
+    String? caption,
+  }) {
+    final ext = fileExtension ?? (fileName.contains('.') ? fileName.split('.').last.toUpperCase() : 'DOC');
+    sendMessage(
+      conversationId: conversationId,
+      textContent: caption?.trim().isNotEmpty == true ? caption! : 'Shared document: $fileName',
+      messageType: MessageTypeEnum.file,
+      mediaAttachment: MediaAttachmentModel(
+        mediaUrl: fileUrl,
+        mediaType: 'file',
+        fileName: fileName,
+        fileSize: fileSize,
+        fileExtension: ext,
         caption: caption,
       ),
     );

@@ -4,6 +4,7 @@ import '../../../../theme/app_theme.dart';
 import '../../../../utils/maps_launcher.dart';
 import '../../auth/services/auth_service.dart';
 import '../../auth/presentation/auth_sheet.dart';
+import '../../auth/presentation/welcome_auth_screen.dart';
 import '../data/profile_models.dart';
 import 'widgets/digital_passport_card.dart';
 import 'widgets/profile_sheets.dart';
@@ -80,7 +81,7 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                 const SizedBox(width: 10),
                 const Expanded(
                   child: Text(
-                    'Guest Explorer Mode · Sign in to save digital passport and sync bookings.',
+                    'Sign in to save digital passport and sync bookings.',
                     style: TextStyle(fontSize: 11.5, color: TraverzaColors.text, fontWeight: FontWeight.w500),
                   ),
                 ),
@@ -392,20 +393,26 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: const [
-                      Icon(Icons.near_me_rounded, color: TraverzaColors.roseEmergency, size: 18),
-                      SizedBox(width: 6),
-                      Text(
-                        'Nearest Emergency Facilities',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: TraverzaColors.text,
+                  Expanded(
+                    child: Row(
+                      children: const [
+                        Icon(Icons.near_me_rounded, color: TraverzaColors.roseEmergency, size: 18),
+                        SizedBox(width: 6),
+                        Flexible(
+                          child: Text(
+                            'Nearest Emergency Facilities',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: TraverzaColors.text,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
+                  const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
@@ -583,9 +590,12 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                   children: [
                     Row(
                       children: [
-                        Text(
-                          _profile.emergencyContact.name,
-                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: TraverzaColors.text),
+                        Flexible(
+                          child: Text(
+                            _profile.emergencyContact.name,
+                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: TraverzaColors.text),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                         const SizedBox(width: 6),
                         Container(
@@ -693,20 +703,23 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text(
-                  'Corridor Travel Preferences',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: TraverzaColors.text),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  'Customises route buffering, vehicles, dining and language.',
-                  style: TextStyle(fontSize: 11.5, color: TraverzaColors.textMuted),
-                ),
-              ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  Text(
+                    'Corridor Travel Preferences',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: TraverzaColors.text),
+                  ),
+                  SizedBox(height: 2),
+                  Text(
+                    'Customises route buffering, vehicles, dining and language.',
+                    style: TextStyle(fontSize: 11.5, color: TraverzaColors.textMuted),
+                  ),
+                ],
+              ),
             ),
+            const SizedBox(width: 8),
             IconButton(
               icon: const Icon(Icons.restore_rounded, color: TraverzaColors.secondary),
               tooltip: 'Reset to Defaults',
@@ -944,20 +957,23 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text(
-                  'Digital Documents Vault',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: TraverzaColors.text),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  'Encrypted offline travel credentials & SLTDA verifications.',
-                  style: TextStyle(fontSize: 11.5, color: TraverzaColors.textMuted),
-                ),
-              ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  Text(
+                    'Digital Documents Vault',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: TraverzaColors.text),
+                  ),
+                  SizedBox(height: 2),
+                  Text(
+                    'Encrypted offline travel credentials & SLTDA verifications.',
+                    style: TextStyle(fontSize: 11.5, color: TraverzaColors.textMuted),
+                  ),
+                ],
+              ),
             ),
+            const SizedBox(width: 8),
             ElevatedButton.icon(
               onPressed: () {
                 _showFeedback('Opening Camera / Document Scanner...');
@@ -1033,16 +1049,15 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      Wrap(
+                        alignment: WrapAlignment.spaceBetween,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 8,
+                        runSpacing: 4,
                         children: [
-                          Expanded(
-                            child: Text(
-                              doc.title,
-                              style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.bold, color: TraverzaColors.text),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                          Text(
+                            doc.title,
+                            style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.bold, color: TraverzaColors.text),
                           ),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -1068,11 +1083,15 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                         style: const TextStyle(fontSize: 11, color: TraverzaColors.text),
                       ),
                       const SizedBox(height: 10),
-                      Row(
+                      Wrap(
+                        spacing: 12,
+                        runSpacing: 6,
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           InkWell(
                             onTap: () => ProfileSheets.showDocumentDetailsModal(context, doc),
                             child: Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: const [
                                 Icon(Icons.remove_red_eye_rounded, size: 14, color: TraverzaColors.secondary),
                                 SizedBox(width: 4),
@@ -1083,10 +1102,10 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                               ],
                             ),
                           ),
-                          const SizedBox(width: 16),
                           InkWell(
                             onTap: () => _showFeedback('Certificate for ${doc.title} is verified by SLTDA'),
                             child: Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: const [
                                 Icon(Icons.verified_outlined, size: 14, color: TraverzaColors.emeraldSuccess),
                                 SizedBox(width: 4),
@@ -1141,10 +1160,14 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Account & Profile',
-                      style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.bold, color: TraverzaColors.text),
+                    const Flexible(
+                      child: Text(
+                        'Account & Profile',
+                        style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.bold, color: TraverzaColors.text),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
+                    const SizedBox(width: 8),
                     if (_authService.isAuthenticated)
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -1165,7 +1188,7 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: const Text(
-                          'Guest Mode',
+                          'Signed Out',
                           style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: TraverzaColors.primary),
                         ),
                       ),
@@ -1205,12 +1228,12 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              _authService.isAuthenticated ? _profile.fullName : 'Guest Explorer',
+                              _authService.isAuthenticated ? _profile.fullName : 'Traveller (Signed Out)',
                               style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: TraverzaColors.text),
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              _authService.isAuthenticated ? _profile.email : 'Explore as guest or sign in to sync',
+                              _authService.isAuthenticated ? _profile.email : 'Sign in to access and sync credentials',
                               style: const TextStyle(fontSize: 11, color: TraverzaColors.textMuted),
                             ),
                           ],
@@ -1256,17 +1279,26 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                   trailing: const Icon(Icons.chevron_right_rounded, size: 18, color: TraverzaColors.textMuted),
                   onTap: () => AuthSheet.show(context),
                 ),
+                const Divider(height: 1),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.flight_takeoff_rounded, color: TraverzaColors.accent, size: 20),
+                  title: const Text('Welcome & Onboarding Portal', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold)),
+                  subtitle: const Text('View the full-screen Sri Lanka arrival experience', style: TextStyle(fontSize: 10.5, color: TraverzaColors.textMuted)),
+                  trailing: const Icon(Icons.chevron_right_rounded, size: 18, color: TraverzaColors.textMuted),
+                  onTap: () => WelcomeAuthScreen.show(context),
+                ),
                 if (_authService.isAuthenticated) ...[
                   const Divider(height: 1),
                   ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: const Icon(Icons.logout_rounded, color: TraverzaColors.amberWarning, size: 20),
-                    title: const Text('Sign Out to Guest Mode', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: TraverzaColors.amberWarning)),
-                    subtitle: const Text('Return to guest state while preserving emergency features', style: TextStyle(fontSize: 10.5, color: TraverzaColors.textMuted)),
+                    title: const Text('Sign Out', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: TraverzaColors.amberWarning)),
+                    subtitle: const Text('Sign out of your session while preserving offline emergency features', style: TextStyle(fontSize: 10.5, color: TraverzaColors.textMuted)),
                     trailing: const Icon(Icons.chevron_right_rounded, size: 18, color: TraverzaColors.textMuted),
                     onTap: () {
                       _authService.signOut();
-                      _showFeedback('Signed out to Guest Mode');
+                      _showFeedback('Signed out');
                     },
                   ),
                   const Divider(height: 1),
@@ -1349,7 +1381,14 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Payment Gateways', style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.bold, color: TraverzaColors.text)),
+                    const Expanded(
+                      child: Text(
+                        'Payment Gateways',
+                        style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.bold, color: TraverzaColors.text),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
                     TextButton.icon(
                       onPressed: () => _showFeedback('Add Card modal opened'),
                       icon: const Icon(Icons.add, size: 14),
@@ -1392,7 +1431,11 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
           child: OutlinedButton.icon(
             onPressed: () => _showFeedback('Local cache cleared (142 MB freed)'),
             icon: const Icon(Icons.cleaning_services_rounded, size: 16),
-            label: const Text('Clear Offline Corridor Cache (142 MB)', style: TextStyle(fontSize: 12)),
+            label: const Text(
+              'Clear Offline Corridor Cache (142 MB)',
+              style: TextStyle(fontSize: 12),
+              overflow: TextOverflow.ellipsis,
+            ),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 12),
               side: const BorderSide(color: TraverzaColors.border),

@@ -77,62 +77,71 @@ class DigitalPassportCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
-                          ),
-                          child: const Row(
-                            children: [
-                              Icon(Icons.flight_takeoff_rounded, color: TraverzaColors.sand, size: 13),
-                              SizedBox(width: 5),
-                              Text(
+                    Flexible(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.flight_takeoff_rounded, color: TraverzaColors.sand, size: 12),
+                            SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
                                 'TRAVERZA PASSPORT',
                                 style: TextStyle(
-                                  fontSize: 10,
+                                  fontSize: 9.5,
                                   fontWeight: FontWeight.w800,
-                                  letterSpacing: 1.1,
+                                  letterSpacing: 0.8,
                                   color: Colors.white,
                                 ),
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.15),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.star_rounded, size: 12, color: Colors.white),
-                          const SizedBox(width: 3),
-                          Text(
-                            profile.membershipTier.toUpperCase(),
-                            style: const TextStyle(
-                              fontSize: 9.5,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 0.8,
-                              color: Colors.white,
                             ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
                           ),
-                        ],
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.15),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.star_rounded, size: 12, color: Colors.white),
+                            const SizedBox(width: 3),
+                            Flexible(
+                              child: Text(
+                                profile.membershipTier.toUpperCase(),
+                                style: const TextStyle(
+                                  fontSize: 9.0,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 0.6,
+                                  color: Colors.white,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -299,8 +308,8 @@ class DigitalPassportCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
 
-                // Action Buttons: Digital QR Pass & Edit Profile or Guest Sign In
-                if (profile.id == 'TRV-GUEST-001' && onSignIn != null) ...[
+                // Action Buttons: Digital QR Pass & Edit Profile or Sign In
+                if (!profile.isSltdaRegistered && onSignIn != null) ...[
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
@@ -324,10 +333,11 @@ class DigitalPassportCard extends StatelessWidget {
                       Expanded(
                         child: ElevatedButton.icon(
                           onPressed: onShowQrPass,
-                          icon: const Icon(Icons.qr_code_rounded, size: 16),
+                          icon: const Icon(Icons.qr_code_rounded, size: 15),
                           label: const Text(
                             'Digital QR Pass',
-                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                            style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold),
+                            overflow: TextOverflow.ellipsis,
                           ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
@@ -340,19 +350,22 @@ class DigitalPassportCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 10),
-                      OutlinedButton.icon(
-                        onPressed: onEditProfile,
-                        icon: const Icon(Icons.tune_rounded, size: 15, color: Colors.white),
-                        label: const Text(
-                          'Edit Preferences',
-                          style: TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.w600),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: Colors.white.withValues(alpha: 0.4)),
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: onEditProfile,
+                          icon: const Icon(Icons.tune_rounded, size: 14, color: Colors.white),
+                          label: const Text(
+                            'Edit Preferences',
+                            style: TextStyle(fontSize: 11.5, color: Colors.white, fontWeight: FontWeight.w600),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(color: Colors.white.withValues(alpha: 0.4)),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                           ),
                         ),
                       ),
